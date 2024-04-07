@@ -58,10 +58,10 @@ end
 function DumbellService:Lift(player: Player): nil
 	AssertPlayer(player)
 
-	self._sound:PlayFor(player, "Train")
 	local dumbellInfo = self._playerDumbellInfo[player.UserId]
 	if not dumbellInfo.Equipped then return end
 	if dumbellInfo.LiftDebounce then return end
+	self._sound:PlayFor(player, "Train")
 	dumbellInfo.LiftDebounce = true
 	self._playerDumbellInfo[player.UserId] = dumbellInfo
 

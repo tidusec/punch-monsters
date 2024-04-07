@@ -13,7 +13,7 @@ local defaultCameraMinZoom = player.CameraMinZoomDistance
 local character = player.Character or player.CharacterAdded:Wait()
 local characterRoot = character:WaitForChild("HumanoidRootPart")
 
-local COOLDOWN = 0.5
+local COOLDOWN = 1.75
 
 local SitupBench: Component.Def = {
 	Name = script.Name;
@@ -81,7 +81,7 @@ function SitupBench:Initialize(): nil
 	
 	self._benchTemplate = SitupBenchTemplate[self.Instance.Parent.Parent.Name][self.Instance.Name]
 	self._absRequirement = self._benchTemplate.AbsRequirement
-	self:AddToJanitor(self._proximityPrompt.Triggered:Connect(function(player)
+	self:AddToJanitor(self._proximityPrompt.Triggered:Connect(function()
 		self:Enter()
 	end))
 	self:AddToJanitor(self._exitBench.MouseButton1Click:Connect(function()
