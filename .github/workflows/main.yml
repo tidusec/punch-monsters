@@ -11,11 +11,10 @@ jobs:
         uses: tsickert/discord-webhook@v5.3.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          embed-title: 'New commit in ${{ github.repository }}'
-          embed-description: |
-            Commit: ${{ github.sha }}
-            Message: ${{ github.event.head_commit.message }}
-            Author: ${{ github.event.head_commit.author.name }}
+          embed-title: 'New update in ${{ github.repository }}'
+          embed-description: 'Author: ${{ github.event.head_commit.author.name }}'
           embed-url: 'https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
-          embed-color: 16711680 # This is the color red in decimal
-          embed-footer-text: 'GitHub Actions'
+          embed-color: 3447003 # This is the color blue in decimal
+          embed-footer-text: 'Click title to view commit'
+          embed-author-name: ${{ github.event.head_commit.author.name }}
+          embed-author-icon-url: ${{ github.event.head_commit.author.avatar_url }}
