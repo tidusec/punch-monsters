@@ -7,16 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Send Discord message
-        uses: discord-actions/message@v2
+        uses: Ilshidur/action-discord@2.4.5
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          message: |
-            A new commit has been pushed to ${{ github.repository }}.
-            Commit: ${{ github.sha }}
-            Message: ${{ github.event.head_commit.message }}
-            Author: ${{ github.event.head_commit.author.name }}
-            URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
-          username: 'GitHub Actions'
+          args: >
+            {
+              "username": "GitHub Actions",
+              "content": "A new commit has been pushed to ${{ github.repository }}.\nCommit: ${{ github.sha }}\nMessage: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.event.head_commit.author.name }}\nURL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+            }
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
