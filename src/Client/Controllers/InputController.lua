@@ -48,8 +48,7 @@ end
 
 local function liftDumbell(): nil
 	local dumbell = Knit.GetService("DumbellService")
-	dumbell:Lift()
-	return
+	return dumbell:Lift()
 end
 
 local InputTypeMap = {
@@ -87,7 +86,7 @@ function InputController:KnitStart(): nil
 			if destroyAutoTrainClicker then
 				destroyAutoTrainClicker()
 			end
-			destroyAutoTrainClicker = scheduler:Every("0.5 seconds", function()
+			destroyAutoTrainClicker = scheduler:Every("0.05 seconds", function()
 				task.spawn(liftDumbell)
 			end)
 			return
@@ -101,8 +100,8 @@ function InputController:KnitStart(): nil
 				end
 				return
 			end
-			startAutoTrain()
-			return
+			
+			return startAutoTrain()
 		end)
 		return
 	end)
@@ -122,7 +121,7 @@ function InputController:ExecuteAction(input: InputObject, type: "UserInputType"
 		local actionMap = if type == "KeyCode" then KeyboardInputMap else InputTypeMap
 		for inputType in pairs(actionMap) do
 			if (Enum :: any)[type][inputType] then continue end
-			warn(`Listening for input on invalid {if type == "KeyCode" then "keycode" else "input type"}: {inputType}`)
+			warn(`Listening for input on invalid {if type == "KeyCode" then "key code" else "input type"}: {inputType}`)
 		end
 		
 		local actionName: string = (input :: any)[type].Name

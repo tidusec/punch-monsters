@@ -27,7 +27,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local characterRoot = character:WaitForChild("HumanoidRootPart")
 
 local MAX_BAG_DISTANCE = 6
-local COOLDOWN = 0.1
+local COOLDOWN = 0.3
 
 local PunchingBag: Component.Def = {
 	Name = script.Name;
@@ -43,11 +43,12 @@ local PunchingBag: Component.Def = {
 	};
 }
 
-function PunchingBag:Initialize(): nil	
+function PunchingBag:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 	self._gamepass = Knit.GetService("GamepassService")
 	self._dumbell = Knit.GetService("DumbellService")
 	self._animation = Knit.GetService("AnimationService")
+	self._sound = Knit.GetService("SoundService")
 	local scheduler = Knit.GetController("SchedulerController")
 	local destroyAutoTrainClicker
 
@@ -56,8 +57,8 @@ function PunchingBag:Initialize(): nil
 			self._janitor:RemoveNoClean("AutoTrain")
 			destroyAutoTrainClicker()
 		end
-		destroyAutoTrainClicker = scheduler:Every("0.5 seconds", function()
-			self:Punch()
+		destroyAutoTrainClicker = scheduler:Every("0.05 second", function(): nil
+			return self:Punch()
 		end)
 		self:AddToJanitor(destroyAutoTrainClicker, true, "AutoTrain")
 		return
@@ -72,11 +73,10 @@ function PunchingBag:Initialize(): nil
 			end
 			return
 		end
-		startAutoTrain()
-		return
+		return startAutoTrain()
 	end))
 
-	self._jab1 = false
+	self._jab1 = true
 	return
 end
 
@@ -109,33 +109,34 @@ function PunchingBag:Punch(): nil
 	
 	local mapName = self.Instance.Parent.Parent.Name
 	local bagTemplate = PunchBagsTemplate[mapName][self.Instance.Name]
-	local punchStrength = self._data:GetTotalStrength("Punch")
+	local punchStrength, strengthMultiplier = self._data:GetTotalStrength("Punch")
 	if punchStrength < bagTemplate.PunchRequirement then return end
-	self.Attributes.PunchDebounce = true
 	
-	local punchAnim = if self._jab1 then "Jab" else "Jab2"
-	self._animation:Play(punchAnim, 1.5)
-	self._jab1 = not self._jab1
-	task.delay(COOLDOWN, function()
-		self.Attributes.PunchDebounce = false
+	self.Attributes.PunchDebounce = true
+	task.spawn(function(): nil
+		local punchAnim = if self._jab1 then "Jab" else "Jab2"
+		self._animation:Play(punchAnim, 1)
+		self._jab1 = not self._jab1
+		task.delay(COOLDOWN, function()
+			self.Attributes.PunchDebounce = false
+		end)
+		return
 	end)
 
-	local strengthMultiplier = self._data:GetTotalStrengthMultiplier(player)
 	local hasVIP =  self._gamepass:DoesPlayerOwn("VIP")
 	if bagTemplate.Vip and not hasVIP then
 		return self._gamepass:PromptPurchase("VIP")
 	end
 	
-	Sound.Master.Punch:Play()
+	self._sound:Play("Punch")
 	task.spawn(function()
 		cameraShaker:Shake(CameraShaker.Presets.Rock)
 		local vfx = PunchBagsTemplate[mapName].VFX:Clone()
 		vfx.Parent = self.Instance.Cylinder
-		Debris:AddItem(vfx, 0.5)
+		Debris:AddItem(vfx, 0.7)
 	end)
 
-	self._data:IncrementValue("PunchStrength", bagTemplate.Hit * strengthMultiplier)
-	return
+	return self._data:IncrementValue("PunchStrength", bagTemplate.Hit * strengthMultiplier)
 end
 
 return Component.new(PunchingBag)

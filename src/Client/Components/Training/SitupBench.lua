@@ -13,7 +13,7 @@ local defaultCameraMinZoom = player.CameraMinZoomDistance
 local character = player.Character or player.CharacterAdded:Wait()
 local characterRoot = character:WaitForChild("HumanoidRootPart")
 
-local COOLDOWN = 1.75
+local COOLDOWN = 1.5
 
 local SitupBench: Component.Def = {
 	Name = script.Name;
@@ -51,7 +51,7 @@ function SitupBench:Initialize(): nil
 			self._janitor:RemoveNoClean("AutoTrain")
 			destroyAutoTrainClicker()
 		end
-		destroyAutoTrainClicker = scheduler:Every("0.5 seconds", function()
+		destroyAutoTrainClicker = scheduler:Every("0.05 seconds", function()
 			self:Situp()
 		end)
 		self:AddToJanitor(destroyAutoTrainClicker, true, "AutoTrain")
@@ -128,7 +128,7 @@ function SitupBench:Situp(): nil
 		self.Attributes.SitupDebounce = false
 	end)
 
-	self._animation:Play("Situp", 1.75)
+	self._animation:Play("Situp", 1.5)
 	Sound.Master.Train:Play()
 	local strengthMultiplier = self._data:GetTotalStrengthMultiplier(player)
 	local hasVIP =  self._gamepass:DoesPlayerOwn("VIP")

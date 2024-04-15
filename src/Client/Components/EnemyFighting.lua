@@ -1,5 +1,7 @@
 --!native
 --!strict
+
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Sound = game:GetService("SoundService")
 local Players = game:GetService("Players")
@@ -75,7 +77,7 @@ function EnemyFighting:Initialize(): nil
 			self._janitor:RemoveNoClean("AutoFight")
 			destroyAutoFightClicker()
 		end
-		destroyAutoFightClicker = scheduler:Every("0.25 seconds", function()
+		destroyAutoFightClicker = scheduler:Every("0.05 seconds", function()
 			self:Attack()
 		end)
 		self:AddToJanitor(destroyAutoFightClicker, true, "AutoFight")
@@ -142,6 +144,7 @@ function EnemyFighting:Toggle(on: boolean): nil
 	self._remoteDispatcher:SetShiftLockOption(not on)
 	return
 end
+
 
 function EnemyFighting:Enter(): nil
 	if self._dumbell:IsEquipped() then return end
@@ -325,3 +328,5 @@ function EnemyFighting:Kill(): nil
 end
 
 return Component.new(EnemyFighting)
+
+

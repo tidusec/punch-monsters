@@ -15,23 +15,21 @@ local UIController = Knit.CreateController {
 
 function UIController:KnitStart(): nil
 	self._blur = Knit.GetController("BlurController")
-	task.delay(5, function()
-		Knit.GetService("RemoteDispatcher"):InitializeClientUpdate()
-	end)
 	return
 end
 
 function UIController:KnitInit(): nil
 	task.spawn(function()
 		repeat 
-			local success = pcall(function() 
-				StarterGui:SetCore("ResetButtonCallback", false) 
+			local success = pcall(function(): nil
+				return StarterGui:SetCore("ResetButtonCallback", false) 
 			end)
 			task.wait(1)
 		until success
 	end)
 	return
 end
+
 
 function UIController:SetScreen(name: string, blur: boolean?): ScreenGui?
 	if blur ~= nil then

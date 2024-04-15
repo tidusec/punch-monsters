@@ -75,17 +75,18 @@ function LoadScreen:Activate(): nil
 	self:AnimateBar()
 	
 	self._bar.Title.Text = "Loading decals, sounds, meshes..."
-	task.delay(1, function()
+	task.delay(1, function(): nil
 		self._bar.Skip.Visible = true
+		return
 	end)
 
-	self:AddToJanitor(self._bar.Skip.MouseButton1Click:Connect(function()
-		self._preloader.FinishedLoading:Fire()
+	self:AddToJanitor(self._bar.Skip.MouseButton1Click:Connect(function(): nil
+		return self._preloader.FinishedLoading:Fire()
 	end))
 
-	self:AddToJanitor(self._preloader.ContentLoaded:Connect(function()
+	self:AddToJanitor(self._preloader.ContentLoaded:Connect(function(): nil
 		local loaded: number = self._preloader:GetLoaded()
-		self:UpdateProgressBar(loaded / self._preloader:GetRemaining())
+		return self:UpdateProgressBar(loaded / self._preloader:GetRemaining())
 	end))
 
 	self._preloader.FinishedLoading:Wait()
@@ -107,23 +108,21 @@ function LoadScreen:Activate(): nil
 	self._finished = true
 	self._mainUI.Enabled = true
 	player:SetAttribute("Loaded", true)
-	Knit.GetService("RemoteDispatcher"):InitializeClientUpdate()
+	Knit.GetService("DataService"):DispatchUpdate(player)
 
 	fadeOut:Play()
 	fadeOut.Completed:Wait()
-	self:Destroy()
-	return
+	return self:Destroy()
 end
 
 function LoadScreen:UpdateProgressBar(progress: number): nil
 	self._bar.Title.Text = `Loading\n{math.round(progress * 100)}%`
-	self._bar.Progress:TweenSize(
+	return self._bar.Progress:TweenSize(
 		UDim2.fromScale(math.max(progress, 0.05), 1),
 		Enum.EasingDirection.In,
 		Enum.EasingStyle.Linear,
 		0.35, true
 	)
-	return
 end
 
 function LoadScreen:AnimateBar(): nil

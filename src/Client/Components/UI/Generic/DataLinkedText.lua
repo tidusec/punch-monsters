@@ -24,11 +24,10 @@ local DataLinkedText: Component.Def = {
 function DataLinkedText:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 
-	self:AddToJanitor(self._data.DataUpdated:Connect(function(key)
+	self:AddToJanitor(self._data.DataUpdated:Connect(function(key, value)
 		local linkedKey = self.Attributes.DataKey
 		if key ~= linkedKey then return end
 		
-		local value = self._data:GetValue(linkedKey)
 		self.Instance.Text = if self.Attributes.Abbreviate then abbreviate(value) else tostring(value)
 	end))
 	return

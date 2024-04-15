@@ -60,16 +60,15 @@ local MegaQuestScreen: Component.Def = {
 
 function MegaQuestScreen:Initialize(): nil
 	self._data = Knit.GetService("DataService")
-  self._quests = Knit.GetService("QuestService")
-  self._questGoals = self._quests:GetQuestGoals()
+	self._quests = Knit.GetService("QuestService")
+	self._questGoals = self._quests:GetQuestGoals()
 	self._background = self.Instance.Background
 
 	local db = Debounce.new(0.5)
 	self:AddToJanitor(self._background.Claim.MouseButton1Click:Connect(function(): nil
     if not self._quests:IsComplete() then return end
 		if db:IsActive() then return end
-		self._quests:Claim()
-		return
+		return self._quests:Claim()
 	end))
 
 	self:AddToJanitor(self._data.DataUpdated:Connect(function(key): nil
@@ -83,29 +82,31 @@ end
 function MegaQuestScreen:UpdateProgress(): nil
 	task.spawn(function(): nil
 		local progressData = self._data:GetValue("MegaQuestProgress")
-    local index = 1
 
+    local index = 1
     for name, currentValue in pairs(progressData) do
       task.spawn(function(): nil
-        local barContainer = self._background[`Goal{index}Progress`]
-        local title = self._background[`Goal{index}Title`]
+        local barContainer = self._background:FindFirstChild(`Goal{index}Progress`)
+		local title = self._background:FindFirstChild(`Goal{index}Title`)
+		if not barContainer or not title then return end
+		
         local goalValue: number = self._questGoals[name]
-        local progress = currentValue :: number / goalValue
+		local progress = currentValue :: number / goalValue
         barContainer.Bar.Size = UDim2.fromScale(progress, 1)
-        
-        if name == "StayActive" then
-          barContainer.Value.Text = `{currentValue :: number / 60}/{goalValue / 60}`
+		barContainer.Value.Text = if name == "StayActive" then
+			`{currentValue :: number / 60}/{goalValue / 60}`
         else
-          barContainer.Value.Text = `{currentValue}/{goalValue}`
-        end
+        	`{currentValue}/{goalValue}`
         
-        if name == "StayActive" then
-          title.Text = `Stay Active for {goalValue / 60} Minutes`
+		title.Text = if name == "StayActive" then
+          `Stay Active for {goalValue / 60} Minutes`
         elseif name == "OpenEggs" then
-          title.Text = `Open {goalValue} Eggs`
+          `Open {goalValue} Eggs`
         elseif name == "GainStrength" then
-          title.Text = `Gain {abbreviate(goalValue)} Strength`
-        end
+		  `Gain {abbreviate(goalValue)} Strength`
+		else
+			"???"
+		  
         return
       end)
       index += 1

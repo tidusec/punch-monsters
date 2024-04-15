@@ -15,7 +15,7 @@ function SoundController:KnitInit(): nil
   local SoundService = Knit.GetService("SoundService")
   
   SoundService.SoundPlayed:Connect(function(soundName: string): nil
-    assert(soundName)
+	assert(soundName)
     Sound.Master[soundName]:Play()
     return
   end)
