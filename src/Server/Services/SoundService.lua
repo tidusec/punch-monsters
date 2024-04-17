@@ -12,8 +12,11 @@ local SoundService = Knit.CreateService {
 }
 
 function SoundService:PlayFor(player: Player, soundName: string): nil
-	self.Client.SoundPlayed:Fire(player, soundName)
-  return
+	return self.Client.SoundPlayed:Fire(player, soundName)
+end
+
+function SoundService.Client:Play(player: Player, soundName: string): nil
+	return self.Server:PlayFor(player, soundName)
 end
 
 return SoundService

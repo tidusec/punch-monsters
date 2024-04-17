@@ -21,13 +21,10 @@ type Timer = {
 function TimerService:KnitStart(): nil
   self._data = Knit.GetService("DataService")
 
-  self._data.DataUpdated.Event:Connect(function(player, key): nil
+  return self._data.DataUpdated.Event:Connect(function(player, key): nil
     if key ~= "Timers" then return end
-    self:RemoveFinished(player)
-    return
+    return self:RemoveFinished(player)
   end)
-
-  return
 end
 
 function TimerService:RemoveFinished(player: Player): nil

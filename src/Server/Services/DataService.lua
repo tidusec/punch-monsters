@@ -28,7 +28,7 @@ local DataService = Knit.CreateService {
 	Name = "DataService";
 	DataUpdated = Instance.new("BindableEvent");
 	Client = {
-		DataUpdated = Knit.CreateSignal()
+		DataUpdated = Knit.CreateSignal(),
 	};
 }
 
@@ -54,22 +54,16 @@ end)
 
 local function GetProfile(player: Player): Promise
 	AssertPlayer(player)
-	return Promise.new(function(resolve, reject)
+	return Promise.new(function(resolve, reject): nil
 		local profile = PROFILE_CACHE[player]
-		local elapsed = 0
-
 		if gameClosed then
 			return resolve()
 		end
 
-		repeat 
-			local dt = task.wait(0.25)
-			if elapsed >= 10 then
-				reject(`Waited more than 10 seconds for {player}'s profile.`)
-			end
-			elapsed += dt
-		until profile
-
+		repeat
+			profile = PROFILE_CACHE[player]
+			task.wait()
+		until profile ~= nil and profile.Loaded
 		return resolve(profile)
 	end)
 end
@@ -111,7 +105,7 @@ local function UpdateLeaderstats(player: Player): nil
 
 		local data = profile.Data
 		local leaderstats = player:WaitForChild("leaderstats")
-	
+
 		data.leaderstats.Strength = data.PunchStrength + data.BicepsStrength + data.AbsStrength;
 		(leaderstats :: any).Strength.Value = abbreviate(data.leaderstats.Strength);
 		(leaderstats :: any).Eggs.Value = abbreviate(data.leaderstats.Eggs);
@@ -127,24 +121,23 @@ function DataService:KnitStart()
 	self._boosts = Knit.GetService("BoostService")
 	self._gamepass = Knit.GetService("GamepassService")
 	self._quests = Knit.GetService("QuestService")
-		
-	Players.PlayerAdded:Connect(function(player)
-		self:OnPlayerAdded(player)
+	
+	Players.PlayerAdded:Connect(function(player: Player): nil
+		return self:OnPlayerAdded(player)
 	end)
-	Players.PlayerRemoving:Connect(function(player)
+	Players.PlayerRemoving:Connect(function(player: Player): nil
 		local profile = PROFILE_CACHE[player]
 		if not profile then return end
-		profile:Release()
+		return profile:Release()
 	end)
 
 	for _, player in Players:GetPlayers() do
-		self:OnPlayerAdded(player):await()
+		self:OnPlayerAdded(player)
 	end
 end
 
 function DataService:OnPlayerAdded(player: Player): nil
 	AssertPlayer(player)
-	
 	local profile = ProfileStore:LoadProfileAsync(`Player_{player.UserId}`)
 	if not profile then
 		return player:Kick()
@@ -152,9 +145,9 @@ function DataService:OnPlayerAdded(player: Player): nil
 
 	profile:AddUserId(player.UserId)
 	profile:Reconcile()
-	profile:ListenToRelease(function()
+	profile:ListenToRelease(function(): nil
 		PROFILE_CACHE[player] = nil
-		player:Kick()
+		return player:Kick()
 	end)
 
 	if player:IsDescendantOf(Players) then
@@ -163,11 +156,11 @@ function DataService:OnPlayerAdded(player: Player): nil
 		CreatePetsFolder(player)
 		UpdateLeaderstats(player)
 		self:InitializeClientUpdate(player)
+		profile.Loaded = true
 	else
 		profile:Release()
 	end
-
-	return
+	return 
 end
 
 function DataService:InitializeClientUpdate(player: Player): nil
@@ -198,12 +191,10 @@ end
 
 function DataService:DataUpdate<T>(player: Player, key: string, value: T): nil
 	task.spawn(function(): nil
-		self.Client.DataUpdated:Fire(player, key, value)
-		return
+		return self.Client.DataUpdated:Fire(player, key, value)
 	end)
 	task.spawn(function(): nil
-		self.DataUpdated:Fire(player, key, value)
-		return
+		return self.DataUpdated:Fire(player, key, value)
 	end)
 	return
 end
@@ -241,12 +232,7 @@ function DataService:SetValue<T>(player: Player, name: string, value: T): Promis
 		end
 		
 		task.spawn(function(): nil
-			if name == "Eggs" then
-				self._quests:SetProgress(player, "OpenEggs", value)
-			elseif name == "Strength" then
-				self._quests:SetProgress(player, "GainStrength", value)
-			end
-			return
+			return self._quests:SetProgress(player, if name == "Eggs" then "OpenEggs" else "GainStrength", value)
 		end)
 		
 		local data = profile.Data
@@ -257,7 +243,7 @@ function DataService:SetValue<T>(player: Player, name: string, value: T): Promis
 		else
 			return reject(`Could not find key "{name}" in profile while setting {player.DisplayName}'s data.`)
 		end
-
+		
 		UpdateLeaderstats(player)
 		self:DataUpdate(player, name, value)
 		return resolve()
@@ -300,10 +286,11 @@ function DataService:GetSetting<T>(player: Player, settingName: string): T
 	return settings[settingName]
 end
 
-function DataService:GetTotalStrength(player: Player, strengthType: "Punch" | "Abs" | "Biceps"?): number
+function DataService:GetTotalStrength(player: Player, strengthType: "Punch" | "Abs" | "Biceps"?): (number, number)
 	AssertPlayer(player)
 	local initialStrength = self:GetValue(player, (strengthType or "") .. "Strength")
-	return math.round(initialStrength * self:GetTotalStrengthMultiplier(player))
+	local strengthMultiplier = self:GetTotalStrengthMultiplier(player)
+	return math.round(initialStrength * strengthMultiplier), strengthMultiplier
 end
 
 function DataService:GetTotalStrengthMultiplier(player: Player): number
@@ -353,6 +340,10 @@ end
 
 function DataService.Client:AddDefeatedBoss(player: Player, bossMap: string): nil
 	return self.Server:AddDefeatedBoss(player, bossMap)
+end
+
+function DataService.Client:DispatchUpdate(player: Player): nil
+	return self.Server:InitializeClientUpdate(player)
 end
 
 return DataService

@@ -61,9 +61,10 @@ function DumbellService:Lift(player: Player): nil
 	local dumbellInfo = self._playerDumbellInfo[player.UserId]
 	if not dumbellInfo.Equipped then return end
 	if dumbellInfo.LiftDebounce then return end
-	self._sound:PlayFor(player, "Train")
 	dumbellInfo.LiftDebounce = true
 	self._playerDumbellInfo[player.UserId] = dumbellInfo
+	
+	self._sound:PlayFor(player, "Train")
 
 	task.spawn(function(): nil
 		local liftAnim = self._liftAnimations[player.UserId]

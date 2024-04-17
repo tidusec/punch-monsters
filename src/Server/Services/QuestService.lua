@@ -27,8 +27,7 @@ function QuestService:KnitStart(): nil
   self._playtime = Knit.GetService("DataService")
 
   self._data.DataUpdated.Event:Connect(function(player: Player, key): nil
-    self:_Reset(player)
-    return
+    return self:_Reset(player)
   end)
 
   local elapsed = 0
@@ -40,7 +39,7 @@ function QuestService:KnitStart(): nil
       if date.wday == 1 then
         if questsWereReset then return end
 
-        GameData:RemoveAsync("GoalsThisWeek")
+        GameData:SetAsync("GoalsThisWeek", nil)
         GameData:SetAsync("QuestsResetThisWeek", true):await()
         questsWereReset = GameData:GetAsync("QuestsResetThisWeek")
         for _, player in pairs(Players:GetPlayers()) do
@@ -78,18 +77,20 @@ function QuestService:_Reset(player: Player): nil
 end
 
 function QuestService:IncrementProgress(player: Player, goalName: string, amount: number): nil
-  local progress = self._data:GetValue(player, "MegaQuestProgress")
+	local progress = self._data:GetValue(player, "MegaQuestProgress")
+	if not progress then return end
 	if progress[goalName] then
-    self:SetProgress(player, goalName, progress[goalName] + amount)
+    	self:SetProgress(player, goalName, progress[goalName] + amount)
 	end
   return
 end
 
 function QuestService:SetProgress(player: Player, goalName: string, value: number): nil
-  local progress = self._data:GetValue(player, "MegaQuestProgress")
+	local progress = self._data:GetValue(player, "MegaQuestProgress")
+	if not progress then return end
 	if progress[goalName] then
 		progress[goalName] = value
-    self._data:SetValue(player, "MegaQuestProgress", progress)
+	    self._data:SetValue(player, "MegaQuestProgress", progress)
 	end
   return
 end

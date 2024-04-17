@@ -12,8 +12,7 @@ local HatchingService = Knit.CreateService {
 }
 
 function HatchingService:Hatch(player: Player, times: number): nil
-	self.Client.Hatched:Fire(player, times)
-  return
+	return self.Client.Hatched:Fire(player, times)
 end
 
 return HatchingService

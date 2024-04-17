@@ -22,15 +22,14 @@ function BoostService:KnitStart(): nil
 end
 
 function BoostService:_StartTimer(player: Player, name: BoostName, length: number): nil
-  self._timers:Start(player, name .. "Boost", length)
-  return
+  return self._timers:Start(player, name .. "Boost", length)
 end
 
 function BoostService:IsBoostActive(player: Player, boostName: BoostName): boolean
-  return Array.new("table", self._timers:GetAll(player))
-    :Some(function(timer)
-      return timer.Name == boostName .. "Boost" and not self._timers:IsFinished(timer)
-    end)
+	return Array.new("table", self._timers:GetAll(player))
+		:Some(function(timer)
+	    	return timer.Name == boostName .. "Boost" and not self._timers:IsFinished(timer)
+	    end)
 end
 
 function BoostService:Activate10xLuckBoost(player: Player): nil

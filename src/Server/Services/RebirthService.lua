@@ -68,10 +68,10 @@ end
 
 function RebirthService:GetBoost(player: Player, boostType: "Wins" | "Strength", addRebirths: number?): number
   local rebirths = self:Get(player) + (if addRebirths ~= nil then addRebirths else 0)
-  return 1 + if boostType == "Wins" then
+  return 1 + (if boostType == "Wins" then
     rebirths ^ 0.025 * (rebirths / 4)
   else
-    rebirths ^ 0.285 * (rebirths / 5)
+    rebirths ^ 0.285 * (rebirths / 5))
 end
 
 function RebirthService.Client:Rebirth(player: Player): nil

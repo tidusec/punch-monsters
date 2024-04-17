@@ -169,7 +169,7 @@ function PetService:Equip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 end
 
 function PetService:Unequip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
-	task.spawn(function()
+	task.spawn(function(): nil
 		AssertPlayer(player)
 		VerifyID(player, pet.ID)
 
@@ -178,6 +178,7 @@ function PetService:Unequip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 		equippedPets:RemoveValue(pet)
 		pets.Equipped = equippedPets:ToTable()
 		self._data:SetValue(player, "Pets", pets)
+		return
 	end)
 	return
 end
@@ -197,14 +198,12 @@ end
 function PetService:GetTotalMultiplier(player: Player): number
 	AssertPlayer(player)
 	local pets = self._data:GetValue(player, "Pets")
-
-	return Array.new("table", pets.Equipped)
-		:Map(function(pet)
-			return pet.StrengthMultiplier
-		end)
-		:Reduce(function(total: number, mult: number)
-			return total + mult
-		end, 1)
+	local total = 1
+	for _, pet in pets.Equipped do
+		total += pet.StrengthMultiplier
+	end
+	
+	return total
 end
 
 function PetService:GetPetOrder(player: Player): number?
