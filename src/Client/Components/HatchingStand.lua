@@ -250,4 +250,3 @@ function HatchingStand:AddPetCards(): nil
 end
 
 return Component.new(HatchingStand)
-

@@ -86,7 +86,7 @@ function InputController:KnitStart(): nil
 			if destroyAutoTrainClicker then
 				destroyAutoTrainClicker()
 			end
-			destroyAutoTrainClicker = scheduler:Every("0.05 seconds", function()
+			destroyAutoTrainClicker = scheduler:Every("0.2 seconds", function()
 				task.spawn(liftDumbell)
 			end)
 			return
