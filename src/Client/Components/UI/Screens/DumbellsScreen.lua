@@ -50,6 +50,7 @@ local DumbellsScreen: Component.Def = {
 
 function DumbellsScreen:Initialize(): nil
 	local dumbell = Knit.GetService("DumbellService")
+	local data = Knit.GetService("DataService")
 	local cards = Array.new("Instance", self.Instance.Map1:GetChildren())
 		:Combine(Array.new("Instance", self.Instance.Map2:GetChildren()))
 		:Combine(Array.new("Instance", self.Instance.Map3:GetChildren()))
@@ -65,8 +66,11 @@ function DumbellsScreen:Initialize(): nil
 				local mapDumbells = DumbellsTemplate[mapName]
 				local cardNumber = tonumber(card.Name) :: number
 				local template = mapDumbells[cardNumber]
+				
 				template.IsVIP = cardNumber == 15
-
+				local plr_strength = data:GetTotalStrength("Biceps")
+				if plr_strength < template.Required then return end
+				
 				local isEquipped = dumbell:IsEquipped()
 				task.spawn(function()
 					if isEquipped then

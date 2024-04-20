@@ -20,7 +20,7 @@ local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local characterRoot = character:WaitForChild("HumanoidRootPart")
 
-local MAX_STAND_DISTANCE = 8
+local MAX_STAND_DISTANCE = 6
 
 local HatchingStand: Component.Def = {
 	Name = script.Name;

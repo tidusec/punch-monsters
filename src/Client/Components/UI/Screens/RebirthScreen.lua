@@ -69,6 +69,8 @@ function RebirthScreen:Initialize(): nil
 		self:UpdateStats()
 	end))
 
+	self:UpdateStats()
+
 	return
 end
 
