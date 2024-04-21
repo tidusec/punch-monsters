@@ -57,7 +57,7 @@ function PunchingBag:Initialize(): nil
 			self._janitor:RemoveNoClean("AutoTrain")
 			destroyAutoTrainClicker()
 		end
-		destroyAutoTrainClicker = scheduler:Every("0.2 second", function(): nil
+		destroyAutoTrainClicker = scheduler:Every("0.33 second", function(): nil
 			return self:Punch()
 		end)
 		self:AddToJanitor(destroyAutoTrainClicker, true, "AutoTrain")

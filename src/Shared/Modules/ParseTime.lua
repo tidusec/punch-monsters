@@ -1,4 +1,4 @@
-local s, m, h, d, w = 1, 60, 3600, 86400, 604800;
+local s, m, h, d, w = 1, 60, 3600, 86400, 604800
 local timePatterns = {
   s = s, second = s, seconds = s, sec = s, secs = s,
   m = m, minute = m, minutes = m, min = m, mins = m,
@@ -9,9 +9,9 @@ local timePatterns = {
 
 local function parseTime(time: string): number
   local seconds = 0 
-  for value, unit in time:gsub(" ", ""):gmatch("(%d+)(%a)") do
-    local figure: number = value
-    seconds += figure * timePatterns[unit]
+  for value, unit in time:gsub(" ", ""):gmatch("(%d+%.?%d*)(%a)") do
+    local figure: number = tonumber(value)
+    seconds += figure * (timePatterns[unit] or 0)
   end
   return seconds
 end

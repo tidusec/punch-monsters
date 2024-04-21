@@ -10,6 +10,10 @@ local Knit = require(Packages.Knit)
 local Component = require(Packages.Component)
 local Array = require(Packages.Array)
 
+local ServerScriptService = game:GetService("ServerScriptService")
+local Modules = ServerScriptService.Server.Modules
+local AssertPlayer = require(Modules.AssertPlayer)
+
 local MapTeleporter: Component.Def = {
   Name = script.Name;
   Guards = {
@@ -61,15 +65,18 @@ function MapTeleporter:Initialize(): nil
   
       local player = getPlayerFromPart(hit)
       if not player then return end
+      AssertPlayer(player)
       if not playerTeleporterDebounces[player.UserId] then
         local db = Debounce.new(2)
         playerTeleporterDebounces[player.UserId] = db
         self:AddToJanitor(db)
+        self:Teleport(player, player.Character, destinationCFrame + destinationOffset)
+        return
       end
       
       local db = playerTeleporterDebounces[player.UserId]
       if db:IsActive() then return end
-      self:Teleport(player.Character, destinationCFrame + destinationOffset)
+      self:Teleport(player, player.Character, destinationCFrame + destinationOffset)
       return
     end))
   end
@@ -100,11 +107,11 @@ function MapTeleporter:Initialize(): nil
   return
 end
 
-function MapTeleporter:Teleport(character: Model, cframe: CFrame): nil
-  if not Array.new(self._data:GetValue("DefeatedBosses")):Has(self._mapName) then return end
-  if self._data:GetValue("Rebirths") < self.Attributes.RequiredRebirths then return end
-  if self._data:GetValue("Wins") < self.Attributes.RequiredWins then return end
-  (character.PrimaryPart :: BasePart).CFrame = cframe
+function MapTeleporter:Teleport(player: Player, character: Model, cframe: CFrame): nil
+  if not Array.new(self._data:GetValue(player, "DefeatedBosses")):Has(self._mapName) then return end
+  if self._data:GetValue(player, "Rebirths") < self.Attributes.RequiredRebirths then return end
+  if self._data:GetValue(player, "Wins") < self.Attributes.RequiredWins then return end
+  (character.HumanoidRootPart :: BasePart).CFrame = cframe
   return
 end
 

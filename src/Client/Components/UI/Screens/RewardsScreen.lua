@@ -71,7 +71,7 @@ function RewardsScreen:Initialize(): nil
 		self:UpdateScreen()
 	end))
 
-	self:AddToJanitor(scheduler:Every("0.03 second", function(): nil
+	self:AddToJanitor(scheduler:Every("1 second", function(): nil
 		self:UpdateScreen()
 		return
 	end))

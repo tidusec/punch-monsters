@@ -77,7 +77,7 @@ function EnemyFighting:Initialize(): nil
 			self._janitor:RemoveNoClean("AutoFight")
 			destroyAutoFightClicker()
 		end
-		destroyAutoFightClicker = scheduler:Every("0.2 seconds", function()
+		destroyAutoFightClicker = scheduler:Every("0.33 seconds", function()
 			self:Attack()
 		end)
 		self:AddToJanitor(destroyAutoFightClicker, true, "AutoFight")

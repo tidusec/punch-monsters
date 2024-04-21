@@ -20,7 +20,7 @@ local module = {
 		Strength = 18000
 	},
 	Powerlifter = {
-		Wins = 350,
+		Wins = 3500,
 		Strength = 45000
 	},
 	

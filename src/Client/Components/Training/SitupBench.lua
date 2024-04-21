@@ -51,7 +51,7 @@ function SitupBench:Initialize(): nil
 			self._janitor:RemoveNoClean("AutoTrain")
 			destroyAutoTrainClicker()
 		end
-		destroyAutoTrainClicker = scheduler:Every("0.2 seconds", function()
+		destroyAutoTrainClicker = scheduler:Every("0.33 seconds", function()
 			self:Situp()
 		end)
 		self:AddToJanitor(destroyAutoTrainClicker, true, "AutoTrain")

@@ -19,7 +19,7 @@ function WallController:KnitInit(): nil
     local walls = CollectionService:GetTagged("mapwalls")
     self.cache = {}
 
-    scheduler:Every("0.1 seconds", function()
+    scheduler:Every("0.33 seconds", function()
         local pos = humanoidRootPart.Position
         for _, wall in ipairs(walls) do
             local closestPoint = self:GetClosestPoint(pos, wall)
