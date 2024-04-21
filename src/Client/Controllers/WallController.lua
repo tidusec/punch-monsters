@@ -24,7 +24,7 @@ function WallController:KnitInit(): nil
         for _, wall in ipairs(walls) do
             local closestPoint = self:GetClosestPoint(pos, wall)
             local distance = (closestPoint - pos).Magnitude
-            if distance < 13 then
+            if distance < 10 then
                 if self.cache[wall] then continue end
                 self.cache[wall] = true
                 wall.Texture.Transparency = self:HandleSmoothTransparency(2, humanoidRootPart, wall)
@@ -53,9 +53,9 @@ function WallController:HandleSmoothTransparency(time: number, humanoidRootPart:
         local pos = humanoidRootPart.Position
         local closestPoint = self:GetClosestPoint(pos, wall)
         local distance = (closestPoint - pos).Magnitude
-        if distance < 8 then
+        if distance < 5 then
             elapsed = 0
-            wall.Texture.Transparency = 1 - math.clamp(-1/8 * distance + 1, 0, 1)
+            wall.Texture.Transparency = 1 - math.clamp(-1/5 * distance + 1, 0, 1)
         else
             wall.Texture.Transparency = 1
         end

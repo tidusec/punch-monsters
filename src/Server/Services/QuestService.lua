@@ -39,8 +39,8 @@ function QuestService:KnitStart(): nil
       if date.wday == 1 then
         if questsWereReset then return end
 
-        GameData:SetAsync("GoalsThisWeek", nil)
-        GameData:SetAsync("QuestsResetThisWeek", true):await()
+        GameData:RemoveAsync("GoalsThisWeek")
+        GameData:SetAsync("QuestsResetThisWeek", true)
         questsWereReset = GameData:GetAsync("QuestsResetThisWeek")
         for _, player in pairs(Players:GetPlayers()) do
           task.spawn(function(): nil
@@ -51,7 +51,7 @@ function QuestService:KnitStart(): nil
         end
       else
         if not questsWereReset then return end
-        GameData:SetAsync("QuestsResetThisWeek", false):await()
+        GameData:SetAsync("QuestsResetThisWeek", false)
         questsWereReset = GameData:GetAsync("QuestsResetThisWeek")
       end
     else

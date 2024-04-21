@@ -65,7 +65,7 @@ function RebirthScreen:Initialize(): nil
 	end))
 
 	self:AddToJanitor(self._data.DataUpdated:Connect(function(key)
-		if key ~= "Rebirths" then return end
+		if key ~= "Rebirths" and key ~= "Wins" then return end
 		self:UpdateStats()
 	end))
 
