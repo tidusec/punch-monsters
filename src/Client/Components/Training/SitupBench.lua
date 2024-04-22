@@ -18,7 +18,7 @@ local COOLDOWN = 1.5
 local SitupBench: Component.Def = {
 	Name = script.Name;
 	Guards = {
-		Ancestors = { workspace.Map1.SitupBenches, workspace.Map2.SitupBenches, workspace.Map3.SitupBenches },
+		Ancestors = { workspace:WaitForChild("Map1"):WaitForChild("SitupBenches"), workspace:WaitForChild("Map2"):WaitForChild("SitupBenches"), workspace:WaitForChild("Map3"):WaitForChild("SitupBenches") },
 		ClassName = "Model",
 		Attributes = {
 			InUse = { Type = "boolean" },

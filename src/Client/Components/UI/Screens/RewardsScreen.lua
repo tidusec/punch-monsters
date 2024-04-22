@@ -119,7 +119,7 @@ function RewardsScreen:UpdateScreen(): nil
 	return
 end
 
-function RewardsScreen:GetRemainingTime(crateButton: CrateButton): number
+function RewardsScreen:GetRemainingTime(crateButton: Instance): number
 	local crateTime = parseTime(crateButton:GetAttribute("Length"))
 	return math.round(math.max(crateTime - self._timedRewards:GetElapsedTime(), 0))
 end

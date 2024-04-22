@@ -99,7 +99,7 @@ function DumbellService:Equip(player: Player, mapName: string, number: number, d
 	task.spawn(function()
 		local character = player.Character :: any
 		local hand = character.RightHand
-		local mesh = workspace[mapName].DumbellRack[tostring(number)]:Clone()
+		local mesh: MeshPart = workspace[mapName]:WaitForChild("DumbellRack")[tostring(number)]:Clone()
 		mesh.Name = "Dumbell"
 		Welder.WeldConstraint(hand, { mesh })
 		mesh.CFrame = CFrame.new(hand.Position, -character.PrimaryPart.CFrame.RightVector)

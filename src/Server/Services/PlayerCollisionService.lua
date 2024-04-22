@@ -15,7 +15,7 @@ local function assignPlayerCollisionGroup(char: Model): nil
 	char:WaitForChild("Head")
 	char:WaitForChild("Humanoid")
 
-	for _, descendant: Instance in pairs(char:GetDescendants()) do
+	for _, descendant: BasePart in pairs(char:GetDescendants()) do
 		task.spawn(function()
 			if not descendant:IsA("BasePart") then return end
 			descendant.CollisionGroup = "Player"

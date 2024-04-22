@@ -44,7 +44,8 @@ function mod:Ragdoll(Character : Model)
 				v.Part1.CanCollide = true
 				v.Enabled = false
 			else
-				Character.PrimaryPart:FindFirstChild("WeldConstraint").Enabled = true
+				--: WeldConstraint
+				Character.PrimaryPart:FindFirstChildOfClass("WeldConstraint").Enabled = true
 				Character.PrimaryPart.CanCollide = false
 			end
 		end
@@ -58,7 +59,7 @@ function mod:Recover(Character : Model)
 				v.Part1.CanCollide = false
 				v.Enabled = true
 			else
-				Character.PrimaryPart:FindFirstChild("WeldConstraint").Enabled = false
+				Character.PrimaryPart:FindFirstChildOfClass("WeldConstraint").Enabled = false
 				Character.PrimaryPart.CanCollide = true
 			end
 		end
@@ -72,7 +73,7 @@ function mod:Deathphysics(Character : Model)
 				v.Part1.CanCollide = true
 				v:Destroy()
 			else
-				Character.PrimaryPart:FindFirstChild("WeldConstraint").Enabled = true
+				Character.PrimaryPart:FindFirstChildOfClass("WeldConstraint").Enabled = true
 				Character.PrimaryPart.CanCollide = false
 			end
 		end

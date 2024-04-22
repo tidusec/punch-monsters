@@ -10,7 +10,7 @@ local Component = require(Packages.Component)
 local Dumbells: Component.Def = {
 	Name = script.Name;
 	Guards = {
-		Ancestors = { workspace.Map1, workspace.Map2, workspace.Map3 },
+		Ancestors = { workspace:WaitForChild("Map1"), workspace:WaitForChild("Map2"), workspace:WaitForChild("Map3") },
 		ClassName = "Model",
 		Children = {
 			Circle = { ClassName = "MeshPart" },

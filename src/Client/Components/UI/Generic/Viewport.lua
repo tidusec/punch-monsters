@@ -23,7 +23,8 @@ function Viewport:Initialize(): nil
 	self.Attributes.DefaultFOV = self.Attributes.FOV or 55
 	
 	self:AddToJanitor(self._camera)
-	self._camera.CFrame = workspace:WaitForChild("ViewportCamera").CFrame
+	local viewportcamera = workspace:WaitForChild("ViewportCamera")
+	self._camera.CFrame = viewportcamera.CFrame
 	self._camera.FieldOfView = self.Attributes.DefaultFOV
 	self._camera.Parent = self.Instance;
 	(self.Instance :: ViewportFrame).CurrentCamera = self._camera

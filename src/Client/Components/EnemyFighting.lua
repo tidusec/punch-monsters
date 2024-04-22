@@ -39,7 +39,7 @@ local EnemyFighting: Component.Def = {
 	Name = script.Name;
 	IgnoreAncestors = { player.PlayerGui };
 	Guards = {
-		Ancestors = { workspace.Map1.Enemies, workspace.Map2.Enemies, workspace.Map3.Enemies },
+		Ancestors = { workspace:WaitForChild("Map1"):WaitForChild("Enemies"), workspace:WaitForChild("Map2"):WaitForChild("Enemies"), workspace:WaitForChild("Map3"):WaitForChild("Enemies") },
 		ClassName = "Model",
 		Attributes = {
 			InUse = { Type = "boolean" },

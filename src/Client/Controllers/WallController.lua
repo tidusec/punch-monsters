@@ -36,7 +36,7 @@ function WallController:KnitInit(): nil
     end)
 end
 
-function WallController:GetClosestPoint(PlayerPos: Vector3, Wall: Instance): Vector3
+function WallController:GetClosestPoint(PlayerPos: Vector3, Wall: BasePart): Vector3
     local RelPoint = Wall.CFrame:PointToObjectSpace(PlayerPos)
     local ClampedPos = Vector3.new(
         math.clamp(RelPoint.X, -Wall.Size.X/2, Wall.Size.X/2),
@@ -47,7 +47,7 @@ function WallController:GetClosestPoint(PlayerPos: Vector3, Wall: Instance): Vec
     return ClosestPoint
 end
 
-function WallController:HandleSmoothTransparency(time: number, humanoidRootPart: Instance, wall: Instance): nil
+function WallController:HandleSmoothTransparency(time: number, humanoidRootPart: BasePart, wall: BasePart): nil
     local elapsed = 0
     while task.wait(0.05) do
         local pos = humanoidRootPart.Position

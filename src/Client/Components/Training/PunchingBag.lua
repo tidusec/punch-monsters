@@ -32,7 +32,7 @@ local COOLDOWN = 0.6
 local PunchingBag: Component.Def = {
 	Name = script.Name;
 	Guards = {
-		Ancestors = { workspace.Map1.PunchingBags, workspace.Map2.PunchingBags, workspace.Map3.PunchingBags },
+		Ancestors = { workspace:WaitForChild("Map1"):WaitForChild("PunchingBags"), workspace:WaitForChild("Map2"):WaitForChild("PunchingBags"), workspace:WaitForChild("Map3"):WaitForChild("PunchingBags") },
 		ClassName = "Model",
 		Attributes = {
 			PunchDebounce = { Type = "boolean" }
