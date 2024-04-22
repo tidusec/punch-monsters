@@ -63,6 +63,7 @@ local EnemyFighting: Component.Def = {
 function EnemyFighting:Initialize(): nil
 	self._remoteDispatcher = Knit.GetService("RemoteDispatcher")	
 	self._data = Knit.GetService("DataService")
+	self._rebirths = Knit.GetService("RebirthService")
 	self._boosts = Knit.GetService("BoostService")
 	self._gamepass = Knit.GetService("GamepassService")
 	self._dumbell = Knit.GetService("DumbellService")
@@ -280,10 +281,12 @@ function EnemyFighting:AddWin(): nil
 		Sound.Master.Win:Play()
 		local hasDoubleWins = self._gamepass:DoesPlayerOwn("2x Wins")
 		local hasWinsBoost = self._boosts:IsBoostActive("2xWins")
-		local multiplier = (if hasDoubleWins then 2 else 1)
+		local gamepassMultiplier: number = (if hasDoubleWins then 2 else 1)
 			* (if hasWinsBoost then 2 else 1)
 
-		self._data:IncrementValue("Wins", (self :: any)._enemyTemplate.Wins * multiplier)
+		local rebirthMultiplier: number = self._rebirths:GetBoost(player, "Wins")
+
+		self._data:IncrementValue("Wins", (self :: any)._enemyTemplate.Wins * rebirthMultiplier * gamepassMultiplier)
 	end)
 	return
 end
