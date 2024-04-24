@@ -29,6 +29,7 @@ local DataService = Knit.CreateService {
 	DataUpdated = Instance.new("BindableEvent");
 	Client = {
 		DataUpdated = Knit.CreateSignal(),
+
 	};
 }
 
@@ -168,7 +169,7 @@ function DataService:InitializeClientUpdate(player: Player): nil
 	task.spawn(function(): nil
 		local success, profile = GetProfile(player):await()
 		if not success then return error(profile) end
-
+		
 		self:DataUpdate(player, "leaderstats", profile.Data.leaderstats)
 		self:DataUpdate(player, "Pets", profile.Data.Pets)
 		self:DataUpdate(player, "ActiveBoosts", profile.Data.ActiveBoosts)
@@ -272,12 +273,19 @@ end
 
 function DataService:SetSetting<T>(player: Player, settingName: string, value: T): Promise
 	AssertPlayer(player)
-	return Promise.new(function(resolve): nil
-		local settings = self:GetValue(player, "Settings")
-		settings[settingName] = value
-		self:SetValue(player, "Settings", settings)
-		return resolve()
-	end)
+	if string.find(settingName, "Auto") then
+		return Promise.new(function(resolve): nil
+			self:SetValue(player, settingName, value)
+			return resolve()
+		end)
+	else
+		return Promise.new(function(resolve): nil
+			local settings = self:GetValue(player, "Settings")
+			settings[settingName] = value
+			self:SetValue(player, "Settings", settings)
+			return resolve()
+		end)
+	end
 end
 
 function DataService:GetSetting<T>(player: Player, settingName: string): T
@@ -314,13 +322,13 @@ function DataService.Client:GetValue(player, name)
 	return self.Server:GetValue(player, name)
 end
 
-function DataService.Client:SetValue(player, name, value): Promise
+--[[function DataService.Client:SetValue(player, name, value): Promise
 	return self.Server:SetValue(player, name, value)
 end
 
 function DataService.Client:IncrementValue(player, name, amount): Promise
 	return self.Server:IncrementValue(player, name, amount)
-end
+end]]
 
 function DataService.Client:GetSetting(player, name)
 	return self.Server:GetSetting(player, name)
@@ -338,9 +346,9 @@ function DataService.Client:GetTotalStrengthMultiplier(player)
 	return self.Server:GetTotalStrengthMultiplier(player)
 end
 
-function DataService.Client:AddDefeatedBoss(player: Player, bossMap: string): nil
+--[[function DataService.Client:AddDefeatedBoss(player: Player, bossMap: string): nil
 	return self.Server:AddDefeatedBoss(player, bossMap)
-end
+end]]
 
 function DataService.Client:DispatchUpdate(player: Player): nil
 	return self.Server:InitializeClientUpdate(player)

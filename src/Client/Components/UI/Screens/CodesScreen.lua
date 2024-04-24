@@ -38,6 +38,7 @@ local CodesScreen: Component.Def = {
 }
 
 function CodesScreen:Initialize(): nil
+	self._code = Knit.GetService("CodeService")
 	self._data = Knit.GetService("DataService")
 	
 	local background = self.Instance.Background
@@ -53,26 +54,11 @@ end
 
 function CodesScreen:Redeem(): nil
 	local code = trim(self._textInput.Text:lower())
-	local reward = CodeTemplate[code]
-	if not reward then 
-		return self:PushStatus("Invalid code provided!", true)
+	if code == "" then
+		return self:PushStatus("Please enter a code!", true)
 	end
-
-	local redeemedCodes = Array.new("string", self._data:GetValue("RedeemedCodes"))
-	if redeemedCodes:Has(code) then
-		return self:PushStatus("You've already redeemed this code!", true)
-	end
-
-	for key, value in reward do
-		task.spawn(function()
-			self._data:IncrementValue(key, value)
-		end)
-	end
-	
-	(self :: any):PushStatus("Successfully redeemed code!")
-	redeemedCodes:Push(code)
-	self._data:SetValue("RedeemedCodes", redeemedCodes:ToTable())
-	return
+	local push = self._code:Redeem(code)
+	self:PushStatus(push, not push:find("Success"))
 end
 
 function CodesScreen:PushStatus(message: string, err: boolean?): nil

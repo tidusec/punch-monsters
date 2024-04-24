@@ -7,6 +7,9 @@ local module = {
 	early = {
 		Wins = 500
 	},
+	test = {
+		Wins = 1000
+	},
 	summer = {
 		--TODO: 30M 2X WIN BOOST
 	},

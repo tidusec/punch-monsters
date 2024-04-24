@@ -42,7 +42,7 @@ function AutoButton:Event_MouseButton1Click(): nil
   if self.Attributes.Type == "Auto Rebirth" and not self._gamepass:DoesPlayerOwn("Auto Rebirth") then
 		return self._gamepass:PromptPurchase("Auto Rebirth")
 	end
-  return self._data:SetValue(self._dataKey, not self._data:GetValue(self._dataKey))
+  return self._data:SetSetting(self._dataKey, not self._data:GetValue(self._dataKey))
 end
 
 function AutoButton:UpdateText(): nil

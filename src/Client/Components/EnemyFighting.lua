@@ -70,6 +70,7 @@ function EnemyFighting:Initialize(): nil
 	self._ragdoll = Knit.GetService("RagdollService")
 	self._animation = Knit.GetService("AnimationService")
 	self._ui = Knit.GetController("UIController")
+	self._enemyfighting = Knit.GetService("EnemyFightingService")
 	local scheduler = Knit.GetController("SchedulerController")
 	local destroyAutoFightClicker
 
@@ -148,8 +149,12 @@ end
 
 
 function EnemyFighting:Enter(): nil
-	if self._dumbell:IsEquipped() then return end
+	if self._dumbell:IsEquipped() then 
+		self._dumbell:Unequip()
+	end
 	if self.Attributes.InUse then return end
+
+	self._enemyfighting:Enter(self.Instance.Name)
 	
 	local playerStrength: number = self._data:GetValue("Strength")
 	self._playerMaxHealth = playerStrength * self._healthToDamageRatio
@@ -188,6 +193,8 @@ end
 
 function EnemyFighting:StartFight(): nil
 	self._fighting = true
+	self._enemyfighting:StartFight(self.Instance.Name)
+	
 	task.spawn(function()
 		repeat task.wait(0.5);
 			task.spawn(function(): nil
@@ -265,7 +272,8 @@ function EnemyFighting:Attack(): nil
 		cameraShaker:Shake(CameraShaker.Presets.Rock);
 	end);
 	
-	(self :: any)._enemyHealth -= self._playerDamage
+	self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
+
 	task.spawn(function()
 		self:UpdateBars()
 		if self._enemyHealth <= 0 then
