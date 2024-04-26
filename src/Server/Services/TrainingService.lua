@@ -10,25 +10,29 @@ local Players = game:GetService("Players")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Array = require(Packages.Array)
 
-local EnemyFightingService = Knit.CreateService {
-	Name = "EnemyFightingService";
+local TrainingService = Knit.CreateService {
+	Name = "TrainingService";
 }
 
-function EnemyFightingService:KnitStart(): nil
+function TrainingService:KnitStart(): nil
     self._data = Knit.GetService("DataService")
-	self._enemies = require(ReplicatedStorage.Templates.EnemiesTemplate)
-	self._rebirths = Knit.GetService("RebirthService")
+    self._rebirths = Knit.GetService("RebirthService")
 	self._boosts = Knit.GetService("BoostService")
 	self._gamepass = Knit.GetService("GamepassService")
+
+	self._situptemplates = require(ReplicatedStorage.Templates.SitupBenchTemplate)
+    self._dumbelltemplates = require(ReplicatedStorage.Templates.DumbellTemplates)
+    self._punchbagtemplates = require(ReplicatedStorage.Templates.PunchbagTemplates)
+    
     self.memory = {}
 
 	Players.PlayerAdded:Connect(function(player: Player)
 		self.memory[player.UserId] = {
-			entered = false,
-			fighting = false,
-			health = 100,
-			boss = "",
-			bosshealth = 100,
+			equipped = {
+                SitupBench = self._situptemplates[1],
+                Dumbell = self._dumbelltemplates[1]
+            },
+            current_training = "",
 		}
 	end)
 
@@ -39,7 +43,7 @@ function EnemyFightingService:KnitStart(): nil
 	return
 end
 
-function EnemyFightingService:Enter(player: Player, boss: string): string
+function TrainingService:Enter(player: Player, boss: string): string
 	if self.memory[player.UserId].entered then return end
 	if self._enemies[boss] then
 		self.memory[player.UserId].entered = true
@@ -49,7 +53,7 @@ function EnemyFightingService:Enter(player: Player, boss: string): string
 	end
 end
 
-function EnemyFightingService:StartFight(player: Player, boss: string): string
+function TrainingService:StartFight(player: Player, boss: string): string
 	if not self.memory[player.UserId].entered then return end
 	if self.memory[player.UserId].fighting then return end
 	if self.memory[player.UserId].boss == boss then
@@ -58,7 +62,7 @@ function EnemyFightingService:StartFight(player: Player, boss: string): string
 	end
 end
 
-function EnemyFightingService:Attack(player: Player): string
+function TrainingService:Attack(player: Player): string
 	if not self.memory[player.UserId].fighting then return end
 	self.memory[player.UserId].bosshealth -= self._data:GetTotalStrength(player)
 	if self.memory[player.UserId].bosshealth <= 0 then
@@ -78,7 +82,7 @@ function EnemyFightingService:Attack(player: Player): string
 	end
 end
 
-function EnemyFightingService:AddWin(player: Player): string
+function TrainingService:AddWin(player: Player): string
 	local hasDoubleWins = self._gamepass:DoesPlayerOwn(player, "2x Wins")
 	local hasWinsBoost = self._boosts:IsBoostActive(player, "2xWins")
 	local gamepassMultiplier: number = (if hasDoubleWins then 2 else 1) * (if hasWinsBoost then 2 else 1)
@@ -87,7 +91,7 @@ function EnemyFightingService:AddWin(player: Player): string
 	return
 end
 
-function EnemyFightingService:ClearData(player: Player): string
+function TrainingService:ClearData(player: Player): string
 	self.memory[player.UserId].fighting = false
 	self.memory[player.UserId].boss = ""
 	self.memory[player.UserId].bosshealth = 100
@@ -95,16 +99,16 @@ function EnemyFightingService:ClearData(player: Player): string
 	return
 end
 
-function EnemyFightingService.Client:Enter(player: Player, boss: string): number
+function TrainingService.Client:Enter(player: Player, boss: string): number
 	return self.Server:Enter(player, boss)
 end
 
-function EnemyFightingService.Client:StartFight(player: Player, boss: string): number
+function TrainingService.Client:StartFight(player: Player, boss: string): number
 	return self.Server:StartFight(player, boss)
 end
 
-function EnemyFightingService.Client:Attack(player: Player): number
+function TrainingService.Client:Attack(player: Player): number
 	return self.Server:Attack(player)
 end
 
-return EnemyFightingService
+return TrainingService
