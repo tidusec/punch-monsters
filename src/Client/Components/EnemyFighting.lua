@@ -196,14 +196,14 @@ function EnemyFighting:StartFight(): nil
 	self._enemyfighting:StartFight(self.Instance.Name)
 	
 	task.spawn(function()
-		repeat task.wait(0.5);
+		repeat task.wait(0.4);
 			task.spawn(function(): nil
 				local punchAnim = self._enemyAnims[math.random(1, #self._enemyAnims)]
 				punchAnim:Play()
-				punchAnim:AdjustSpeed(2.5)
+				punchAnim:AdjustSpeed(2.8)
 				return
 			end);
-			(self :: any)._playerHealth -= self._enemyDamage
+			self:UpdateFight()
 			self:UpdateBars()
 		until (self._playerHealth <= 0) or (self._enemyHealth <= 0)
 		
@@ -284,6 +284,12 @@ function EnemyFighting:Attack(): nil
 	end)
 
 	return
+end
+
+function EnemyFighting:UpdateFight()
+	task.spawn(function()
+		self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
+	end)
 end
 
 function EnemyFighting:AddWin(): nil

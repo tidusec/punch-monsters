@@ -41,6 +41,7 @@ function SitupBench:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 	self._gamepass = Knit.GetService("GamepassService")
 	self._dumbell = Knit.GetService("DumbellService")
+	self._situp = Knit.GetService("SitupService")
 	self._animation = Knit.GetService("AnimationService")
 	self._ui = Knit.GetController("UIController")
 	local scheduler = Knit.GetController("SchedulerController")
@@ -105,6 +106,10 @@ function SitupBench:Enter(): nil
 	if self._dumbell:IsEquipped() then return end
 	if self.Attributes.InUse then return end
 	
+	task.spawn(function()
+		self._situp:Equip(self.Instance)
+	end)
+
 	local absStrength = self._data:GetTotalStrength("Abs")
 	if absStrength < self._absRequirement then return end
 	
@@ -115,6 +120,9 @@ function SitupBench:Enter(): nil
 end
 
 function SitupBench:Exit(): nil
+	task.spawn(function()
+		self._situp:Unequip()
+	end)
 	self:Toggle(false) 
 	player.CameraMinZoomDistance = defaultCameraMinZoom
 	return

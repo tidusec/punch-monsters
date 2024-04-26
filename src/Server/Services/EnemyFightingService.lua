@@ -52,8 +52,19 @@ end
 function EnemyFightingService:StartFight(player: Player, boss: string): string
 	if not self.memory[player.UserId].entered then return end
 	if self.memory[player.UserId].fighting then return end
+
 	if self.memory[player.UserId].boss == boss then
 		self.memory[player.UserId].fighting = true
+		task.spawn(function()
+			while self.memory[player.UserId].fighting do
+				task.wait(0.5)
+				self.memory[player.UserId].health -= self._enemies[boss].Damage
+				if self.memory[player.UserId].health <= 0 then
+					self:ClearData(player)
+					return
+				end
+			end
+		end)
 		return
 	end
 end
