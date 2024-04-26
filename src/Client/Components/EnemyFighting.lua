@@ -272,7 +272,9 @@ function EnemyFighting:Attack(): nil
 		cameraShaker:Shake(CameraShaker.Presets.Rock);
 	end);
 	
-	self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
+	task.spawn(function()
+		self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
+	end)
 
 	task.spawn(function()
 		self:UpdateBars()
@@ -285,7 +287,8 @@ function EnemyFighting:Attack(): nil
 end
 
 function EnemyFighting:AddWin(): nil
-	task.spawn(function()
+	Sound.Master.Win:Play()
+	--[[task.spawn(function()
 		Sound.Master.Win:Play()
 		local hasDoubleWins = self._gamepass:DoesPlayerOwn("2x Wins")
 		local hasWinsBoost = self._boosts:IsBoostActive("2xWins")
@@ -294,8 +297,8 @@ function EnemyFighting:AddWin(): nil
 
 		local rebirthMultiplier: number = self._rebirths:GetBoost(player, "Wins")
 
-		self._data:IncrementValue("Wins", (self :: any)._enemyTemplate.Wins * rebirthMultiplier * gamepassMultiplier)
-	end)
+		--self._data:IncrementValue("Wins", (self :: any)._enemyTemplate.Wins * rebirthMultiplier * gamepassMultiplier)
+	end)]]
 	return
 end
 
@@ -328,9 +331,9 @@ function EnemyFighting:Kill(): nil
 		self.Instance.PrimaryPart.AssemblyLinearVelocity = forwards * -RAGDOLL_FORCE + up * (RAGDOLL_FORCE / 3)
 	end)
 
-	if self.Attributes.Boss then
+	--[[if self.Attributes.Boss then
 		self._data:AddDefeatedBoss(script.Parent.Parent.Name) -- map name
-	end
+	end]]
 	task.delay(2, function()
 		self:Exit()
 	end)
