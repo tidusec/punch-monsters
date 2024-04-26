@@ -6,8 +6,6 @@ local Players = game:GetService("Players")
 
 local trim = require(ReplicatedStorage.Assets.Modules.Trim)
 
-local CodeTemplate = require(ReplicatedStorage.Templates.CodeTemplate)
-
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 local Array = require(Packages.Array)
