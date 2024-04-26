@@ -9,6 +9,8 @@ local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 local AssertPlayer = require(script.Parent.Parent.Modules.AssertPlayer)
 
+local SitupBenchTemplate = require(ReplicatedStorage.Templates.SitupBenchTemplate)
+
 type Situp = {
 	Required: number;
 	Gain: number;
@@ -72,12 +74,20 @@ function SitupService:Situp(player: Player): nil
 	return
 end
 
-function SitupService:Equip(player: Player, mapName: string, number: number, Situp: Situp): nil
+function SitupService:Enter(player: Player, mapName: string, bench: Instance): nil
 	AssertPlayer(player)
 
 	local SitupInfo = self._playerSitupInfo[player.UserId]
+	local Situp = SitupBenchTemplate[self.Instance.Parent.Parent.Name][self.Instance.Name]
+
+	assert(SitupInfo, "SitupInfo not found "..player.Name)
+	assert(Situp, "Situp not found "..self.Instance.Name.." fired by "..player.Name)
+
 	if SitupInfo.EquippedSitupTemplate == Situp then return end
 	if SitupInfo.Equipped then return end
+
+	self._remoteDispatcher:SetAttribute(bench, "InUse", true)
+	self._remoteDispatcher:SetShiftLockOption(player, false)
 
 	local bicepsStrength = self._data:GetValue(player, "AbsStrength")
 	if Situp.Required > bicepsStrength then return end
@@ -88,7 +98,7 @@ function SitupService:Equip(player: Player, mapName: string, number: number, Sit
 	return
 end
 
-function SitupService:Unequip(player: Player): nil
+function SitupService:Exit(player: Player): nil
 	AssertPlayer(player)
 
 	local SitupInfo = self._playerSitupInfo[player.UserId]
@@ -110,12 +120,12 @@ function SitupService.Client:Situp(player: Player): nil
 	return self.Server:Situp(player)
 end
 
-function SitupService.Client:Equip(player: Player, mapName: string, number: number, Situp: Situp): nil
-	return self.Server:Equip(player, mapName, number, Situp)
+function SitupService.Client:Enter(player: Player, mapName: string, bench: Instance): nil
+	return self.Server:Enter(player, mapName, bench)
 end
 
-function SitupService.Client:Unequip(player: Player): nil
-	return self.Server:Unequip(player)
+function SitupService.Client:Exit(player: Player): nil
+	return self.Server:Exit(player)
 end
 
 function SitupService.Client:IsEquipped(player: Player): boolean

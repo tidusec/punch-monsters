@@ -93,8 +93,6 @@ function SitupBench:Initialize(): nil
 end
 
 function SitupBench:Toggle(on: boolean): nil
-	self._remoteDispatcher:SetAttribute(self.Instance, "InUse", on)
-	self._remoteDispatcher:SetShiftLockOption(not on)
 	--self._ui:SetShiftLock(not on)
 	self._proximityPrompt.Enabled = not on
 	self._exitBench.Visible = on
@@ -107,7 +105,7 @@ function SitupBench:Enter(): nil
 	if self.Attributes.InUse then return end
 	
 	task.spawn(function()
-		self._situp:Equip(self.Instance)
+		self._situp:Enter(self.Instance.Parent.Parent.Name, self.Instance)
 	end)
 
 	local absStrength = self._data:GetTotalStrength("Abs")
@@ -121,7 +119,7 @@ end
 
 function SitupBench:Exit(): nil
 	task.spawn(function()
-		self._situp:Unequip()
+		self._situp:Exit()
 	end)
 	self:Toggle(false) 
 	player.CameraMinZoomDistance = defaultCameraMinZoom
