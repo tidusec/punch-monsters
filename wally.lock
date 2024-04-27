@@ -3,6 +3,11 @@
 registry = "test"
 
 [[package]]
+name = "chriscerie/iter"
+version = "0.1.4"
+dependencies = [["TestEZ", "roblox/testez@0.4.1"]]
+
+[[package]]
 name = "evaera/promise"
 version = "4.0.0"
 dependencies = []
@@ -24,8 +29,8 @@ dependencies = []
 
 [[package]]
 name = "r-unic/array"
-version = "0.3.0"
-dependencies = []
+version = "0.3.9"
+dependencies = [["Iter", "chriscerie/iter@0.1.4"]]
 
 [[package]]
 name = "r-unic/componentize"
@@ -33,9 +38,14 @@ version = "0.5.0"
 dependencies = [["Array", "r-unic/array@0.2.9"], ["Janitor", "howmanysmall/janitor@1.15.6"]]
 
 [[package]]
+name = "roblox/testez"
+version = "0.4.1"
+dependencies = []
+
+[[package]]
 name = "sam-rbx/punch-monsters"
 version = "0.2.0"
-dependencies = [["Array", "r-unic/array@0.3.0"], ["Component", "r-unic/componentize@0.5.0"], ["Input", "sleitnick/input@2.1.1"], ["Janitor", "howmanysmall/janitor@1.15.6"], ["Knit", "sleitnick/knit@1.5.1"], ["ProfileService", "jakebball/profileservice@1.5.0"], ["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@1.5.0"]]
+dependencies = [["Array", "r-unic/array@0.3.9"], ["Component", "r-unic/componentize@0.5.0"], ["Input", "sleitnick/input@2.1.1"], ["Janitor", "howmanysmall/janitor@1.15.6"], ["Knit", "sleitnick/knit@1.5.1"], ["ProfileService", "jakebball/profileservice@1.5.0"], ["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@1.5.0"]]
 
 [[package]]
 name = "sleitnick/comm"
