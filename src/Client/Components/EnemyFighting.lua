@@ -154,12 +154,12 @@ function EnemyFighting:Enter(): nil
 	end
 	if self.Attributes.InUse then return end
 
-	self._enemyfighting:Enter(self.Instance.Name)
+	self._playerMaxHealth, self._enemyMaxHealth = self._enemyfighting:Enter(self.Instance.Name)
 	
-	local playerStrength: number = self._data:GetValue("Strength")
-	self._playerMaxHealth = playerStrength * self._healthToDamageRatio
+	local playerStrength = self._data:GetTotalStrength()
+
 	self._playerHealth = self._playerMaxHealth
-	self._playerDamage = playerStrength
+	self._enemyHealth = self._enemyMaxHealth
 	
 	local proxyCFrame: CFrame = self._proxyPart.CFrame;
 	characterRoot.CFrame = proxyCFrame + Vector3.new(0, 2.5 * humanoid.BodyHeightScale.Value, 0)
@@ -180,6 +180,8 @@ function EnemyFighting:Enter(): nil
 		self._ui:SetScreen("FightUi")
 	end)
 	
+	self._enemyHealth, self._playerHealth = self._enemyfighting:Update()
+
 	task.spawn(function()
 		for i = 3, 0, -1 do
 			task.wait(0.8)
@@ -272,9 +274,7 @@ function EnemyFighting:Attack(): nil
 		cameraShaker:Shake(CameraShaker.Presets.Rock);
 	end);
 	
-	task.spawn(function()
-		self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
-	end)
+	self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
 
 	task.spawn(function()
 		self:UpdateBars()
@@ -288,7 +288,7 @@ end
 
 function EnemyFighting:UpdateFight()
 	task.spawn(function()
-		self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
+		self._enemyHealth, self._playerHealth = self._enemyfighting:Update()
 	end)
 end
 

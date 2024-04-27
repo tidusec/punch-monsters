@@ -11,3 +11,5 @@ Knit.Start({ServicePromises  = false}):andThen(function()
 	Component.StartComponents()
 	print("Knit started on server")
 end):catch(warn)
+
+shared.Knit = Knit

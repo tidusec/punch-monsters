@@ -25,12 +25,16 @@ function WallController:KnitInit(): nil
             local closestPoint = self:GetClosestPoint(pos, wall)
             local distance = (closestPoint - pos).Magnitude
             if distance < 10 then
-                if self.cache[wall] then continue end
-                self.cache[wall] = true
-                wall.Texture.Transparency = self:HandleSmoothTransparency(2, humanoidRootPart, wall)
+                if not self.cache[wall] then
+                    self.cache[wall] = true
+                    if humanoidRootPart and wall then
+                        wall.Texture.Transparency = self:HandleSmoothTransparency(2, humanoidRootPart, wall) 
+                    end
+                end
             else
-                if self.cache[wall] then continue end
-                wall.Texture.Transparency = 1
+                if not self.cache[wall] then
+                    wall.Texture.Transparency = 1 
+                end
             end
         end
     end)
@@ -53,18 +57,24 @@ function WallController:HandleSmoothTransparency(time: number, humanoidRootPart:
         local pos = humanoidRootPart.Position
         local closestPoint = self:GetClosestPoint(pos, wall)
         local distance = (closestPoint - pos).Magnitude
-        if distance < 5 then
-            elapsed = 0
-            wall.Texture.Transparency = 1 - math.clamp(-1/5 * distance + 1, 0, 1)
+        if distance then
+            if distance < 5 then
+                elapsed = 0
+                wall.Texture.Transparency = 1 - math.clamp(-1/5 * distance + 1, 0, 1)
+            else
+                wall.Texture.Transparency = 1
+            end
+            elapsed += 0.05
+            if elapsed >= time then
+                self.cache[wall] = nil
+                break
+            end
         else
             wall.Texture.Transparency = 1
-        end
-        elapsed += 0.05
-        if elapsed >= time then
-            self.cache[wall] = nil
-            break
+            elapsed += 0.25
         end
     end
+    return 1
 end
 
 return WallController

@@ -21,8 +21,8 @@ local PROFILE_TEMPLATE = require(ReplicatedStorage.Templates.ProfileTemplate)
 
 type Promise = typeof(Promise.new())
 
-local Test = RunService:IsStudio()
--- local Test = false
+-- local Test = RunService:IsStudio()
+local Test = false
 
 local DataService = Knit.CreateService {
 	Name = "DataService";
@@ -313,6 +313,7 @@ end
 function DataService:AddDefeatedBoss(player: Player, bossMap: string): nil
 	local defeatedBosses = self:GetValue(player, "DefeatedBosses")
 	table.insert(defeatedBosses, bossMap)
+	warn(defeatedBosses)
 	self:SetValue(player, "DefeatedBosses", defeatedBosses)
 	return
 end
