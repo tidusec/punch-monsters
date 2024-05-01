@@ -65,24 +65,21 @@ function MapTeleporter:Initialize(): nil
       if self._mapName == "Map3" then return end
   
       local player = getPlayerFromPart(hit)
-      if not player then warn("no player") return end
       AssertPlayer(player)
 
       if not playerTeleporterDebounces[player.UserId] then
-        warn("adding to debounce list")
         local db = Debounce.new(2)
         playerTeleporterDebounces[player.UserId] = db
         self:Teleport(player, player.Character, destinationCFrame + destinationOffset)
-        warn('did teleport ahem')
         self:AddToJanitor(db)
         return
-      else
-        warn("debounce exists")
       end
       
       local db = playerTeleporterDebounces[player.UserId]
-      if db:IsActive() then warn("active") return end
+      if db:IsActive() then return end
+
       self:Teleport(player, player.Character, destinationCFrame + destinationOffset)
+      
       return
     end))
   end
@@ -114,12 +111,9 @@ function MapTeleporter:Initialize(): nil
 end
 
 function MapTeleporter:Teleport(player: Player, character: Model, cframe: CFrame): nil
-  warn(self._mapName)
   if not Array.new("string",self._data:GetValue(player, "DefeatedBosses")):Has(self._mapName) then return end
-  warn("has defeated boss")
   if self._data:GetValue(player, "Rebirths") < self.Attributes.RequiredRebirths then return end
   if self._data:GetValue(player, "Wins") < self.Attributes.RequiredWins then return end
-  warn("has required rebirths and wins");
   (character.HumanoidRootPart :: BasePart).CFrame = cframe
   return
 end

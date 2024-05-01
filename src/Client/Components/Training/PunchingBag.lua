@@ -27,7 +27,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local characterRoot = character:WaitForChild("HumanoidRootPart")
 
 local MAX_BAG_DISTANCE = 6
-local COOLDOWN = 0.6
+local COOLDOWN = 0.5
 
 local PunchingBag: Component.Def = {
 	Name = script.Name;
