@@ -38,7 +38,8 @@ function SitupService:KnitStart(): nil
 			self._playerSitupInfo[player.UserId] = {
 				Equipped = false,
 				SitupDebounce = false,
-				EquippedSitupTemplate = nil
+				EquippedSitupTemplate = nil,
+				bench = nil,
 			}
 		end
 	end)
@@ -95,6 +96,8 @@ function SitupService:Enter(player: Player, mapName: string, bench: Instance): n
 	
 	SitupInfo.Equipped = true
 	SitupInfo.EquippedSitupTemplate = Situp
+	SitupInfo.bench = bench
+
 	self._playerSitupInfo[player.UserId] = SitupInfo
 	return
 end
@@ -104,9 +107,13 @@ function SitupService:Exit(player: Player): nil
 
 	local SitupInfo = self._playerSitupInfo[player.UserId]
 	if not SitupInfo.Equipped then return end
+	if SitupInfo.bench then
+		self._remoteDispatcher:SetAttribute(player, self._playerSitupInfo[player.UserId].bench, "InUse", false)
+	end
 	SitupInfo.Equipped = false
 	SitupInfo.EquippedSitupTemplate = nil
 	self._playerSitupInfo[player.UserId] = SitupInfo
+	self._remoteDispatcher:SetShiftLockOption(player, false)
 
 	task.spawn(function()
 		local character = player.Character :: any

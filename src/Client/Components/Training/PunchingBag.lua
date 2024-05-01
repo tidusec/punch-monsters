@@ -136,7 +136,7 @@ function PunchingBag:Punch(): nil
 		Debris:AddItem(vfx, 0.7)
 	end)
 
-	return self._data:IncrementValue("PunchStrength", bagTemplate.Hit * strengthMultiplier)
+	return true--self._data:IncrementValue("PunchStrength", bagTemplate.Hit * strengthMultiplier)
 end
 
 return Component.new(PunchingBag)

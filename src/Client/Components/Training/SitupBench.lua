@@ -112,6 +112,7 @@ function SitupBench:Enter(): nil
 	if absStrength < self._absRequirement then return end
 	
 	self:Toggle(true)
+	self.DoingSitups = true
 	characterRoot.CFrame = self.Instance.TP.CFrame
 	player.CameraMinZoomDistance = 4
 	return
@@ -122,6 +123,7 @@ function SitupBench:Exit(): nil
 		self._situp:Exit()
 	end)
 	self:Toggle(false) 
+	self.DoingSitups = false
 	player.CameraMinZoomDistance = defaultCameraMinZoom
 	return
 end
@@ -129,6 +131,8 @@ end
 function SitupBench:Situp(): nil
 	if not self.Attributes.InUse then return end
 	if self.Attributes.SitupDebounce then return end
+	if not self.DoingSitups then return end
+
 	self.Attributes.SitupDebounce = true
 	task.delay(COOLDOWN, function()
 		self.Attributes.SitupDebounce = false
@@ -136,7 +140,6 @@ function SitupBench:Situp(): nil
 
 	self._animation:Play("Situp", 1.5)
 	Sound.Master.Train:Play()
-	local strengthMultiplier = self._data:GetTotalStrengthMultiplier(player)
 	local hasVIP =  self._gamepass:DoesPlayerOwn("VIP")
 	if self._benchTemplate.Vip and not hasVIP then
 		return self._gamepass:PromptPurchase("VIP")

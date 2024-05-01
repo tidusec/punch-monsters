@@ -20,6 +20,7 @@ local PROFILE_TEMPLATE = {
 
 	DefeatedBosses = {},
 	Wins = 0,
+
 	PunchStrength = 0,
 	BicepsStrength = 0,
 	AbsStrength = 0,

@@ -24,7 +24,7 @@ local module = {
 		Boss = false
 	},
 	Powerlifter = {
-		Wins = 3500,
+		Wins = 300,
 		Strength = 45000,
 		Boss = true,
 		Map = 1,

@@ -298,7 +298,13 @@ function DataService:GetTotalStrength(player: Player, strengthType: "Punch" | "A
 	AssertPlayer(player)
 	local initialStrength = self:GetValue(player, (strengthType or "") .. "Strength")
 	local strengthMultiplier = self:GetTotalStrengthMultiplier(player)
-	return math.round(initialStrength * strengthMultiplier), strengthMultiplier
+
+	--// The reason why I return initialStrength here instead of initialStrength * strengthMultiplier is because
+	--// you will be counting double as incrementvalue already takes account of the strength multiplier
+	--// (and it makes no sense to double a players strength at the when he has 1B to 2B because he bought gamepass)
+	--// it will improve his training 
+	--/                      - tidusec
+	return initialStrength, strengthMultiplier
 end
 
 function DataService:GetTotalStrengthMultiplier(player: Player): number
