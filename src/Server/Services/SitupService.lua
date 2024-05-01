@@ -30,6 +30,7 @@ local SitupService = Knit.CreateService {
 function SitupService:KnitStart(): nil
 	self._data = Knit.GetService("DataService")
 	self._gamepass = Knit.GetService("GamepassService")
+	self._remoteDispatcher = Knit.GetService("RemoteDispatcher")
 	self._playerSitupInfo = {}
 
 	Players.PlayerAdded:Connect(function(player)
@@ -67,10 +68,10 @@ function SitupService:Situp(player: Player): nil
 	local strengthMultiplier = self._data:GetTotalStrengthMultiplier(player)
 	local hasVIP = self._gamepass:DoesPlayerOwn(player, "VIP")
 	if SitupInfo.EquippedSitupTemplate.IsVIP and not hasVIP then
-		return self._gamepass:PromptPurchase(player, "VIP")
+		self._gamepass:PromptPurchase(player, "VIP")
+	else
+		self._data:IncrementValue(player, "AbsStrength", SitupInfo.EquippedSitupTemplate.Hit * strengthMultiplier)
 	end
-	
-	self._data:IncrementValue(player, "AbsStrength", SitupInfo.EquippedSitupTemplate.Gain * strengthMultiplier)
 	return
 end
 
@@ -78,19 +79,19 @@ function SitupService:Enter(player: Player, mapName: string, bench: Instance): n
 	AssertPlayer(player)
 
 	local SitupInfo = self._playerSitupInfo[player.UserId]
-	local Situp = SitupBenchTemplate[self.Instance.Parent.Parent.Name][self.Instance.Name]
+	local Situp = SitupBenchTemplate[mapName][bench.Name]
 
 	assert(SitupInfo, "SitupInfo not found "..player.Name)
-	assert(Situp, "Situp not found "..self.Instance.Name.." fired by "..player.Name)
+	assert(Situp, "Situp not found "..bench.Name.." fired by "..player.Name)
 
 	if SitupInfo.EquippedSitupTemplate == Situp then return end
 	if SitupInfo.Equipped then return end
 
-	self._remoteDispatcher:SetAttribute(bench, "InUse", true)
+	self._remoteDispatcher:SetAttribute(player, bench, "InUse", true)
 	self._remoteDispatcher:SetShiftLockOption(player, false)
 
-	local bicepsStrength = self._data:GetValue(player, "AbsStrength")
-	if Situp.Required > bicepsStrength then return end
+	local bicepsStrength = self._data:GetTotalStrength(player, "Abs")
+	if Situp.AbsRequirement > bicepsStrength then return end
 	
 	SitupInfo.Equipped = true
 	SitupInfo.EquippedSitupTemplate = Situp

@@ -115,7 +115,7 @@ end
 
 function MapTeleporter:Teleport(player: Player, character: Model, cframe: CFrame): nil
   warn(self._mapName)
-  if not Array.new(self._data:GetValue(player, "DefeatedBosses")):Has(self._mapName) then return end
+  if not Array.new("string",self._data:GetValue(player, "DefeatedBosses")):Has(self._mapName) then return end
   warn("has defeated boss")
   if self._data:GetValue(player, "Rebirths") < self.Attributes.RequiredRebirths then return end
   if self._data:GetValue(player, "Wins") < self.Attributes.RequiredWins then return end

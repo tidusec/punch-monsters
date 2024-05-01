@@ -142,7 +142,8 @@ function SitupBench:Situp(): nil
 		return self._gamepass:PromptPurchase("VIP")
 	end
 	
-	self._data:IncrementValue("AbsStrength", self._benchTemplate.Hit * strengthMultiplier)
+	self._situp:Situp()
+	--self._data:IncrementValue("AbsStrength", self._benchTemplate.Hit * strengthMultiplier)
 	return
 end
 
