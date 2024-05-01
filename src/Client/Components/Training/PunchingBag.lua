@@ -47,6 +47,7 @@ function PunchingBag:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 	self._gamepass = Knit.GetService("GamepassService")
 	self._dumbell = Knit.GetService("DumbellService")
+	self._punchingbag = Knit.GetService("PunchingBagService")
 	self._animation = Knit.GetService("AnimationService")
 	self._sound = Knit.GetService("SoundService")
 	local scheduler = Knit.GetController("SchedulerController")
@@ -136,7 +137,9 @@ function PunchingBag:Punch(): nil
 		Debris:AddItem(vfx, 0.7)
 	end)
 
-	return true--self._data:IncrementValue("PunchStrength", bagTemplate.Hit * strengthMultiplier)
+	self._punchingbag:Hit(mapName, self.Instance.Name)
+
+	return
 end
 
 return Component.new(PunchingBag)
