@@ -9,7 +9,7 @@ local Tweens = require(script.Parent.Parent.Parent.Parent.Modules.Tweens)
 
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 local Component = require(Packages.Component)
 
 local player = Players.LocalPlayer
@@ -135,7 +135,7 @@ function LoadScreen:AnimateBar(): nil
 		)
 	)
 
-	for tween in tweens:Values() do
+	for _, tween in tweens:GetValues() do
 		tween:Play()
 		tween.Completed:Wait()
 	end

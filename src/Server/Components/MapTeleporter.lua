@@ -8,7 +8,7 @@ local Debounce = require(ReplicatedStorage.Modules.Debounce)
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 local Component = require(Packages.Component)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 
 local ServerScriptService = game:GetService("ServerScriptService")
 local Modules = ServerScriptService.Server.Modules

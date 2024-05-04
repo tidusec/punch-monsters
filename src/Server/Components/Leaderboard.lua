@@ -8,7 +8,7 @@ local abbreviate = require(ReplicatedStorage.Modules.Abbreviate)
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 local Component = require(Packages.Component)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 
 local Leaderboard: Component.Def = {
   Name = script.Name;
@@ -65,7 +65,7 @@ function Leaderboard:UpdateEntries(): nil
     end)
     :Truncate(50)
 
-  for player, i in bestPlayers:Values() do
+  for i, player in bestPlayers:GetValues() do
     task.spawn(function()
       local entryFrame = self._leaderboardEntry:Clone()
       entryFrame.PlayerName.Text = player.DisplayName

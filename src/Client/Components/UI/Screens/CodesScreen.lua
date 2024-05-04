@@ -8,7 +8,7 @@ local trim = require(ReplicatedStorage.Assets.Modules.Trim)
 
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 local Component = require(Packages.Component)
 
 local player = Players.LocalPlayer

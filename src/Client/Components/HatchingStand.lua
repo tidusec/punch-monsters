@@ -12,7 +12,7 @@ local PetsTemplate = require(ReplicatedStorage.Templates.PetsTemplate)
 
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 local Component = require(Packages.Component)
 
 local UserInterface = ReplicatedStorage.Assets.UserInterface
@@ -228,7 +228,7 @@ function HatchingStand:AddPetCards(): nil
 			return a.Chance > b.Chance
 		end)
 		
-		for pet in pets:Values() do
+		for _, pet in pets:GetValues() do
 			self._chancesUI.Enabled = true
 			local petModel: Model? = ReplicatedStorage.Assets.Pets:FindFirstChild(pet.Name)		
 			local petCard: ImageLabel & { Viewport: ViewportFrame; Chance: TextLabel } = UserInterface.Hatching.PetChanceCard:Clone()

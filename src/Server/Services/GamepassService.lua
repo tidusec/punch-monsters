@@ -10,7 +10,7 @@ local trim = require(ReplicatedStorage.Assets.Modules.Trim)
 
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 
 local NAME_TO_ID_CACHE: { [string]: number } = {}
 

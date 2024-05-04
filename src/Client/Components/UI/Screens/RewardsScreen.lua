@@ -10,7 +10,7 @@ local parseTime = require(ReplicatedStorage.Modules.ParseTime)
 
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 local Component = require(Packages.Component)
 
 local player = Players.LocalPlayer
@@ -57,7 +57,7 @@ function RewardsScreen:Initialize(): nil
 			return element:IsA("ImageButton")
 		end)
 
-	for crateButton: CrateButton in self._crateButtons:Values() do
+	for _, crateButton: CrateButton in self._crateButtons:GetValues() do
 		local db = Debounce.new(0.5)
 		self:AddToJanitor(crateButton.MouseButton1Click:Connect(function()
 			if db:IsActive() then return end
@@ -94,7 +94,7 @@ function RewardsScreen:UpdateScreen(): nil
 		return
 	end)
 
-	for crateButton: CrateButton in self._crateButtons:Values() do
+	for crateButton: CrateButton in self._crateButtons:GetValues() do
 		task.spawn(function(): nil
 			local isClaimed = self._timedRewards:IsClaimed(crateButton.LayoutOrder)
 			local collectText = if isClaimed then "Collected!" else "Collect"

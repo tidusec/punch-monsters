@@ -15,12 +15,12 @@ local VerifyID = require(ReplicatedStorage.Modules.VerifyID)
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 local Janitor = require(Packages.Janitor)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 local ProfileTemplate = require(ReplicatedStorage.Templates.ProfileTemplate)
 
 local FOLLOW_SPEED = 15
 local Y_OFFSET = 0
-local PET_POSITIONS = Array.new("Vector3", {
+local PET_POSITIONS = Array.new("vector", {
 	Vector3.new(2, Y_OFFSET, 3),
 	Vector3.new(-4, Y_OFFSET, 6),
 	Vector3.new(6, Y_OFFSET, 10),
@@ -270,7 +270,7 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		local order = self:GetPetOrder(player)
 		pet:SetAttribute("Order", order)
 
-		local position = PET_POSITIONS[order]
+		local position = PET_POSITIONS:Index(order)
 		characterAttachment.Position = position
 		characterAttachment.Orientation = Vector3.new(0, -90, 0)
 		
@@ -279,7 +279,7 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 				return e:IsA("BasePart")
 			end)
 		
-		for part: BasePart in petParts:Values() do
+		for _, part: BasePart in petParts:GetValues() do
 			part.Anchored = false
 			part.CanCollide = false
 			if part == pet.PrimaryPart then continue end

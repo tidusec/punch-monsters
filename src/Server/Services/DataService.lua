@@ -14,7 +14,7 @@ local abbreviate = require(ReplicatedStorage.Assets.Modules.Abbreviate)
 
 local Knit = require(Packages.Knit)
 local Promise = require(Packages.Promise)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 local ProfileService = require(Packages.ProfileService)
 
 local PROFILE_TEMPLATE = require(ReplicatedStorage.Templates.ProfileTemplate)
@@ -107,7 +107,19 @@ local function UpdateLeaderstats(player: Player): nil
 		local data = profile.Data
 		local leaderstats = player:WaitForChild("leaderstats")
 
-		data.leaderstats.Strength = data.PunchStrength + data.BicepsStrength + data.AbsStrength;
+		local punchStrength = data.PunchStrength
+		local bicepsStrength = data.BicepsStrength
+		local absStrength = data.AbsStrength
+
+		local arithmeticMean = (punchStrength + bicepsStrength + absStrength) / 3
+
+		local geometricMean = (punchStrength * bicepsStrength * absStrength) ^ (1/3)
+
+		local harmonicMean = 3 / ((1 / punchStrength) + (1 / bicepsStrength) + (1 / absStrength))
+
+		--// make it a combination of all 3, making it so that the player has to train all 3 to get the best strength
+		data.leaderstats.Strength = (arithmeticMean + 3 * geometricMean + 2 * harmonicMean) / 6
+
 		(leaderstats :: any).Strength.Value = abbreviate(data.leaderstats.Strength);
 		(leaderstats :: any).Eggs.Value = abbreviate(data.leaderstats.Eggs);
 		(leaderstats :: any).Rebirths.Value = abbreviate(data.leaderstats.Rebirths)
@@ -208,7 +220,7 @@ local function PetDuplicatesWereFound(): boolean
 	
 	for player, profile in pairs(PROFILE_CACHE) do	
 		local pets = Array.new("table", profile.Data.Pets.OwnedPets)
-		for pet in pets:Values() do
+		for _, pet in pets:GetValues() do
 			if ids:Has(pet.ID) then
 				duplicatesFound = true
 				player:Kick(`Exploiting | Duplicate pet ID found | Pet name: {pet.Name}`)

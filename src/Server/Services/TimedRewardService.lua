@@ -9,7 +9,7 @@ local TimedRewardTemplate = require(ReplicatedStorage.Templates.TimedRewardTempl
 
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 
 local TimedRewardService = Knit.CreateService {
   Name = "TimedRewardService";

@@ -37,7 +37,7 @@ local function forEachComponent(componentName: string, actionName: string): nil
 			COMPONENT_INSTANCES_CACHE[componentName] = components
 		end
 	
-		for component in components:Values() do
+		for _, component in components:GetValues() do
 			local action = component[actionName]
 			task.spawn(action, component)
 		end

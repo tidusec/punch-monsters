@@ -8,7 +8,7 @@ local Debounce = require(ReplicatedStorage.Modules.Debounce)
 
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 local Component = require(Packages.Component)
 
 local player = Players.LocalPlayer

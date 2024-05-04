@@ -9,7 +9,7 @@ local Packages = ReplicatedStorage.Packages
 local Players = game:GetService("Players")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Array = require(Packages.Array)
+local Array = require(ReplicatedStorage.Modules.NewArray)
 
 local CodeService = Knit.CreateService {
 	Name = "CodeService";
