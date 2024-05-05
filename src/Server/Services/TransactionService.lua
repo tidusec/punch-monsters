@@ -118,14 +118,14 @@ function TransactionService:KnitStart()
 				end
 
 				local success, err = pcall(function()
-					task.spawn(handleProduct, player)
+					task.defer(handleProduct, player)
 				end)
 				if not success then
 					error(`Failed to process a product purchase for {player.Name}, ProductId: {receipt.ProductId}.  Error: {err}`)
 					return nil
 				end
 				
-				task.spawn(function()
+				task.defer(function()
 					local player = Players:GetPlayerByUserId(receipt.PlayerId)
 					local devProductIDs = Array.new("table", getPageContents(MarketplaceService:GetDeveloperProductsAsync()):ToTable())
 						:Map(function(product)

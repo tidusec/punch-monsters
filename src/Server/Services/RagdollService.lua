@@ -27,7 +27,7 @@ function RagdollService:KnitInit(): nil
 end
 
 function RagdollService:RigModel(character: Model): nil
-	task.spawn(function(): nil
+	task.defer(function(): nil
 		Ragdoll:RigModel(character)
 		return
 	end)

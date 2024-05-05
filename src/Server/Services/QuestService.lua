@@ -43,7 +43,7 @@ function QuestService:KnitStart(): nil
         GameData:SetAsync("QuestsResetThisWeek", true)
         questsWereReset = GameData:GetAsync("QuestsResetThisWeek")
         for _, player in pairs(Players:GetPlayers()) do
-          task.spawn(function(): nil
+          task.defer(function(): nil
             self._data:SetValue(player, "UpdatedQuestProgress", false):await()
             self:_Reset(player)
             return

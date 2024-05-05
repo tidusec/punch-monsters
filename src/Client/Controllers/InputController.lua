@@ -39,7 +39,7 @@ local function forEachComponent(componentName: string, actionName: string): nil
 	
 		for _, component in components:GetValues() do
 			local action = component[actionName]
-			task.spawn(action, component)
+			task.defer(action, component)
 		end
 		return
 	end)
@@ -80,7 +80,7 @@ function InputController:KnitStart(): nil
 	local data = Knit.GetService("DataService")
 	local scheduler = Knit.GetController("SchedulerController")
 	
-	task.spawn(function(): nil
+	task.defer(function(): nil
 		local destroyAutoTrainClicker
 		local function startAutoTrain(): nil
 			if destroyAutoTrainClicker then
@@ -117,7 +117,7 @@ function InputController:KnitStart(): nil
 end
 
 function InputController:ExecuteAction(input: InputObject, type: "UserInputType" | "KeyCode"): nil
-	task.spawn(function()
+	task.defer(function()
 		local actionMap = if type == "KeyCode" then KeyboardInputMap else InputTypeMap
 		for inputType in pairs(actionMap) do
 			if (Enum :: any)[type][inputType] then continue end

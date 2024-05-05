@@ -10,6 +10,8 @@ local Players = game:GetService("Players")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Array = require(ReplicatedStorage.Modules.NewArray)
 
+local AssertPlayer = require(ServerScriptService.Modules.AssertPlayer)
+
 local EnemyFightingService = Knit.CreateService {
 	Name = "EnemyFightingService";
 }
@@ -41,6 +43,12 @@ function EnemyFightingService:KnitStart(): nil
 		self.memory[player.UserId] = nil
 	end)
 
+	return
+end
+
+function EnemyFightingService:Toggle(player, thing, on): nil
+	self._remoteDispatcher:SetAttribute(thing, "InUse", on)
+	self._remoteDispatcher:SetShiftLockOption(player, not on)
 	return
 end
 
@@ -83,7 +91,6 @@ function EnemyFightingService:Attack(player: Player): string
 	if self.memory[player.UserId].bosshealth <= 0 then
 		if self._enemies[self.memory[player.UserId].boss].Boss then
 			local bossmap = "Map"..self._enemies[self.memory[player.UserId].boss].Map
-			warn(bossmap)
 			self._data:AddDefeatedBoss(player, bossmap)
 		end
 		
@@ -117,6 +124,19 @@ function EnemyFightingService:ClearData(player: Player, winner: boolean): string
 	return
 end
 
+function EnemyFightingService:Exit(player: Player, thing: Instance): string
+	AssertPlayer(player)
+	assert(thing:IsA("Model"), "Thing must be a model")
+	if self.memory[player.UserId].boss == thing.Name then
+		self:ClearData(player, false)
+		self:Toggle(player, thing, false)
+		return
+	else
+		warn("Player tried to exit a boss fight they weren't in")
+	end
+	return
+end
+
 function EnemyFightingService:Update(player: Player): string
 	return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health
 end
@@ -135,6 +155,10 @@ end
 
 function EnemyFightingService.Client:Update(player: Player): number
 	return self.Server:Update(player)
+end
+
+function EnemyFightingService.Client:Exit(player: Player, thing: Instance): number
+	self.Server:Exit(player, thing)
 end
 
 return EnemyFightingService

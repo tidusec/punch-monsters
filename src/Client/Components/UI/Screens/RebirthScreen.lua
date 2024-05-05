@@ -77,11 +77,12 @@ end
 function RebirthScreen:UpdateStats(): nil
 	if self._data:GetValue("AutoRebirth") then
 		task.spawn(function(): nil
+			--// FIXME: make it check on server if can rebirth (save data)
 			self._rebirths:Rebirth()
 			return
 		end)
 	end
-	task.spawn(function(): nil
+	task.defer(function(): nil
 		local boosts = self._rebirths:GetBeforeAndAfter()
 		local wins = self._data:GetValue("Wins")
 		local rebirths = self._rebirths:Get()

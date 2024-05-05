@@ -224,7 +224,7 @@ function HatchingStand:AddPetCards(): nil
 			})
 		end
 		
-		pets:SortMutable(function(a: ChanceTable, b: ChanceTable)
+		pets:Sort(function(a: ChanceTable, b: ChanceTable)
 			return a.Chance > b.Chance
 		end)
 		

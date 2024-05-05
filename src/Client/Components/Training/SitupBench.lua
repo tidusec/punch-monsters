@@ -119,7 +119,7 @@ function SitupBench:Enter(): nil
 end
 
 function SitupBench:Exit(): nil
-	task.spawn(function()
+	task.defer(function()
 		self._situp:Exit()
 	end)
 	self:Toggle(false) 

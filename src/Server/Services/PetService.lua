@@ -55,7 +55,7 @@ function PetService:KnitStart()
 			self:UpdateFollowingPets(player, pets.Equipped)
 			lastEquippedPlayerPets[player.UserId] = pets.Equipped
 		elseif key == "Settings" then
-			task.spawn(function()
+			task.defer(function()
 				local lastOwnVisible = playersLastOwnVisible[player.UserId]
 				local settings: typeof(ProfileTemplate.Settings) = value
 				if lastOwnVisible == settings.ShowOwnPets then return end
@@ -63,7 +63,7 @@ function PetService:KnitStart()
 				self:ToggleVisibility(player, settings.ShowOwnPets)
 				playersLastOwnVisible[player.UserId] = settings.ShowOwnPets
 			end)
-			task.spawn(function()
+			task.defer(function()
 				local lastOthersVisible = playersLastOthersVisible[player.UserId]
 				local settings: typeof(ProfileTemplate.Settings) = value
 
@@ -81,15 +81,15 @@ function PetService:KnitStart()
 end
 
 function PetService:ToggleVisibility(player: Player, on: boolean): nil
-	task.spawn(function()
+	task.defer(function()
 		local char = player.Character or player.CharacterAdded:Wait()
 		local petsFolder = char:FindFirstChild("Pets")
 		if not petsFolder then return end
 
 		for _, pet in pairs(petsFolder:GetChildren()) do
-			task.spawn(function()
+			task.defer(function()
 				for _, part in pairs(pet:GetChildren()) do
-					task.spawn(function()
+					task.defer(function()
 						if not part:IsA("BasePart") then return end
 						part.Transparency = if on then 0 else 1
 					end)
@@ -123,7 +123,7 @@ function PetService:Add(player: Player, petName: string): nil
 		StrengthMultiplier = template.StrengthMultiplier
 	}
 
-	task.spawn(function(): nil
+	task.defer(function(): nil
 		local pets = self._data:GetValue(player, "Pets")
 		local ownedPets = pets.OwnedPets
 		table.insert(ownedPets, pet)
@@ -149,7 +149,7 @@ function PetService:GetPetSpace(player: Player): number
 end
 
 function PetService:Equip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
-	task.spawn(function()
+	task.defer(function()
 		AssertPlayer(player)
 		VerifyID(player, pet.ID)
 
@@ -169,7 +169,7 @@ function PetService:Equip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 end
 
 function PetService:Unequip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
-	task.spawn(function(): nil
+	task.defer(function(): nil
 		AssertPlayer(player)
 		VerifyID(player, pet.ID)
 
@@ -233,7 +233,7 @@ end
 
 function PetService:StartFollowing(player: Player, pet: Model): nil
 	AssertPlayer(player)
-	task.spawn(function()
+	task.defer(function()
 		local janitor = Janitor.new()
 		janitor:LinkToInstance(pet, true)
 
@@ -308,7 +308,7 @@ function PetService:UpdateFollowingPets(player: Player, pets: { typeof(PetsTempl
 	self:ToggleVisibility(player, visible)
 
 	for _, pet in pets do
-		task.spawn(function(): nil
+		task.defer(function(): nil
 			local petModelTemplate = ReplicatedStorage.Assets.Pets:FindFirstChild(pet.Name)
 			if not petModelTemplate then
 				return warn(`Could not find pet model "{pet.Name}"`)

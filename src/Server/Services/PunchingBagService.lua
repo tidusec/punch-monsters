@@ -26,7 +26,7 @@ function PunchingBagService:KnitStart(): nil
 
     Players.PlayerRemoving:Connect(function(plr)
         if self._playerPunchBagInfo[plr.UserId] then
-            self._playerPunchBagInfo[plr.UserId]:Destroy()
+            self._playerPunchBagInfo[plr.UserId] = nil
         end
         self._playerPunchBagInfo[plr.UserId] = nil
     end)

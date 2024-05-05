@@ -118,7 +118,8 @@ local function UpdateLeaderstats(player: Player): nil
 		local harmonicMean = 3 / ((1 / punchStrength) + (1 / bicepsStrength) + (1 / absStrength))
 
 		--// make it a combination of all 3, making it so that the player has to train all 3 to get the best strength
-		data.leaderstats.Strength = (arithmeticMean + 3 * geometricMean + 2 * harmonicMean) / 6
+		data.leaderstats.Strength = (arithmeticMean + 3 * geometricMean + 2 * harmonicMean) / 6 * 3
+		data.leaderstats.Strength = math.floor(data.leaderstats.Strength * 100) / 100
 
 		(leaderstats :: any).Strength.Value = abbreviate(data.leaderstats.Strength);
 		(leaderstats :: any).Eggs.Value = abbreviate(data.leaderstats.Eggs);
@@ -331,7 +332,6 @@ end
 function DataService:AddDefeatedBoss(player: Player, bossMap: string): nil
 	local defeatedBosses = self:GetValue(player, "DefeatedBosses")
 	table.insert(defeatedBosses, bossMap)
-	warn(defeatedBosses)
 	self:SetValue(player, "DefeatedBosses", defeatedBosses)
 	return
 end

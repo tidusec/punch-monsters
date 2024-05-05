@@ -13,7 +13,7 @@ local RemoteDispatcher = Knit.CreateService {
 
 local listenerModules: { ModuleScript } = script:GetChildren()
 for _, listenerModule in pairs(listenerModules) do
-	task.spawn(function()
+	task.defer(function()
 		local callback = require(listenerModule) :: any
 		RemoteDispatcher[listenerModule.Name] = function(_, player: Player, ...)
 			callback(player, ...)

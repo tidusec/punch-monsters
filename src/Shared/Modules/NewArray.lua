@@ -87,12 +87,8 @@ function Array:Add(value)
     return self
 end
 
-function Array:Remove(value)
-    for i, v in ipairs(self.Values) do
-        if v == value then
-            table.remove(self.Values, i)
-        end
-    end
+function Array:Remove(index)
+    table.remove(self.Values, index)
     return self
 end
 
@@ -197,8 +193,38 @@ function Array:Truncate(amount)
     return self
 end
 
-function Array:SortMutable(sortfunction)
-    table.sort(self.Values, sortfunction)
+function Array:Some(callback)
+    for _, value in ipairs(self.Values) do
+        if callback(value) then
+            return true
+        end
+    end
+    return false
+end
+
+function Array:ForEach(callback)
+    for _, value in ipairs(self.Values) do
+        callback(value)
+    end
+    return self
+end
+
+function Array:FindAndRemove(callback)
+    for i, value in ipairs(self.Values) do
+        if callback(value) then
+            table.remove(self.Values, i)
+            return value
+        end
+    end
+    return nil
+end
+
+function Array:RemoveValue(value)
+    for i, v in ipairs(self.Values) do
+        if v == value then
+            table.remove(self.Values, i)
+        end
+    end
     return self
 end
 

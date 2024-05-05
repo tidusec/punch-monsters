@@ -80,12 +80,12 @@ function MegaQuestScreen:Initialize(): nil
 end
 
 function MegaQuestScreen:UpdateProgress(): nil
-	task.spawn(function(): nil
+	task.defer(function(): nil
 		local progressData = self._data:GetValue("MegaQuestProgress")
 
     local index = 1
     for name, currentValue in pairs(progressData) do
-      task.spawn(function(): nil
+      task.defer(function(): nil
         local barContainer = self._background:FindFirstChild(`Goal{index}Progress`)
 		local title = self._background:FindFirstChild(`Goal{index}Title`)
 		if not barContainer or not title then return end

@@ -51,8 +51,6 @@ local DumbellsScreen: Component.Def = {
 function DumbellsScreen:Initialize(): nil
 	local dumbell = Knit.GetService("DumbellService")
 	local data = Knit.GetService("DataService")
-	print(self.Instance)
-	warn("doing")
 	local cards = Array.new( "Instance", self.Instance.Map1:GetChildren())
 		:AddValues(self.Instance.Map2:GetChildren())
 		:AddValues(self.Instance.Map3:GetChildren())
@@ -62,7 +60,6 @@ function DumbellsScreen:Initialize(): nil
 
 	for _, card: ImageLabel & { ImageButton: ImageButton & { TextLabel: TextLabel } } in cards:GetValues() do
 		task.spawn(function()
-			warn(tostring(card))
 			local equipButton = card.ImageButton
 			self:AddToJanitor(equipButton.MouseButton1Click:Connect(function()
 				local mapName: string = self.Attributes.MapName

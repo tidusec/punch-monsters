@@ -81,7 +81,7 @@ end
 
 function GamepassService:PromptPurchase(player: Player, passName: string): nil
 	AssertPlayer(player)
-	task.spawn(function()
+	task.defer(function()
 		local id = getPassIDByName(passName)
 		assert(id, `Failed to find gamepass ID for {passName}`)
 		MarketplaceService:PromptGamePassPurchase(player, id)

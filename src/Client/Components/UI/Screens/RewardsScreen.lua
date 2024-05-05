@@ -94,7 +94,7 @@ function RewardsScreen:UpdateScreen(): nil
 		return
 	end)
 
-	for crateButton: CrateButton in self._crateButtons:GetValues() do
+	for _, crateButton: CrateButton in self._crateButtons:GetValues() do
 		task.spawn(function(): nil
 			local isClaimed = self._timedRewards:IsClaimed(crateButton.LayoutOrder)
 			local collectText = if isClaimed then "Collected!" else "Collect"

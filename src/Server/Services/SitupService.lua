@@ -115,7 +115,7 @@ function SitupService:Exit(player: Player): nil
 	self._playerSitupInfo[player.UserId] = SitupInfo
 	self._remoteDispatcher:SetShiftLockOption(player, false)
 
-	task.spawn(function()
+	task.defer(function()
 		local character = player.Character :: any
 		if character:FindFirstChild("Situp") then
 			character.Situp:Destroy()

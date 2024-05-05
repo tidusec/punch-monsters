@@ -51,7 +51,7 @@ function PurchaseLogService:Log(player: Player, productID: number, isGamepass: b
 		}
 	}))
 
-	task.spawn(function()
+	task.defer(function()
 		local productLog = self._data:GetValue(player, "ProductsLog")
 		table.insert(productLog, {
 			ID = productID,

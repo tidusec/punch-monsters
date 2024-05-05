@@ -38,7 +38,7 @@ end
 
 function UnlockableGamepassButton:UpdateLockedState(): nil
   if not self._lockedOverlay then return end
-  task.spawn(function(): nil
+  task.defer(function(): nil
     local hasRequired = self._gamepass:DoesPlayerOwn(self.Attributes.Requirement)
     self._lockedOverlay.Visible = not hasRequired
     return

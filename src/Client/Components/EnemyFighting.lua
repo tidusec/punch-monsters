@@ -130,7 +130,7 @@ function EnemyFighting:Initialize(): nil
 	end))
 	
 	self:AddToJanitor(self._fightUi.Exit.MouseButton1Click:Connect(function()
-		self:Exit()
+		self:Exit(self.Instance)
 	end))
 
 	return
@@ -142,8 +142,6 @@ function EnemyFighting:Toggle(on: boolean): nil
 	humanoid.WalkSpeed = if on then 0 else defaultSpeed
 	humanoid.JumpPower = if on then 0 else defaultJumpPower
 	self._proximityPrompt.Enabled = not on
-	self._remoteDispatcher:SetAttribute(self.Instance, "InUse", on)
-	self._remoteDispatcher:SetShiftLockOption(not on)
 	return
 end
 
@@ -231,6 +229,9 @@ function EnemyFighting:Reset(): nil
 end
 
 function EnemyFighting:Exit(): nil
+	task.spawn(function()
+		self._enemyfighting:Exit()
+	end)
 	if not self.Attributes.InUse then return end
 	self:Toggle(false)
 	self:Reset()
@@ -294,7 +295,7 @@ end
 
 function EnemyFighting:AddWin(): nil
 	Sound.Master.Win:Play()
-	--[[task.spawn(function()
+	--[[task.defer(function()
 		Sound.Master.Win:Play()
 		local hasDoubleWins = self._gamepass:DoesPlayerOwn("2x Wins")
 		local hasWinsBoost = self._boosts:IsBoostActive("2xWins")

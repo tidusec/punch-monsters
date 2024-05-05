@@ -28,7 +28,7 @@ function TimerService:KnitStart(): nil
 end
 
 function TimerService:RemoveFinished(player: Player): nil
-  task.spawn(function()
+  task.defer(function()
     local unfinishedTimers = Array.new("table", self:GetAll(player))
       :Filter(function(timer: Timer)
         return not self:IsFinished(timer)
@@ -48,7 +48,7 @@ function TimerService:GetAll(player: Player): { Timer }
 end
 
 function TimerService:Start(player: Player, name: string, length: number): nil
-  task.spawn(function()
+  task.defer(function()
     local timer: Timer = {
       Name = name,
       ID = HttpService:GenerateGUID(),
