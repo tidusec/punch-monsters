@@ -48,7 +48,7 @@ function CodeService:Redeem(player: Player, code: string): string
 	end
 
 	for key, value in reward do
-		task.defer(function()
+		task.spawn(function()
 			self._data:IncrementValue(player, key, value)
 		end)
 	end

@@ -82,7 +82,7 @@ function RebirthScreen:UpdateStats(): nil
 			return
 		end)
 	end
-	task.defer(function(): nil
+	task.spawn(function(): nil
 		local boosts = self._rebirths:GetBeforeAndAfter()
 		local wins = self._data:GetValue("Wins")
 		local rebirths = self._rebirths:Get()

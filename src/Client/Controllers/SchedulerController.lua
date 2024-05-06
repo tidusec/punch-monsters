@@ -18,7 +18,7 @@ function SchedulerController:Every(timeExpression: string, callback: () -> ()): 
 
 		Runtime:BindToRenderStep(id, Enum.RenderPriority.Camera.Value, function(dt)
 			if elapsed >= interval then
-				task.defer(callback)
+				task.spawn(callback)
 				elapsed = 0
 			else
 				elapsed += dt

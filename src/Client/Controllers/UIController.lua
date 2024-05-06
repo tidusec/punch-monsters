@@ -19,7 +19,7 @@ function UIController:KnitStart(): nil
 end
 
 function UIController:KnitInit(): nil
-	task.defer(function()
+	task.spawn(function()
 		repeat 
 			local success = pcall(function(): nil
 				return StarterGui:SetCore("ResetButtonCallback", false) 
@@ -68,7 +68,7 @@ function UIController:SetShiftLock(on: boolean): nil
 end
 
 function UIController:AddModelToViewport(viewport: ViewportFrame, modelTemplate: Model, options: { replaceModel: boolean? }?): nil
-	task.defer(function()
+	task.spawn(function()
 		if not modelTemplate then error("Missing viewport model template") end
 		
 		local replaceModel = if options then options.replaceModel else false
