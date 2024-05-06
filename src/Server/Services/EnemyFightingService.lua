@@ -10,7 +10,7 @@ local Players = game:GetService("Players")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Array = require(ReplicatedStorage.Modules.NewArray)
 
-local AssertPlayer = require(ServerScriptService.Modules.AssertPlayer)
+local AssertPlayer = require(ServerScriptService.Server.Modules.AssertPlayer)
 
 local EnemyFightingService = Knit.CreateService {
 	Name = "EnemyFightingService";
