@@ -80,7 +80,7 @@ function InputController:KnitStart(): nil
 	local data = Knit.GetService("DataService")
 	local scheduler = Knit.GetController("SchedulerController")
 	
-	task.sapwn(function(): nil
+	task.spawn(function(): nil
 		local destroyAutoTrainClicker
 		local function startAutoTrain(): nil
 			if destroyAutoTrainClicker then
@@ -121,7 +121,7 @@ function InputController:ExecuteAction(input: InputObject, type: "UserInputType"
 		local actionMap = if type == "KeyCode" then KeyboardInputMap else InputTypeMap
 		for inputType in pairs(actionMap) do
 			if (Enum :: any)[type][inputType] then continue end
-			warn(`Listening for input on invalid {if type == "KeyCode" then "key code" else "input type"}: {inputType}`)
+			warn("Listening for input on invalid input or key code "..inputType)
 		end
 		
 		local actionName: string = (input :: any)[type].Name
