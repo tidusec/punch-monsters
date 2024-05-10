@@ -130,7 +130,7 @@ function EnemyFighting:Initialize(): nil
 	end))
 	
 	self:AddToJanitor(self._fightUi.Exit.MouseButton1Click:Connect(function()
-		self:Exit(self.Instance)
+		self:Exit()
 	end))
 
 	return
@@ -152,7 +152,7 @@ function EnemyFighting:Enter(): nil
 	end
 	if self.Attributes.InUse then return end
 
-	self._playerMaxHealth, self._enemyMaxHealth = self._enemyfighting:Enter(self.Instance.Name)
+	self._playerMaxHealth, self._enemyMaxHealth = self._enemyfighting:Enter(self.Instance)
 	
 	local playerStrength = self._data:GetTotalStrength()
 

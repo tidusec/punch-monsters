@@ -37,6 +37,7 @@ function EnemyFightingService:KnitStart(): nil
 			bosshealth = 0,
 			bossdamage = 0,
 			winner = false,
+			exited = false
 		}
 	end)
 
@@ -65,6 +66,7 @@ function EnemyFightingService:Enter(player: Player, bossmodel: Model): string
 		self.memory[player.UserId].bosshealth = self._enemies[boss].Strength * self._strengthToHealthRatio
 		self.memory[player.UserId].bossdamage = self._enemies[boss].Strength / self._healthToDamageRatio
 		self.memory[player.UserId].winner = false
+		self.memory[player.UserId].exited = false
 		self:Toggle(player, bossmodel, true)
 		return self.memory[player.UserId].health, self.memory[player.UserId].bosshealth
 	end
@@ -126,11 +128,14 @@ function EnemyFightingService:ClearData(player: Player, winner: boolean): string
 	self.memory[player.UserId].entered = false
 	self.memory[player.UserId].health =  winner and self.memory[player.UserId].health or 0
 	self.memory[player.UserId].winner = winner
+	self.memory[player.UserId].exited = true
 	return
 end
 
+--// FIXME: dumb workaround; absolute bullcrap.
 function EnemyFightingService:Exit(player: Player, thing: Instance): string
 	AssertPlayer(player)
+	if self.memory[player.UserId].exited == true then return end
 	if self.memory[player.UserId].boss == thing.Name then
 		self:ClearData(player, false)
 		self:Toggle(player, thing, false)
