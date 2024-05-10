@@ -229,10 +229,10 @@ function EnemyFighting:Reset(): nil
 end
 
 function EnemyFighting:Exit(): nil
-	task.spawn(function()
-		self._enemyfighting:Exit()
-	end)
 	if not self.Attributes.InUse then return end
+	task.spawn(function()
+		self._enemyfighting:Exit(self.Instance)
+	end)
 	self:Toggle(false)
 	self:Reset()
 	self._fighting = false

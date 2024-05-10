@@ -22,6 +22,7 @@ function EnemyFightingService:KnitStart(): nil
 	self._rebirths = Knit.GetService("RebirthService")
 	self._boosts = Knit.GetService("BoostService")
 	self._gamepass = Knit.GetService("GamepassService")
+	self._remoteDispatcher = Knit.GetService("RemoteDispatcher")
     self.memory = {}
 
 	self._strengthToHealthRatio = 10
@@ -47,12 +48,15 @@ function EnemyFightingService:KnitStart(): nil
 end
 
 function EnemyFightingService:Toggle(player, thing, on): nil
-	self._remoteDispatcher:SetAttribute(thing, "InUse", on)
+	self._remoteDispatcher:SetAttribute(player, thing, "InUse", on)
 	self._remoteDispatcher:SetShiftLockOption(player, not on)
 	return
 end
 
-function EnemyFightingService:Enter(player: Player, boss: string): string
+function EnemyFightingService:Enter(player: Player, bossmodel: Model): string
+	AssertPlayer(player)
+	local boss = bossmodel.Name
+	assert(self._enemies[boss], "Boss not found."..boss.." is not a valid boss."..player.Name.." tried to fight it.")
 	if self.memory[player.UserId].entered then return end
 	if self._enemies[boss] then
 		self.memory[player.UserId].entered = true
@@ -61,6 +65,7 @@ function EnemyFightingService:Enter(player: Player, boss: string): string
 		self.memory[player.UserId].bosshealth = self._enemies[boss].Strength * self._strengthToHealthRatio
 		self.memory[player.UserId].bossdamage = self._enemies[boss].Strength / self._healthToDamageRatio
 		self.memory[player.UserId].winner = false
+		self:Toggle(player, bossmodel, true)
 		return self.memory[player.UserId].health, self.memory[player.UserId].bosshealth
 	end
 end
@@ -126,7 +131,6 @@ end
 
 function EnemyFightingService:Exit(player: Player, thing: Instance): string
 	AssertPlayer(player)
-	assert(thing:IsA("Model"), "Thing must be a model")
 	if self.memory[player.UserId].boss == thing.Name then
 		self:ClearData(player, false)
 		self:Toggle(player, thing, false)
@@ -141,8 +145,8 @@ function EnemyFightingService:Update(player: Player): string
 	return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health
 end
 
-function EnemyFightingService.Client:Enter(player: Player, boss: string): number
-	return self.Server:Enter(player, boss)
+function EnemyFightingService.Client:Enter(player: Player, bossmodel: Model): number
+	return self.Server:Enter(player, bossmodel)
 end
 
 function EnemyFightingService.Client:StartFight(player: Player, boss: string): number

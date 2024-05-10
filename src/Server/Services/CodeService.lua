@@ -37,10 +37,10 @@ function CodeService:KnitInit(): nil
 end
 
 function CodeService:Redeem(player: Player, code: string): string
-	local reward = self.codes[code]
-	if not reward then 
+	if not self.codes[code] then 
 		return "Invalid code provided!"
 	end
+	local reward = self.codes[code]
 
 	local redeemedCodes = Array.new("string", self._data:GetValue("RedeemedCodes"))
 	if redeemedCodes:Has(code) then
