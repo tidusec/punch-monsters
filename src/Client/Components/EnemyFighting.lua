@@ -275,7 +275,7 @@ function EnemyFighting:Attack(): nil
 		cameraShaker:Shake(CameraShaker.Presets.Rock);
 	end);
 	
-	self._enemyHealth, self._playerHealth = self._enemyfighting:Attack()
+	self._enemyHealth, self._playerHealth = self._enemyfighting:Attack(self.Instance)
 
 	task.spawn(function()
 		self:UpdateBars()

@@ -55,24 +55,28 @@ function EnemyFightingService:Toggle(player, thing, on): nil
 end
 
 function EnemyFightingService:Enter(player: Player, bossmodel: Model): string
-	AssertPlayer(player)
 	local boss = bossmodel.Name
+
+	AssertPlayer(player)
 	assert(self._enemies[boss], "Boss not found."..boss.." is not a valid boss."..player.Name.." tried to fight it.")
+
 	if self.memory[player.UserId].entered then return end
-	if self._enemies[boss] then
-		self.memory[player.UserId].entered = true
-		self.memory[player.UserId].boss = boss
-		self.memory[player.UserId].health = self._data:GetTotalStrength(player) * self._strengthToHealthRatio
-		self.memory[player.UserId].bosshealth = self._enemies[boss].Strength * self._strengthToHealthRatio
-		self.memory[player.UserId].bossdamage = self._enemies[boss].Strength / self._healthToDamageRatio
-		self.memory[player.UserId].winner = false
-		self.memory[player.UserId].exited = false
-		self:Toggle(player, bossmodel, true)
-		return self.memory[player.UserId].health, self.memory[player.UserId].bosshealth
-	end
+
+	self.memory[player.UserId].entered = true
+	self.memory[player.UserId].boss = boss
+	self.memory[player.UserId].health = self._data:GetTotalStrength(player) * self._strengthToHealthRatio
+	self.memory[player.UserId].bosshealth = self._enemies[boss].Strength * self._strengthToHealthRatio
+	self.memory[player.UserId].bossdamage = self._enemies[boss].Strength / self._healthToDamageRatio
+	self.memory[player.UserId].winner = false
+	self.memory[player.UserId].exited = false
+	self:Toggle(player, bossmodel, true)
+
+	return self.memory[player.UserId].health, self.memory[player.UserId].bosshealth
 end
 
-function EnemyFightingService:StartFight(player: Player, boss: string): string
+function EnemyFightingService:StartFight(player: Player, thing: Model): string
+	AssertPlayer(player)
+	local boss = thing.Name
 	if not self.memory[player.UserId].entered then return end
 	if self.memory[player.UserId].fighting then return end
 
@@ -83,7 +87,7 @@ function EnemyFightingService:StartFight(player: Player, boss: string): string
 				task.wait(0.3)
 				self.memory[player.UserId].health -= self.memory[player.UserId].bossdamage
 				if self.memory[player.UserId].health <= 0 then
-					self:ClearData(player, false)
+					self:Exit(player, thing, false)
 					return
 				end
 			end
@@ -92,20 +96,23 @@ function EnemyFightingService:StartFight(player: Player, boss: string): string
 	end
 end
 
-function EnemyFightingService:Attack(player: Player): string
-	if not self.memory[player.UserId].fighting then return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health end
+function EnemyFightingService:Attack(player: Player, bossmodel: Model): string
+	if not self.memory[player.UserId].fighting then 
+		return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health 
+	end
+
 	self.memory[player.UserId].bosshealth -= self._data:GetTotalStrength(player)
+
 	if self.memory[player.UserId].bosshealth <= 0 then
 		if self._enemies[self.memory[player.UserId].boss].Boss then
 			local bossmap = "Map"..self._enemies[self.memory[player.UserId].boss].Map
 			self._data:AddDefeatedBoss(player, bossmap)
 		end
 		
-		self:AddWin(player)
-		self:ClearData(player, true)
+		self:Exit(player, bossmodel, true)
 		return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health
 	elseif self.memory[player.UserId].health <= 0 then
-		self:ClearData(player)
+		self:Exit(player, bossmodel, false)
 		return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health
 	else
 		return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health
@@ -132,13 +139,18 @@ function EnemyFightingService:ClearData(player: Player, winner: boolean): string
 	return
 end
 
---// FIXME: dumb workaround; absolute bullcrap.
-function EnemyFightingService:Exit(player: Player, thing: Instance): string
+function EnemyFightingService:Exit(player: Player, thing: Instance, winner: boolean): string
 	AssertPlayer(player)
 	if self.memory[player.UserId].exited == true then return end
 	if self.memory[player.UserId].boss == thing.Name then
-		self:ClearData(player, false)
-		self:Toggle(player, thing, false)
+		winner = winner or false
+		if winner then
+			self:AddWin(player)
+		end
+		self:ClearData(player, winner)
+		if thing then
+			self:Toggle(player, thing, false)
+		end
 		return
 	else
 		warn("Player tried to exit a boss fight they weren't in")
@@ -154,12 +166,12 @@ function EnemyFightingService.Client:Enter(player: Player, bossmodel: Model): nu
 	return self.Server:Enter(player, bossmodel)
 end
 
-function EnemyFightingService.Client:StartFight(player: Player, boss: string): number
-	self.Server:StartFight(player, boss)
+function EnemyFightingService.Client:StartFight(player: Player, bossmodel: Model): number
+	self.Server:StartFight(player, bossmodel)
 end
 
-function EnemyFightingService.Client:Attack(player: Player): number
-	return self.Server:Attack(player)
+function EnemyFightingService.Client:Attack(player: Player, bossmodel: Model): number
+	return self.Server:Attack(player, bossmodel)
 end
 
 function EnemyFightingService.Client:Update(player: Player): number
@@ -167,7 +179,7 @@ function EnemyFightingService.Client:Update(player: Player): number
 end
 
 function EnemyFightingService.Client:Exit(player: Player, thing: Instance): number
-	self.Server:Exit(player, thing)
+	self.Server:Exit(player, thing, false)
 end
 
 return EnemyFightingService
