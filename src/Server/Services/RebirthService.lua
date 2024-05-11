@@ -52,6 +52,7 @@ function RebirthService:_AddRebirth(player: Player): nil
   self._data:SetValue(player, "AbsStrength", 0):await()
   self._data:SetValue(player, "Wins", 0):await()
 
+  player:LoadCharacter()
 
   return
 end
