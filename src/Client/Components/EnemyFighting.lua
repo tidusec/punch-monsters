@@ -130,7 +130,7 @@ function EnemyFighting:Initialize(): nil
 	end))
 	
 	self:AddToJanitor(self._fightUi.Exit.MouseButton1Click:Connect(function()
-		self:Exit()
+		self:Exit(true)
 	end))
 
 	return
@@ -193,7 +193,7 @@ end
 
 function EnemyFighting:StartFight(): nil
 	self._fighting = true
-	self._enemyfighting:StartFight(self.Instance.Name)
+	self._enemyfighting:StartFight(self.Instance)
 	
 	task.spawn(function()
 		repeat task.wait(0.4);
@@ -228,14 +228,18 @@ function EnemyFighting:Reset(): nil
 	return
 end
 
-function EnemyFighting:Exit(): nil
-	if not self.Attributes.InUse then return end
-	task.spawn(function()
-		self._enemyfighting:Exit(self.Instance)
-	end)
+function EnemyFighting:Exit(forced: boolean): nil
 	self:Toggle(false)
 	self:Reset()
 	self._fighting = false
+	if not self.Attributes.InUse then return end
+
+	task.spawn(function()
+		if forced then
+			self._enemyfighting:Exit(self.Instance)
+			return
+		end
+	end)
 	return
 end
 
@@ -319,7 +323,7 @@ function EnemyFighting:KillPlayer(): nil
 	character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 	characterRoot.AssemblyLinearVelocity = forwards * -RAGDOLL_FORCE + up * (RAGDOLL_FORCE / 3)
 	task.delay(2.5, function()
-		self:Exit()
+		self:Exit(false)
 	end)
 	return
 end
@@ -342,7 +346,7 @@ function EnemyFighting:Kill(): nil
 		self._data:AddDefeatedBoss(script.Parent.Parent.Name) -- map name
 	end]]
 	task.delay(2, function()
-		self:Exit()
+		self:Exit(false)
 	end)
 
 	return

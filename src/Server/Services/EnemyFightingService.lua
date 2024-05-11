@@ -76,6 +76,7 @@ end
 
 function EnemyFightingService:StartFight(player: Player, thing: Model): string
 	AssertPlayer(player)
+
 	local boss = thing.Name
 	if not self.memory[player.UserId].entered then return end
 	if self.memory[player.UserId].fighting then return end
@@ -97,6 +98,8 @@ function EnemyFightingService:StartFight(player: Player, thing: Model): string
 end
 
 function EnemyFightingService:Attack(player: Player, bossmodel: Model): string
+	AssertPlayer(player)
+
 	if not self.memory[player.UserId].fighting then 
 		return self.memory[player.UserId].bosshealth, self.memory[player.UserId].health 
 	end
