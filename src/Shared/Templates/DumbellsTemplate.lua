@@ -10,67 +10,67 @@ local module = {
       Gain = 3
     }, {
       Required = 350,
-      Gain = 6
+      Gain = 5
     }, {
       Required = 550,
-      Gain = 8
+      Gain = 7
     }, {
       Required = 800,
-      Gain = 14
+      Gain = 10
     }, {
       Required = 1200,
-      Gain = 21
+      Gain = 13
     }, {
       Required = 2000,
-      Gain = 40
+      Gain = 18
     }, {
       Required = 3500,
-      Gain = 64
+      Gain = 23
     }, {
       Required = 7500,
-      Gain = 130
+      Gain = 25
     }, {
       Required = 15_000,
-      Gain = 270
+      Gain = 30
     }, {
       Required = 25_000,
-      Gain = 520
+      Gain = 35
     }, {
       Required = 45_000,
-      Gain = 1000
+      Gain = 50
     }, {
       Required = 75_000,
-      Gain = 1600
+      Gain = 70
     }, {
       Required = 110_000,
-      Gain = 2400
+      Gain = 90
     }, { -- VIP
       Required = 0,
-      Gain = 5200
+      Gain = 100
     }
 	},
 	Map2 = {
 		{
       Required = 0,
-      Gain = 2500
+      Gain = 120
     }, {
       Required = 450_000,
-      Gain = 3400
+      Gain = 150
     }, {
       Required = 550_000,
-      Gain = 3700
+      Gain = 175
     }, {
       Required = 700_000,
-      Gain = 5000
+      Gain = 200
     }, {
       Required = 850_000,
-      Gain = 6250
+      Gain = 225
     }, {
       Required = 1_000_000,
-      Gain = 7500
+      Gain = 250
     }, {
       Required = 1_200_000,
-      Gain = 9000
+      Gain = 300
     }, {
       Required = 1_500_000,
       Gain = 11_250
@@ -94,7 +94,7 @@ local module = {
       Gain = 42_000
     }, { -- VIP
       Required = 0,
-      Gain = 126_000
+      Gain = 50_000
     }
 	},
 	Map3 = {

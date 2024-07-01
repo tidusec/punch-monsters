@@ -23,6 +23,7 @@ function EnemyFightingService:KnitStart(): nil
 	self._boosts = Knit.GetService("BoostService")
 	self._gamepass = Knit.GetService("GamepassService")
 	self._remoteDispatcher = Knit.GetService("RemoteDispatcher")
+	self._randomItem = Knit.GetService("RandomItemService")
     self.memory = {}
 
 	self._strengthToHealthRatio = 10
@@ -149,12 +150,13 @@ function EnemyFightingService:Exit(player: Player, thing: Instance, winner: bool
 		winner = winner or false
 		if winner then
 			self:AddWin(player)
+			winner = self._randomItem:GiveItem(player, thing.Name)
 		end
 		self:ClearData(player, winner)
 		if thing then
 			self:Toggle(player, thing, false)
 		end
-		return
+		return winner
 	else
 		warn("Player tried to exit a boss fight they weren't in")
 	end

@@ -69,6 +69,12 @@ function RebirthScreen:Initialize(): nil
 		self:UpdateStats()
 	end))
 
+	self:AddToJanitor(self._background.AutoRebirth.MouseButton1Click:Connect(function(): nil
+		--// TODO: Check if gui will auto change color
+		self._data:SetSetting("AutoRebirth", not self._data:GetValue("AutoRebirth"))
+		return
+	end))
+
 	self:UpdateStats()
 
 	return
@@ -77,7 +83,6 @@ end
 function RebirthScreen:UpdateStats(): nil
 	if self._data:GetValue("AutoRebirth") then
 		task.spawn(function(): nil
-			--// FIXME: make it check on server if can rebirth (save data)
 			self._rebirths:Rebirth()
 			return
 		end)

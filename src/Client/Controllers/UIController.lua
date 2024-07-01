@@ -1,5 +1,7 @@
 --!native
 --!strict
+local CollectionService = game:GetService("CollectionService")
+local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
@@ -44,6 +46,14 @@ function UIController:SetScreen(name: string, blur: boolean?): ScreenGui?
 		end)
 		if on then
 			setScreen = screen
+		end
+	end
+
+	if name == "MainUi" then
+		for _, frame in CollectionService:GetTagged("OutsideUI") do
+			task.spawn(function()
+				frame.Enabled = true
+			end)
 		end
 	end
 	

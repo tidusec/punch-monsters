@@ -20,7 +20,7 @@ local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local characterRoot = character:WaitForChild("HumanoidRootPart")
 
-local MAX_STAND_DISTANCE = 6
+local MAX_STAND_DISTANCE = 5
 
 local HatchingStand: Component.Def = {
 	Name = script.Name;
@@ -55,10 +55,8 @@ function HatchingStand:Initialize(): nil
 	self._map = self.Instance.Parent.Parent.Name
 	self._eggTemplate = EggTemplate[self._map][self.Instance.Name]
 
-	self:AddToJanitor(self._hatchingService.Hatched:Connect(function(times: number): nil
-		for _ = 1, times do
-			self:Hatch()
-		end
+	self:AddToJanitor(self._hatchingService.Hatched:Connect(function(pets): nil
+		self:HatchAnimation(pets)
 		return
 	end))
 	
@@ -67,113 +65,74 @@ function HatchingStand:Initialize(): nil
 	return
 end
 
-function HatchingStand:ReturnPet(): string?
-	local has2xLuck = self._gamepass:DoesPlayerOwn("2x Luck")
-	local has10xLuck = self._gamepass:DoesPlayerOwn("10x Luck")
-	local has100xLuck = self._gamepass:DoesPlayerOwn("100x Luck")
-	local has10xLuckBoost = self._boosts:IsBoostActive("10xLuck")
-	local has100xLuckBoost = self._boosts:IsBoostActive("100xLuck")
-	local luckMultiplier = 0
-	
-	if has2xLuck then
-		luckMultiplier += 2
-	end
-	if has10xLuck then
-		luckMultiplier += 10
-	end
-	if has100xLuck then
-		luckMultiplier += 100
-	end
-	if has10xLuckBoost then
-		luckMultiplier += 10
-	end
-	if has100xLuckBoost then
-		luckMultiplier += 100
-	end
-	
-	local totalProbability = 0
-	local cumulativeProbabilities = {}
-	for petName, probability in self._eggTemplate.Chances do
-		totalProbability += probability * luckMultiplier
-		cumulativeProbabilities[petName] = totalProbability
-	end
-	
-	local random = Random.new():NextNumber() * totalProbability
-	for petName, cumulativeProbability in cumulativeProbabilities do
-		if random <= cumulativeProbability then
-			return petName
-		end
-	end
-	
-	for petName in self._eggTemplate.Chances do
-		return petName
-	end
+function HatchingStand:HatchAnimation(pets)
+    if type(pets) == "string" then
+        pets = Array.new("string", { pets })
+    end
 
-	return
+    self._ui:SetScreen("EggUi", true)
+
+    for _, pet in pets:GetValues() do
+        local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
+        if not petModel then
+            self._hatching = false
+            return warn(string.format("Could not find pet model \"%s\"", pet))
+        end
+
+        local petTemplate = PetsTemplate[pet]
+        if petTemplate.Rarity == "Legendary" then
+            Sound.Master.LegendaryHatch:Play()
+        end
+
+        self._eggViewport:SetAttribute("FitModel", false)
+        self._eggViewport:SetAttribute("FOV", nil :: any)
+        self._eggViewport:SetAttribute("ModelRotation", 0 :: any)
+        self._ui:AddModelToViewport(self._eggViewport, self._egg, { replaceModel = true })
+
+        -- Wait for the initial setup before showing the pet model
+        task.wait(1.5)
+
+        self._eggViewport:SetAttribute("FitModel", true)
+        self._eggViewport:SetAttribute("FOV", 15 :: any)
+        self._eggViewport:SetAttribute("ModelRotation", -120 :: any)
+        self._ui:AddModelToViewport(self._eggViewport, petModel, { replaceModel = true })
+
+        -- Wait for the pet's animation to finish before continuing to the next pet
+        task.wait(1.5)
+    end
+
+    -- No need to wait here anymore as the last pet's animation wait is included in the loop
+    self._ui:SetScreen("MainUi", false)
+
+    self._hatching = false
+    self._chancesUI.Enabled = true
 end
 
-function HatchingStand:Hatch(): nil
+function HatchingStand:Hatch(amount :number): nil
+	assert(type(amount) == "number", "Amount must be a number")
+	assert(amount > 0, "Amount must be greater than 0")
 	if self._dumbell:IsEquipped() then return end
 	if self._hatching then return end
 	self._hatching = true
-	
-	local pet = self:ReturnPet()
-	if not pet then
-		self._hatching = false
-		return warn("No pet returned from HatchingStand")
-	end
-	
-	local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
-	if not petModel then
-		self._hatching = false
-		return warn(`Could not find pet model "{pet}"`)
-	end
-	
-	local petTemplate = PetsTemplate[pet]
-	if petTemplate.Rarity == "Legendary" then
-		Sound.Master.LegendaryHatch:Play()
-	end
 
-	self._pets:Add(pet)
-	self._eggViewport:SetAttribute("FitModel", false)
-	self._eggViewport:SetAttribute("FOV", nil :: any)
-	self._eggViewport:SetAttribute("ModelRotation", 0 :: any)
-	self._ui:AddModelToViewport(self._eggViewport, self._egg, { replaceModel = true })
-	self._ui:SetScreen("EggUi", true)
-
-	task.delay(2.5, function()
-		self._eggViewport:SetAttribute("FitModel", true)
-		self._eggViewport:SetAttribute("FOV", 15 :: any)
-		self._eggViewport:SetAttribute("ModelRotation", -120 :: any)
-		self._ui:AddModelToViewport(self._eggViewport, petModel, { replaceModel = true })
-
-		task.wait(2.5)
-		self._ui:SetScreen("MainUi", false)
-	end)
-	
-	local cost = self._eggTemplate.WinsCost
-	if self._eggTemplate.Robux and not cost then
-		print("devproduct here")
+	if amount == 1 then
+		self._hatchingService:Hatch(self._map, self.Instance.Name)
+	else
+		self._hatchingService:HatchMany(self._map, self.Instance.Name, amount)
 	end
 	
-	self._data:IncrementValue("Eggs")
-	self._hatching = false
-	self._chancesUI.Enabled = true
 	return
 end
 
 function HatchingStand:BuyOne(): nil
 	if not self:IsClosest() then return end
-	self:Hatch()
+	self:Hatch(1)
 	return
 end
 
 function HatchingStand:BuyThree(): nil
 	if not self:IsClosest() then return end
-	
-	for _ = 1, 3 do
-		self:Hatch()
-	end
+	self:Hatch(3)
 	return
 end
 

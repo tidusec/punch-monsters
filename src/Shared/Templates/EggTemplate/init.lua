@@ -13,7 +13,9 @@ local module = {
 			['Chances'] = ChancesTemplate.Map1.Egg2
 		},
 		['Egg3Robux'] = {
-			['Robux'] = 79,
+			['Robux1'] = 1631383150,
+			['Robux3'] = 1631383146,
+			['Robux5'] = 1631383837,
 			['Chances'] = ChancesTemplate.Map1.Egg3Robux
 		}
 	},

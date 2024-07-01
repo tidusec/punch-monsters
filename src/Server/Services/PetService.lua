@@ -322,10 +322,6 @@ function PetService:UpdateFollowingPets(player: Player, pets: { typeof(PetsTempl
 	return
 end
 
-function PetService.Client:Add(player, pet)
-	return self.Server:Add(player, pet)
-end
-
 function PetService.Client:Equip(player, pet)
 	return self.Server:Equip(player, pet)
 end
