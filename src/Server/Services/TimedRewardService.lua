@@ -49,7 +49,7 @@ function TimedRewardService:Claim(player: Player, crateNumber: number): nil
     local key, value = randomPair(rewardPool)
     if key == "Eggs" then
       local _, randomEgg = randomPair(value)
-      self._pets:Add(randomEgg)
+      self._pets:Add(player, randomEgg)
     elseif key == "Strength" then
       local strengthType, strength = randomPair(value)
       self._data:IncrementValue(player, strengthType .. "Strength", strength * rebirthMultiplier)

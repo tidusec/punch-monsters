@@ -204,6 +204,7 @@ end
 
 function DataService:DataUpdate<T>(player: Player, key: string, value: T): nil
 	task.spawn(function(): nil
+		self.Client.DataUpdated:Fire(player, key, value)
 		return self.Client.DataUpdated:Fire(player, key, value)
 	end)
 	task.spawn(function(): nil
@@ -335,6 +336,7 @@ function DataService:GetTotalStrengthMultiplier(player: Player): number
 	AssertPlayer(player)
 	local petMultiplier = self._pets:GetTotalMultiplier(player)
 	local rebirthMultiplier = self._rebirths:GetBoost(player, "Strength")
+	print("OOF")
 	local gamepassMultiplier = if self._gamepass:DoesPlayerOwn(player, "2x Strength") then 2 else 1
 	local boostMultiplier = if self._boosts:IsBoostActive(player, "2xStrength") then 2 else 1
 	return petMultiplier * rebirthMultiplier * gamepassMultiplier * boostMultiplier
@@ -349,17 +351,8 @@ end
 
 -- client
 
-DataService.Client.Cache = {}
-
-function DataService.Client:DataUpdated(key: string, value: any): nil
-	self.Cache[key] = value
-end
-
 function DataService.Client:GetValue(player, name)
-	if not self.Cache[name] then
-		warn(`Could not find key "{name}" in player's data.`)
-	end
-	return self.Cache[name]
+	return self.Server:GetValue(player, name)
 end
 
 function DataService.Client:GetSetting(player, name)

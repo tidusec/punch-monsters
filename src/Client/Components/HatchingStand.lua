@@ -55,7 +55,7 @@ function HatchingStand:Initialize(): nil
 	self._map = self.Instance.Parent.Parent.Name
 	self._eggTemplate = EggTemplate[self._map][self.Instance.Name]
 
-	self:AddToJanitor(self._hatchingService.Hatched:Connect(function(pets): nil
+	self:AddToJanitor(self._hatchingService.PetHatched:Connect(function(pets): nil
 		self:HatchAnimation(pets)
 		return
 	end))
@@ -72,7 +72,7 @@ function HatchingStand:HatchAnimation(pets)
 
     self._ui:SetScreen("EggUi", true)
 
-    for _, pet in pets:GetValues() do
+    for _, pet in pets do
         local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
         if not petModel then
             self._hatching = false
@@ -121,6 +121,8 @@ function HatchingStand:Hatch(amount :number): nil
 		self._hatchingService:HatchMany(self._map, self.Instance.Name, amount)
 	end
 	
+	task.wait(0.5)
+	self._hatching = false
 	return
 end
 

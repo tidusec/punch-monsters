@@ -1,5 +1,17 @@
 {
   "robloxLsp.diagnostics.globals": [
     "parseTime"
-  ]
+  ],
+  "robloxLsp.completion.alwaysShowMethods": true,
+  "robloxLsp.completion.callParenthesess": true,
+  "robloxLsp.completion.deprecatedMembers": true,
+  "robloxLsp.completion.displayContext": 5,
+  "robloxLsp.completion.endAutocompletion": true,
+  "robloxLsp.hint.enable": true,
+  "robloxLsp.hint.paramName": true,
+  "robloxLsp.hint.returnType": true,
+  "robloxLsp.hint.setType": true,
+  "robloxLsp.hover.enumsLimit": 10,
+  "robloxLsp.hover.fieldInfer": 5000,
+  "robloxLsp.intelliSense.searchDepth": 10
 }

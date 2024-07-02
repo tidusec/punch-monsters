@@ -62,17 +62,20 @@ function HatchingService:HatchManyServer(player: Player, map: string, name: stri
 		local petName = self:ReturnPet(player, egg)
 		self._pets:Add(player, petName)
 		self._data:IncrementValue(player, "Eggs")
-		pets:push(petName)
+		pets:Add(petName)
 	end
 
-	self.Client.PetHatched:Fire(player, pets)
-
+	self.Client.PetHatched:Fire(player, pets:GetValues())
+	
 	return
 end
 
 function HatchingService:DeductCost(player: Player, egg: table, amount: number): nil
-	local WinsCost = egg.WinsCost * amount
-	if egg.Robux and not WinsCost then
+	local WinsCost
+	if egg.WinsCost then
+		WinsCost = egg.WinsCost * amount
+	end
+	if egg["Robux"..amount] and not WinsCost then
 		local success, result = pcall(function()
 			return MarketplaceService:PromptProductPurchase(player, egg["Robux"..amount])
 		end)
@@ -80,10 +83,10 @@ function HatchingService:DeductCost(player: Player, egg: table, amount: number):
 		return
 	else
 		local wins = self._data:GetValue(player, "Wins")
-		if wins < WinsCost then
+		if  wins < WinsCost then
 			return
 		end
-		self._data:DecrementValue(player, "Wins", WinsCost)
+		self._data:DeductValue(player, "Wins", WinsCost)
 	end
 
 	return true
@@ -99,6 +102,8 @@ function HatchingService:HatchMany(player: Player, map: string, name: string, am
 
 	local success = self:DeductCost(player, egg, amount)
 	if not success then return end
+
+	self:HatchManyServer(player, map, name, amount)
 
 	return true
 end

@@ -33,5 +33,5 @@ return function(n: number)
 		text = ("%.1f"):format(rounded / 10 ^ (digits - 1)) .. chosenAbbreviation
 	end
 
-	return if chosenAbbreviation then text else tostring(n)
+	return if chosenAbbreviation then text else tostring(math.floor(n))
 end

@@ -23,3 +23,5 @@ local RandomItems = {
         ["Golem"] = 5,
     },
 }
+
+return RandomItems

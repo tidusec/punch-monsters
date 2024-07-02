@@ -72,15 +72,15 @@ function TransactionService:KnitStart()
 			return
 		end,
 		[1631383150] = function(player: Player): nil -- skip rebirth
-			hatching:HatchOne(player, "Map1", "Egg3Robux")
+			hatching:HatchServer(player, "Map1", "Egg3Robux")
 			return
 		end,
 		[1631383146] = function(player: Player): nil -- skip rebirth
-			hatching:HatchMany(player, "Map1", "Egg3Robux", 3)
+			hatching:HatchManyServer(player, "Map1", "Egg3Robux", 3)
 			return
 		end,
 		[1631383837] = function(player: Player): nil -- skip rebirth
-			hatching:HatchMany(player, "Map1", "Egg3Robux", 5)
+			hatching:HatchManyServer(player, "Map1", "Egg3Robux", 5)
 			return
 		end
 	}
