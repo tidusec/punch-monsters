@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local AssertPlayer = require(ReplicatedStorage.Modules.AssertPlayer)
+local AssertPlayer = require(ServerScriptService.Server.Modules.AssertPlayer)
 
 local RandomItemService = Knit.CreateService {
   Name = "RandomItemService";
@@ -15,7 +15,6 @@ local Items = require(ServerScriptService.Server.Templates.RandomItems)
 function RandomItemService:KnitStart()
 	self._gamepass = Knit.GetService("GamepassService")
 	self._boosts = Knit.GetService("BoostService")
-	self._eggTemplate = require(ServerScriptService.Server.Templates.Egg)
 end
 
 function RandomItemService:GiveItem(player, map, boss)

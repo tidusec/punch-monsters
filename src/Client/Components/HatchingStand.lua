@@ -66,17 +66,17 @@ function HatchingStand:Initialize(): nil
 end
 
 function HatchingStand:HatchAnimation(pets)
+	--// TODO: check if this fires all eggs?? Would be crazy should add check to see if it's the correct egg
     if type(pets) == "string" then
-        pets = Array.new("string", { pets })
+        pets = {pets}
     end
 
     self._ui:SetScreen("EggUi", true)
-
     for _, pet in pets do
         local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
         if not petModel then
             self._hatching = false
-            return warn(string.format("Could not find pet model \"%s\"", pet))
+            return warn(string.format("Could not find pet model \"%s\"", tostring(pet)))
         end
 
         local petTemplate = PetsTemplate[pet]

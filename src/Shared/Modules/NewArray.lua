@@ -219,13 +219,68 @@ function Array:FindAndRemove(callback)
     return nil
 end
 
+function valuesEqual(v1, v2)
+    if type(v1) == "table" and type(v2) == "table" then
+        return tablesEqual(v1, v2)
+    else
+        return v1 == v2
+    end
+end
+
+function tablesEqual(t1, t2)
+    if t1 == t2 then return true end
+    if type(t1) ~= "table" or type(t2) ~= "table" then return false end
+    local t1Keys, t2Keys = {}, {}
+    for k, v in pairs(t1) do
+        t1Keys[k] = true
+        if not valuesEqual(v, t2[k]) then
+            return false
+        end
+    end
+    for k, v in pairs(t2) do
+        t2Keys[k] = true
+        if not valuesEqual(v, t1[k]) then
+            return false
+        end
+    end
+    for k in pairs(t1Keys) do
+        if not t2Keys[k] then
+            return false
+        end
+    end
+    for k in pairs(t2Keys) do
+        if not t1Keys[k] then
+            return false
+        end
+    end
+    return true
+end
+
 function Array:RemoveValue(value)
-    for i, v in ipairs(self.Values) do
-        if v == value then
+    local i = 1
+    while i <= #self.Values do
+        local v = self.Values[i]
+        if valuesEqual(v, value) then
             table.remove(self.Values, i)
+            return self
+        else
+            i = i + 1
         end
     end
     return self
+end
+
+function Array:Map(callback)
+    local newValues = {}
+    for _, value in ipairs(self.Values) do
+        table.insert(newValues, callback(value))
+    end
+    self.Values = newValues
+    return self
+end
+
+function Array:ToTable()
+    return self.Values
 end
 
 return Array

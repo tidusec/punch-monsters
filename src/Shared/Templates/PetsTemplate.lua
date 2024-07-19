@@ -241,4 +241,36 @@ local module = {
 	},
 }
 
+--// make a table meta that will include Golden pets with Strength x2
+local meta = {
+	__index = function(self, key)
+		local multiplier = 1
+		local petname = key
+
+		if string.find("Golden ", petname) then 
+			multiplier *= 2 
+			petname = string.gsub(key, "Golden ", "")
+		end
+
+		if string.find("Mythic ", petname) then
+			multiplier *= 3
+			petname = string.gsub(key, "Mythic ", "")
+		end
+
+		local pet = self[petname]
+			
+		if pet then
+			local newPet = {
+				ID = nil,
+				Rarity = pet.Rarity,
+				StrengthMultiplier = pet.StrengthMultiplier * multiplier,
+			}
+			self[key] = newPet
+			return newPet
+		
+		end
+	end
+}
+setmetatable(module, meta)
+
 return module

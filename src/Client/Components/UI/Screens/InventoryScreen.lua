@@ -128,12 +128,25 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 	return
 end
 
+function InventoryScreen:Height(card_amount: number): number
+	local rows = math.ceil(card_amount / 5)
+	local a = -0.0001714  -- Fitted coefficient
+	local b = -0.01133    -- Fitted coefficient
+	local c = 0.2491      -- Fitted coefficient
+	local height = a * math.pow(rows, 2) + b * rows + c
+	return height
+end
+
 function InventoryScreen:UpdatePetCards(): nil
 	-- cleanup old cards & their connections
 	self._updateJanitor:Cleanup()
 	
 	local pets = self._data:GetValue("Pets")
 	local ownedPets: { [string]: Pet } = pets.OwnedPets
+
+	self._container.CanvasSize = UDim2.new(0, 0, #ownedPets/15, 0)
+	self._container.UIGridLayout.CellSize = UDim2.new(0.18, 0, self:Height(#ownedPets), 100)
+
 	for _, pet in pairs(ownedPets) do
 		task.spawn(function()
 			local card: ImageButton & { Viewport: ViewportFrame; StrengthMultiplier: TextLabel } = Assets.UserInterface.Inventory.PetCard:Clone()
@@ -149,6 +162,7 @@ function InventoryScreen:UpdatePetCards(): nil
 			end))
 		end)
 	end
+
 	return
 end
 

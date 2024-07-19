@@ -18,9 +18,11 @@ local TimedRewardService = Knit.CreateService {
 
 local FIRST_JOIN_CACHE = {}
 local CLAIMED_REWARDS_CACHE = {}
+
 function TimedRewardService:KnitStart()
   self._data = Knit.GetService("DataService")
   self._pets = Knit.GetService("PetService")
+  self._hatch = Knit.GetService("HatchingService")
 
   self._data.DataUpdated.Event:Connect(function(player, key)
     if key ~= "FirstJoinToday" then return end
@@ -50,6 +52,7 @@ function TimedRewardService:Claim(player: Player, crateNumber: number): nil
     if key == "Eggs" then
       local _, randomEgg = randomPair(value)
       self._pets:Add(player, randomEgg)
+      self._hatch:ShowFakeHatch(player, randomEgg)
     elseif key == "Strength" then
       local strengthType, strength = randomPair(value)
       self._data:IncrementValue(player, strengthType .. "Strength", strength * rebirthMultiplier)

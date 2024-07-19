@@ -156,7 +156,7 @@ function PetService:Equip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 		local petSpace = self:GetPetSpace(player)
 		local pets = self._data:GetValue(player, "Pets")
 		local equippedPets = pets.Equipped
-		if #equippedPets == petSpace then return end
+		if #equippedPets >= petSpace then return end
 
 		table.insert(equippedPets, pet)
 		pets.Equipped = equippedPets
@@ -320,6 +320,32 @@ function PetService:UpdateFollowingPets(player: Player, pets: { typeof(PetsTempl
 		end)
 	end
 	return
+end
+
+function PetService:Upgrade(player, pet, weight)
+	AssertPlayer(player)
+
+	local pets = self._data:GetValue(player, "Pets")
+	local pets_array = Array.new("table", pets.OwnedPets)
+
+	local amount = pets_array
+		:Filter(function(pet_checked)
+			return pet_checked == pet
+		end)
+		:Amount()
+	
+	if amount < weight then return end
+	
+	for i = 1, weight do
+		pets_array:RemoveValue(pet)
+	end
+
+	local number = Random.new():NextNumber()
+
+	if number < weight * 0.2 then
+		--// TODO: think trough if this is really the way to go
+		self:Add(player, "Gold "..pet)
+	end
 end
 
 function PetService.Client:Equip(player, pet)

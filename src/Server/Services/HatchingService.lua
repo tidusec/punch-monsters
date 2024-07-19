@@ -123,6 +123,10 @@ function HatchingService:Hatch(player: Player, map: string, name: string): nil
   	return true
 end
 
+function HatchingService:ShowFakeHatch(player, petName)
+	self.Client.PetHatched:Fire(player, petName)
+end
+
 function HatchingService:ReturnPet(player, egg): string
   	local has2xLuck = self._gamepass:DoesPlayerOwn(player, "2x Luck")
 	local has10xLuck = self._gamepass:DoesPlayerOwn(player, "10x Luck")

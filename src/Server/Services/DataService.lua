@@ -134,6 +134,7 @@ function DataService:KnitStart()
 	self._boosts = Knit.GetService("BoostService")
 	self._gamepass = Knit.GetService("GamepassService")
 	self._quests = Knit.GetService("QuestService")
+	self._ga = Knit.GetService("GameAnalyticsService")
 	
 	Players.PlayerAdded:Connect(function(player: Player): nil
 		return self:OnPlayerAdded(player)
@@ -204,7 +205,6 @@ end
 
 function DataService:DataUpdate<T>(player: Player, key: string, value: T): nil
 	task.spawn(function(): nil
-		self.Client.DataUpdated:Fire(player, key, value)
 		return self.Client.DataUpdated:Fire(player, key, value)
 	end)
 	task.spawn(function(): nil
@@ -242,12 +242,25 @@ function DataService:SetValue<T>(player: Player, name: string, value: T): Promis
 		if not profile then return end
 
 		if name == "Pets" then
-			if PetDuplicatesWereFound() then return end
+			if PetDuplicatesWereFound() then warn("Pet Duplicates") return end
 		end
 		
 		task.spawn(function(): nil
+			if name ~= "Eggs" and name ~= "Strength" then
+				profile:Reconcile()
+			end
 			return self._quests:SetProgress(player, if name == "Eggs" then "OpenEggs" else "GainStrength", value)
 		end)
+		
+		if type(value) == "number" then
+			local old = self:GetValue(player, name)
+			if old == value then return end
+			if value < old then
+				self._ga:RegisterCurrencySpent(player.UserId, name, old - value)
+			else
+				self._ga:RegisterCurrencyAdded(player.UserId, name, value - old)
+			end
+		end
 		
 		local data = profile.Data
 		if data[name] ~= nil then
@@ -336,7 +349,6 @@ function DataService:GetTotalStrengthMultiplier(player: Player): number
 	AssertPlayer(player)
 	local petMultiplier = self._pets:GetTotalMultiplier(player)
 	local rebirthMultiplier = self._rebirths:GetBoost(player, "Strength")
-	print("OOF")
 	local gamepassMultiplier = if self._gamepass:DoesPlayerOwn(player, "2x Strength") then 2 else 1
 	local boostMultiplier = if self._boosts:IsBoostActive(player, "2xStrength") then 2 else 1
 	return petMultiplier * rebirthMultiplier * gamepassMultiplier * boostMultiplier
