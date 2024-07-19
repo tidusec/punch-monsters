@@ -30,6 +30,8 @@ function RandomItemService:Redeem(player, item)
 end
 
 function RandomItemService:GiveRandomItem(player, map)
+	return
+	--[[
 	local chances = Items[map]
   	local has2xLuck = self._gamepass:DoesPlayerOwn(player, "2x Luck")
 	local has10xLuck = self._gamepass:DoesPlayerOwn(player, "10x Luck")
@@ -75,7 +77,7 @@ function RandomItemService:GiveRandomItem(player, map)
 	
 	for prizeName in self._eggTemplate.Chances do
 		return prizeName
-	end
+	end]]
 end
 
 return RandomItemService

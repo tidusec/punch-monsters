@@ -129,7 +129,7 @@ function EnemyFighting:Initialize(): nil
 		self:Enter()
 	end))
 	
-	self:AddToJanitor(self._fightUi.Exit.MouseButton1Click:Connect(function()
+	self:AddToJanitor(self._fightUi.Exit.Exit.TextButton.MouseButton1Click:Connect(function()
 		self:Exit(true)
 	end))
 

@@ -26,10 +26,10 @@ local InventoryScreen: Component.Def = {
 			Background = {
 				ClassName = "ImageLabel",
 				Children = {
-					Pets = { ClassName = "ScrollingFrame" },
-					Stats = { ClassName = "ImageLabel" }
+					Stats = { ClassName = "ImageLabel" },
+					Pets = { ClassName = "ScrollingFrame" }
 				}
-			}
+			},
 		}
 	};
 }
@@ -41,7 +41,7 @@ function InventoryScreen:Initialize(): nil
 	
 	local background: ImageLabel & { Pets: ScrollingFrame; Stats: ImageLabel } = self.Instance.Background
 	self._background = background
-	self._container = background.Pets
+	self._container = self._background.Pets
 	self._petStats = background.Stats
 	self._petStats.Visible = false
 	
@@ -144,14 +144,11 @@ function InventoryScreen:UpdatePetCards(): nil
 	local pets = self._data:GetValue("Pets")
 	local ownedPets: { [string]: Pet } = pets.OwnedPets
 
-	self._container.CanvasSize = UDim2.new(0, 0, #ownedPets/15, 0)
-	self._container.UIGridLayout.CellSize = UDim2.new(0.18, 0, self:Height(#ownedPets), 100)
-
 	for _, pet in pairs(ownedPets) do
 		task.spawn(function()
 			local card: ImageButton & { Viewport: ViewportFrame; StrengthMultiplier: TextLabel } = Assets.UserInterface.Inventory.PetCard:Clone()
 			card.StrengthMultiplier.Text = `{pet.StrengthMultiplier}x`
-			card.Parent = self._container
+			card.Parent = self._container.Frame
 			
 			local Viewport = Component.Get("Viewport")
 			Viewport:Add(card.Viewport)

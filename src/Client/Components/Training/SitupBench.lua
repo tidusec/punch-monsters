@@ -78,7 +78,8 @@ function SitupBench:Initialize(): nil
 	self._proximityPrompt.Parent = self.Instance.Cube
 	
 	local MainUi = player.PlayerGui.MainUi
-	self._exitBench = MainUi.ExitBench
+	self._exitBench = MainUi.ExitBench.Exit.TextButton
+	self._exitFrame = MainUi.ExitBench
 	
 	self._benchTemplate = SitupBenchTemplate[self.Instance.Parent.Parent.Name][self.Instance.Name]
 	self._absRequirement = self._benchTemplate.AbsRequirement
@@ -95,7 +96,7 @@ end
 function SitupBench:Toggle(on: boolean): nil
 	--self._ui:SetShiftLock(not on)
 	self._proximityPrompt.Enabled = not on
-	self._exitBench.Visible = on
+	self._exitFrame.Visible = on
 	characterRoot.Anchored = on
 	return
 end

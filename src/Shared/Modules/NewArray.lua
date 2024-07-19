@@ -12,6 +12,15 @@ Array.CheckableTypes = {
     "unknown",
 }
 
+local function stringify(arr)
+    return arr:Map(function(element)
+        if type(element) == "table" and element.__type == "Array" then
+            return stringify(element)
+        else
+            return tostring(element)
+        end
+    end):ToString()
+end
 
 function Array.new(Type, Values)
     if not Values then
@@ -28,6 +37,18 @@ function Array.new(Type, Values)
         Values = Values,
     }, {
         __index = Array,
+        __newindex = function(array, i, v)
+            if array:CheckType(v) then
+                array.Values[i] = v
+            end
+        end,
+        __len = function(array)
+            return #array.Values
+        end,
+        __tostring = function(array)
+            return stringify(array)
+        end,
+        __type = "Array",
     })
     return self
 end
@@ -38,7 +59,7 @@ function Array:CheckType(value)
     end
     for _, checkType in ipairs(Array.CheckableTypes) do
         if self.Type == checkType then
-            return typeof(value) == checkType
+            return type(value) == checkType
         end
     end
     return value:IsA(self.Type)
@@ -73,7 +94,7 @@ end
 
 function Array:AddValues(values)
     for _, value in ipairs(values) do
-        if self.Type and value:IsA(self.Type) == false then
+        if not self:CheckType(value) then
             warn("Value is not of type " .. self.Type .. ": " .. tostring(value))
             continue
         end
@@ -124,7 +145,7 @@ end
 function Array:Sum()
     local sum = 0
     for _, value in ipairs(self.Values) do
-        sum += value
+        sum = sum + value
     end
     return sum
 end
@@ -136,13 +157,13 @@ end
 function Array:GeometricMean()
     local product = 1
     for _, value in ipairs(self.Values) do
-        product *= value
+        product = product * value
     end
     return product ^ (1 / self:Amount())
 end
 
 function Array:Max()
-    local max = 0
+    local max = -math.huge
     for _, value in ipairs(self.Values) do
         if value > max then
             max = value
@@ -162,9 +183,7 @@ function Array:Min()
 end
 
 function Array:Sort(sortfunction)
-    local newValues = self.Values
-    table.sort(newValues, sortfunction)
-    self.Values = newValues
+    table.sort(self.Values, sortfunction)
     return self
 end
 
@@ -281,6 +300,10 @@ end
 
 function Array:ToTable()
     return self.Values
+end
+
+function Array:ToString()
+    return table.concat(self.Values, ", ")
 end
 
 return Array
