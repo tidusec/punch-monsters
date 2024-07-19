@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Packages = ReplicatedStorage.Packages
 local GameAnalytics = require(Packages.GameAnalytics)
 local Knit = require(Packages.Knit)
+local PROFILE_TEMPLATE = require(ReplicatedStorage.Templates.ProfileTemplate)
 
 local GameAnalyticsService = Knit.CreateService {
     Name = "GameAnalyticsService";
@@ -17,6 +18,23 @@ function GameAnalyticsService:KnitInit(): nil
         secretKey = "610e25e1fbf416eb7cd07ad09d3699b94c7d49d3",
         automaticSendBusinessEvents = true,
     })
+
+    local currencytypes = {}
+
+    for key, value in pairs(PROFILE_TEMPLATE) do
+        if type(value) == "number" then
+            table.insert(currencytypes, key)    
+        end
+    end
+    
+    GameAnalytics:configureAvailableResourceCurrencies(currencytypes)
+
+    -- Define the available item types
+    local itemTypes = { "Game" }
+
+    -- Configure the available item types in GameAnalytics
+    GameAnalytics:configureAvailableResourceItemTypes(itemTypes)
+
     return
 end
 
@@ -30,6 +48,7 @@ function GameAnalyticsService:RegisterCurrencyAdded(userid: number, currencyType
         currency = currencyType,
         amount = amount,
         itemType = "Game",
+        itemId = "CurrencyAdded",
     })
     return
 end
@@ -44,6 +63,7 @@ function GameAnalyticsService:RegisterCurrencySpent(userid: number, currencyType
         currency = currencyType,
         amount = amount,
         itemType = "Game",
+        itemId = "CurrencySpent",
     })
     return
 end
