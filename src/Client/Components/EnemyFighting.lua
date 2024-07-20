@@ -133,6 +133,7 @@ function EnemyFighting:Initialize(): nil
 		self:Exit(true)
 	end))
 
+
 	return
 end
 

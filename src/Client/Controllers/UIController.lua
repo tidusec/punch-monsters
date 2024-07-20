@@ -9,6 +9,8 @@ local Players = game:GetService("Players")
 local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 
+local Tween = require(ReplicatedStorage.Modules.Tween)
+
 local player = Players.LocalPlayer
 
 local UIController = Knit.CreateController {
@@ -29,6 +31,7 @@ function UIController:KnitInit(): nil
 			task.wait(1)
 		until success
 	end)
+	self.connections = {}
 	return
 end
 
@@ -111,6 +114,53 @@ function UIController:AddModelToViewport(viewport: ViewportFrame, modelTemplate:
 		model:PivotTo(modelCFrame)
 	end)
 	return
+end
+
+function UIController:AnimateButton(buttonInstance, frameInstance, amount)
+	frameInstance = frameInstance or buttonInstance
+	amount = amount or 1.1
+    local enter = buttonInstance.MouseEnter:Connect(function()
+        local newSize = UDim2.new(frameInstance.Size.X.Scale * amount, 0, frameInstance.Size.Y.Scale * amount, 0)
+        local deltaX = (frameInstance.Size.X.Scale * amount - frameInstance.Size.X.Scale) / 2
+        local deltaY = (frameInstance.Size.Y.Scale * amount - frameInstance.Size.Y.Scale) / 2
+        local newPosition = UDim2.new(frameInstance.Position.X.Scale - deltaX, 0, frameInstance.Position.Y.Scale - deltaY, 0)
+        local constraint
+		if frameInstance:FindFirstChild("UIAspectRatioConstraint") then
+			constraint = frameInstance.UIAspectRatioConstraint
+			constraint.Parent = nil
+		end
+		Tween.new(frameInstance, {Size = newSize, Position = newPosition}, 0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+		if constraint then
+			constraint.Parent = frameInstance
+		end
+    end)
+
+    local leave = buttonInstance.MouseLeave:Connect(function()
+        local newSize = UDim2.new(frameInstance.Size.X.Scale / amount, 0, frameInstance.Size.Y.Scale / amount, 0)
+        local deltaX = (frameInstance.Size.X.Scale - frameInstance.Size.X.Scale / amount) / 2
+        local deltaY = (frameInstance.Size.Y.Scale - frameInstance.Size.Y.Scale / amount) / 2
+        local newPosition = UDim2.new(frameInstance.Position.X.Scale + deltaX, 0, frameInstance.Position.Y.Scale + deltaY, 0)
+        local constraint
+		if frameInstance:FindFirstChild("UIAspectRatioConstraint") then
+			constraint = frameInstance.UIAspectRatioConstraint
+			constraint.Parent = nil
+		end
+		Tween.new(frameInstance, {Size = newSize, Position = newPosition}, 0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+		if constraint then
+			constraint.Parent = frameInstance
+		end
+    end)
+
+    self.connections[buttonInstance] = {enter, leave}
+end
+
+function UIController:RemoveButtonAnimation(buttonInstance)
+	if self.connections[buttonInstance] then
+		for _, connection in pairs(self.connections[buttonInstance]) do
+			connection:Disconnect()
+		end
+		self.connections[buttonInstance] = nil
+	end
 end
 
 return UIController
