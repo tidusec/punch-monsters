@@ -37,30 +37,51 @@ end
 
 
 function UIController:SetScreen(name: string, blur: boolean?): ScreenGui?
-	if blur ~= nil then
-		self._blur:Toggle(blur)
-	end
+    if blur ~= nil then
+        self._blur:Toggle(blur)
+    end
 
-	local setScreen: ScreenGui
-	for _, screen in player:WaitForChild("PlayerGui"):GetChildren() do
-		local on = screen.Name == name
-		task.spawn(function()
-			screen.Enabled = on
-		end)
-		if on then
-			setScreen = screen
-		end
-	end
+    local setScreen: ScreenGui
+    for _, screen in player:WaitForChild("PlayerGui"):GetChildren() do
+        local on = screen.Name == name
+        task.spawn(function()
+            screen.Enabled = on
+        end)
+        if on then
+            setScreen = screen
+            local frames = CollectionService:GetTagged(screen.Name.."Frame")
+            for _, frame in pairs(frames) do
+                local direction = math.random(1, 4) -- 1: top, 2: bottom, 3: left, 4: right
+                local startPos, endPos
+                local screenSize = workspace.CurrentCamera.ViewportSize
+                if direction == 1 then -- top
+                    startPos = UDim2.new(frame.Position.X.Scale, frame.Position.X.Offset, -1, 0)
+                    endPos = frame.Position
+                elseif direction == 2 then -- bottom
+                    startPos = UDim2.new(frame.Position.X.Scale, frame.Position.X.Offset, 1, 0)
+                    endPos = frame.Position
+                elseif direction == 3 then -- left
+                    startPos = UDim2.new(-1, 0, frame.Position.Y.Scale, frame.Position.Y.Offset)
+                    endPos = frame.Position
+                else -- right
+                    startPos = UDim2.new(1, 0, frame.Position.Y.Scale, frame.Position.Y.Offset)
+                    endPos = frame.Position
+                end
+                frame.Position = startPos
+                Tween.new(frame, {Position = endPos}, 0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+            end
+        end
+    end
 
-	if name == "MainUi" then
+    if name == "MainUi" then
 		for _, frame in CollectionService:GetTagged("OutsideUI") do
 			task.spawn(function()
 				frame.Enabled = true
 			end)
 		end
 	end
-	
-	return setScreen
+
+    return setScreen
 end
 
 function UIController:SetFrameEnabled(screenName: string, frameName: string, on: boolean): nil

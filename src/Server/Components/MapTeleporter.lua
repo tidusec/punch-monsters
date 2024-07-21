@@ -102,7 +102,7 @@ function MapTeleporter:Initialize(): nil
       
       local db = playerBackTeleporterDebounces[player.UserId]
       if db:IsActive() then return end
-      self:Teleport(player.Character, previousCFrame + previousOffset)
+      self:Teleport(player,player.Character, previousCFrame + previousOffset, true)
       return
     end))
   end
@@ -110,7 +110,11 @@ function MapTeleporter:Initialize(): nil
   return
 end
 
-function MapTeleporter:Teleport(player: Player, character: Model, cframe: CFrame): nil
+function MapTeleporter:Teleport(player: Player, character: Model, cframe: CFrame, bypass: boolean): nil
+  bypass = bypass or false
+  if bypass then
+    (character.HumanoidRootPart :: BasePart).CFrame = cframe
+  end
   AssertPlayer(player)
   if not Array.new("string",self._data:GetValue(player, "DefeatedBosses")):Has(self._mapName) then return end
   if self._data:GetValue(player, "Rebirths") < self.Attributes.RequiredRebirths then return end

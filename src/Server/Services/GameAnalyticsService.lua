@@ -23,7 +23,13 @@ function GameAnalyticsService:KnitInit(): nil
 
     for key, value in pairs(PROFILE_TEMPLATE) do
         if type(value) == "number" then
-            table.insert(currencytypes, key)    
+            table.insert(currencytypes, key)
+        elseif type(value) == "table" then
+            for k, v in pairs(value) do
+                if type(v) == "number" then
+                    table.insert(currencytypes, k) 
+                end
+            end  
         end
     end
     

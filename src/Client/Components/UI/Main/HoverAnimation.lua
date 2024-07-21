@@ -13,15 +13,16 @@ local player = Players.LocalPlayer
 local HoverAnimation: Component.Def = {
     Name = script.Name;
     IgnoreAncestors = { StarterGui };
-    Guards = {
-        Ancestors = { player.PlayerGui },
-    };
 }
 
 local UIController = Knit.GetController("UIController")
 
 function HoverAnimation:Initialize(): nil
-    print("animating")
+    if not self.Instance:GetAttribute("HoverAmount") == nil then
+        UIController:AnimateButton(self.Instance, nil, self.Instance:GetAttribute("HoverAmount"))
+        return
+    end
+
     UIController:AnimateButton(self.Instance)
     return
 end

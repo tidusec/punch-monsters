@@ -288,7 +288,9 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		
 		pet.Parent = petFolder
 		if not pet.PrimaryPart then return end
-		pet.PrimaryPart:SetNetworkOwner(player)
+		if pet.PrimaryPart:IsDescendantOf(workspace) then
+			pet.PrimaryPart:SetNetworkOwner(player)
+		end
 	end)
 	return
 end

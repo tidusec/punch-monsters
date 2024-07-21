@@ -1,5 +1,6 @@
 --!native
 --!strict
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Tween = game:GetService("TweenService")
 local StarterGui = game:GetService("StarterGui")

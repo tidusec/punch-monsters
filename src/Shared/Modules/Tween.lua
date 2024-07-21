@@ -13,6 +13,7 @@ function Tween.new(instance: Instance, properties: { [string]: any }, duration: 
     self._tween = TweenService:Create(self.Instance, TweenInfo.new(self.Duration, self.EasingStyle, self.EasingDirection), self.Properties)
     self._tween:Play()
     self._tween.Completed:Connect(function()
+        task.wait(3)
         self._tween:Destroy()
     end)
     return self
