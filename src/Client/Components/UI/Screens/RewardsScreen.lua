@@ -52,9 +52,9 @@ function RewardsScreen:Initialize(): nil
 	local data = Knit.GetService("DataService")
 	local scheduler = Knit.GetController("SchedulerController")
 
-	self._crateButtons = Array.new("Instance", self.Instance.Background.Crates:GetChildren())
+	self._crateButtons = Array.new("userdata", self.Instance.Background.Crates:GetChildren())
 		:Filter(function(element: Instance): boolean
-			return element:IsA("ImageButton")
+			return element.ClassName == "ImageButton"
 		end)
 
 	for _, crateButton: CrateButton in self._crateButtons:GetValues() do
@@ -98,8 +98,12 @@ function RewardsScreen:UpdateScreen(): nil
 		task.spawn(function(): nil
 			local isClaimed = self._timedRewards:IsClaimed(crateButton.LayoutOrder)
 			local collectText = if isClaimed then "Collected!" else "Collect"
-			if crateButton.Icon.TextLabel.Visible and crateButton.Icon.TextLabel.Text ~= collectText then
-				crateButton.Icon.TextLabel.Text = collectText
+			local icon = crateButton:FindFirstChild("Icon")
+			if icon then
+				local textLabel = icon:FindFirstChild("TextLabel")
+				if textLabel and textLabel:IsA("TextLabel") and textLabel.Visible and textLabel.Text ~= collectText then
+					textLabel.Text = collectText
+				end
 			end
 			return
 		end)

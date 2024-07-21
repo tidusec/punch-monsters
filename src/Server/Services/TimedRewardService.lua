@@ -34,7 +34,7 @@ function TimedRewardService:Claim(player: Player, crateNumber: number): nil
   if self:IsClaimed(player, crateNumber) then return end
 
   task.defer(function(): nil
-    local rebirthMultiplier = 1.25 ^ self._data:GetValue("Rebirths")
+    local rebirthMultiplier = 1.25 ^ self._data:GetValue(player, "Rebirths")
 
     local claimed
     if CLAIMED_REWARDS_CACHE[player.UserId] then

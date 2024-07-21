@@ -12,16 +12,6 @@ Array.CheckableTypes = {
     "unknown",
 }
 
-local function stringify(arr)
-    return arr:Map(function(element)
-        if type(element) == "table" and element.__type == "Array" then
-            return stringify(element)
-        else
-            return tostring(element)
-        end
-    end):ToString()
-end
-
 function Array.new(Type, Values)
     if not Values then
         Values = {}
@@ -44,9 +34,6 @@ function Array.new(Type, Values)
         end,
         __len = function(array)
             return #array.Values
-        end,
-        __tostring = function(array)
-            return stringify(array)
         end,
         __type = "Array",
     })
