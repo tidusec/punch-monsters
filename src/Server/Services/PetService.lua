@@ -286,7 +286,9 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 			Welder.Weld(pet.PrimaryPart, { part })
 		end
 		
-		pet.Parent = petFolder
+		pcall(function()
+			pet.Parent = petFolder
+		end)
 		if not pet.PrimaryPart then return end
 		if pet.PrimaryPart:IsDescendantOf(workspace) then
 			pet.PrimaryPart:SetNetworkOwner(player)
@@ -351,19 +353,17 @@ function PetService:Upgrade(player, pet, weight)
 end
 
 function PetService:EquipBest(player)
-    AssertPlayer(player)  -- Ensure the player is valid
+    AssertPlayer(player)
 
     local pets = self._data:GetValue(player, "Pets")
     local ownedPets = pets.OwnedPets
     local equippedPets = pets.Equipped
     local petSpace = self:GetPetSpace(player)
     
-    -- Function to compare pets by StrengthMultiplier
     local function comparePets(a, b)
         return a.StrengthMultiplier > b.StrengthMultiplier
     end
 
-    -- Sort ownedPets by StrengthMultiplier in descending order
     table.sort(ownedPets, comparePets)
 
     local equippedPetsMap = {}
@@ -371,7 +371,6 @@ function PetService:EquipBest(player)
         equippedPetsMap[pet.ID] = true
     end
 
-    -- Equip the best pets until petSpace is filled
     local newEquippedPets = {}
     for _, pet in ipairs(ownedPets) do
         if #newEquippedPets >= petSpace then
@@ -383,9 +382,23 @@ function PetService:EquipBest(player)
         end
     end
 
-    -- Update the pets table with the newly equipped pets
     pets.Equipped = newEquippedPets
     self._data:SetValue(player, "Pets", pets)
+end
+
+function PetService:Delete(player: Player, pet: typeof(PetsTemplate.Dog)): nil
+	task.defer(function(): nil
+		AssertPlayer(player)
+		VerifyID(player, pet.ID)
+
+		local pets = self._data:GetValue(player, "Pets")
+		local ownedPets = Array.new("table", pets.OwnedPets)
+		ownedPets:RemoveValue(pet)
+		pets.OwnedPets = ownedPets:ToTable()
+		self._data:SetValue(player, "Pets", pets)
+		return
+	end)
+	return
 end
 
 function PetService.Client:Equip(player, pet)
@@ -410,6 +423,10 @@ end
 
 function PetService.Client:GetTotalMultiplier(player)
 	return self.Server:GetTotalMultiplier(player)
+end
+
+function PetService.Client:Delete(player, pet)
+	return self.Server:Delete(player, pet)
 end
 
 return PetService

@@ -39,7 +39,9 @@ function InventoryScreen:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 	self._pets = Knit.GetService("PetService")
 	self._ui = Knit.GetController("UIController")
-	
+	self._canDelete = false
+	self._petToDelete = nil
+
 	local background: ImageLabel & { Pets: ScrollingFrame; Stats: ImageLabel } = self.Instance.Background
 	self._background = background
 	self._container = self._background.Pets
@@ -54,6 +56,13 @@ function InventoryScreen:Initialize(): nil
 
 	self:AddToJanitor(self._background.EquipBest.MouseButton1Click:Connect(function()
 		self._pets:EquipBest()
+	end))
+
+	self:AddToJanitor(self._background.Delete.MouseButton1Click:Connect(function()
+		if self._canDelete then
+			if not self._petToDelete then return end
+			self._pets:Delete(self._petToDelete)
+		end
 	end))
 	return
 end
@@ -96,8 +105,12 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 	selectionJanitor:Cleanup()
 	if lastPetSelected == pet then
 		lastPetSelected = nil
+		self._canDelete = false
 		return self:ToggleSelectionFrame(false)
+	else
+		self._canDelete = true
 	end
+	self._petToDelete = pet
 	lastPetSelected = pet :: any
 	
 	local isEquipped = self._pets:IsEquipped(pet)

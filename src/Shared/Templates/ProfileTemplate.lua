@@ -47,11 +47,12 @@ local PROFILE_TEMPLATE = {
 		LowQuality = false
 	},
 
-	Map1 = 0,
-	Map2 = 0,
-	Map3 = 0,
-	Map4 = 0,
-	Map5 = 0,
+	--// Roman Numerals because GameAnalytics doesn't allow numbers as keys
+	MapI = 0,
+	MapII = 0,
+	MapIII = 0,
+	MapIV = 0,
+	MapV = 0,
 }
 
 return PROFILE_TEMPLATE

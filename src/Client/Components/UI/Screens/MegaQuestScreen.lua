@@ -91,8 +91,6 @@ function MegaQuestScreen:UpdateProgress(): nil
 	task.spawn(function(): nil
 		local progressData = self._data:GetValue("MegaQuestProgress")
 
-		warn(progressData)
-
     local index = 1
     for name, currentValue in pairs(progressData) do
       task.spawn(function(): nil

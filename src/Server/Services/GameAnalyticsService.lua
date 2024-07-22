@@ -32,6 +32,8 @@ function GameAnalyticsService:KnitInit(): nil
             end  
         end
     end
+
+    table.insert(currencytypes, "Eggs")
     
     GameAnalytics:configureAvailableResourceCurrencies(currencytypes)
 
