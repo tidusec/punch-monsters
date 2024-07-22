@@ -10,6 +10,7 @@ local PROFILE_TEMPLATE = {
 	Pets = {
 		OwnedPets = {},
 		MaxEquip = 4,
+		MaxStorage = 200,
 		RobuxPurchasedPets = {},
 		Equipped = {}
 	},
@@ -44,7 +45,13 @@ local PROFILE_TEMPLATE = {
 		ShowOwnPets = true,
 		ShowOtherPets = true,
 		LowQuality = false
-	}
+	},
+
+	Map1 = 0,
+	Map2 = 0,
+	Map3 = 0,
+	Map4 = 0,
+	Map5 = 0,
 }
 
 return PROFILE_TEMPLATE

@@ -61,12 +61,16 @@ local MegaQuestScreen: Component.Def = {
 function MegaQuestScreen:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 	self._quests = Knit.GetService("QuestService")
+	self._time = Knit.GetService("PlaytimeService")
+	self._schedulercontroller = Knit.GetController("SchedulerController")
 	self._questGoals = self._quests:GetQuestGoals()
 	self._background = self.Instance.Background
+	self._claimed = false
 
 	local db = Debounce.new(0.5)
 	self:AddToJanitor(self._background.Claim.MouseButton1Click:Connect(function(): nil
-    if not self._quests:IsComplete() then return end
+    	if not self._quests:IsComplete() then return end
+		if self._claimed then return end
 		if db:IsActive() then return end
 		return self._quests:Claim()
 	end))
@@ -76,6 +80,10 @@ function MegaQuestScreen:Initialize(): nil
 		return self:UpdateProgress()
 	end))
 
+	self._schedulercontroller:Every("15s", function()
+		self._time:Get()
+	end)
+
   return self:UpdateProgress()
 end
 
@@ -83,26 +91,45 @@ function MegaQuestScreen:UpdateProgress(): nil
 	task.spawn(function(): nil
 		local progressData = self._data:GetValue("MegaQuestProgress")
 
+		warn(progressData)
+
     local index = 1
     for name, currentValue in pairs(progressData) do
       task.spawn(function(): nil
+		if name == "Completed" or name == "Done" then return end
+
+		local collected = false
+		local done = false
+
+		if collected then
+			self._claimed = true
+			self._background.Claim.Text = "Claimed!"
+		end
+
+		if progressData["Completed"] then collected = true end
+		if progressData["Done"] then done = true end
+
         local barContainer = self._background:FindFirstChild(`Goal{index}Progress`)
 		local title = self._background:FindFirstChild(`Goal{index}Title`)
 		if not barContainer or not title then return end
 		
         local goalValue: number = self._questGoals[name]
 		local progress = currentValue :: number / goalValue
+		progress = math.clamp(progress, 0, 1)
+
+		if collected or done then progress = 1; currentValue = goalValue end
+
         barContainer.Bar.Size = UDim2.fromScale(progress, 1)
 		barContainer.Value.Text = if name == "StayActive" then
-			`{currentValue :: number / 60}/{goalValue / 60}`
+			`{math.floor(currentValue / 6)/10}/{math.floor(goalValue / 6)/10}`
         else
-        	`{currentValue}/{goalValue}`
+        	`{abbreviate(currentValue)}/{abbreviate(goalValue)}`
         
 		title.Text = if name == "StayActive" then
-          `Stay Active for {goalValue / 60} Minutes`
+          `Stay Active for {math.floor(goalValue / 6)/10} Minutes`
         elseif name == "OpenEggs" then
           `Open {goalValue} Eggs`
-        elseif name == "GainStrength" then
+        elseif name == "EarnStrength" then
 		  `Gain {abbreviate(goalValue)} Strength`
 		else
 			"???"

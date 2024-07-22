@@ -14,7 +14,7 @@ local Knit = require(Packages.Knit)
 local QUEST_GOALS = {
   StayActive = 45 * 60, -- 45 mins
   OpenEggs = 1500,
-  EarnStrength = 35_000,
+  EarnStrength = 35000,
 }
 
 local QuestService = Knit.CreateService {
@@ -24,10 +24,12 @@ local QuestService = Knit.CreateService {
 
 function QuestService:KnitStart(): nil
   self._data = Knit.GetService("DataService")
-  self._playtime = Knit.GetService("DataService")
+  self._pets = Knit.GetService("PetService")
 
   self._data.DataUpdated.Event:Connect(function(player: Player, key): nil
-    return self:_Reset(player)
+    if key == "UpdatedQuestProgress" then
+      self:_Reset(player)
+    end
   end)
 
   local elapsed = 0
@@ -69,6 +71,7 @@ function QuestService:_Reset(player: Player): nil
 
   local goal1, goal2 = self:GetGoalsThisWeek()
   local progress = self._data:GetValue(player, "MegaQuestProgress")
+  if not progress then progress = {} end
   progress[goal1] = 0
   progress[goal2] = 0
   self._data:SetValue(player, "MegaQuestProgress", progress):await()
@@ -77,21 +80,26 @@ function QuestService:_Reset(player: Player): nil
 end
 
 function QuestService:IncrementProgress(player: Player, goalName: string, amount: number): nil
-	local progress = self._data:GetValue(player, "MegaQuestProgress")
-	if not progress then return end
-	if progress[goalName] then
-    	self:SetProgress(player, goalName, progress[goalName] + amount)
-	end
+  local progress = self._data:GetValue(player, "MegaQuestProgress")
+  if not progress or next(progress) == nil then
+    self._data:SetValue(player, "UpdatedQuestProgress", false):await()
+    self:_Reset(player)
+    progress = self._data:GetValue(player, "MegaQuestProgress")
+  end
+
+  if progress[goalName] then
+    self:SetProgress(player, goalName, progress[goalName] + amount)
+  end
   return
 end
 
 function QuestService:SetProgress(player: Player, goalName: string, value: number): nil
-	local progress = self._data:GetValue(player, "MegaQuestProgress")
-	if not progress then return end
-	if progress[goalName] then
-		progress[goalName] = value
-	    self._data:SetValue(player, "MegaQuestProgress", progress)
-	end
+  local progress = self._data:GetValue(player, "MegaQuestProgress")
+  if not progress then return end
+  if progress[goalName] then
+    progress[goalName] = value
+    self._data:SetValue(player, "MegaQuestProgress", progress)
+  end
   return
 end
 
@@ -107,28 +115,55 @@ end
 
 function QuestService:_GetGoalProgress(player: Player, goalName: string): number
   local progress = self._data:GetValue(player, "MegaQuestProgress")
+  if progress["Done"] then return 1 end
+  if progress["Completed"] then return 1 end
   return math.min(progress[goalName] / QUEST_GOALS[goalName], 1)
 end
 
 function QuestService:GetGoalsThisWeek(): (string, string)
-  if not GameData:GetAsync("GoalsThisWeek") then
-    local goal1 = randomPair(QUEST_GOALS)
-    local goal2 = randomPair(QUEST_GOALS)
+  local goals = GameData:GetAsync("GoalsThisWeek")
+  if not goals then
+    local goal1, goal2 = randomPair(QUEST_GOALS), randomPair(QUEST_GOALS)
+    while goal1 == goal2 do
+      goal2 = randomPair(QUEST_GOALS)
+    end
     GameData:SetAsync("GoalsThisWeek", {goal1, goal2})
     return goal1, goal2
   else
-    local goals = GameData:GetAsync("GoalsThisWeek")
     return goals[1], goals[2]
   end
 end
 
 function QuestService:Claim(player: Player): nil
-  -- handle reward
+  if not self:IsComplete(player) then return end
+  local progress = self._data:GetValue(player, "MegaQuestProgress")
+  if not progress then return end
+  if progress["Completed"] then return end
+
+  --// TODO: make it give the pet
+  self._pets:Add(player, "Magical Winged Wyvern")
+  self._hatch:ShowFakeHatch(player, "Magical Winged Wyvern")
+
+  progress["Completed"] = true
+  self._data:SetValue(player, "MegaQuestProgress", progress)
+
+  return
+end
+
+function QuestService:MakeItDone(player: Player): nil
+  local progress = self._data:GetValue(player, "MegaQuestProgress")
+  if not progress then return end
+  progress["Done"] = true
+  self._data:SetValue(player, "MegaQuestProgress", progress)
   return
 end
 
 function QuestService.Client:Claim(player: Player): nil
   return self.Server:Claim(player)
+end
+
+function QuestService.Client:MakeItDone(player: Player): nil
+  return self.Server:MakeItDone(player)
 end
 
 function QuestService.Client:IsComplete(player: Player): boolean

@@ -47,9 +47,13 @@ function InventoryScreen:Initialize(): nil
 	self._petStats.Visible = false
 	
 	self._updateJanitor = Janitor.new()
-	self:AddToJanitor(self._data.DataUpdated:Connect(function(key)
+	self:AddToJanitor(self._data.DataUpdated:Connect(function(key, value)
 		if key ~= "Pets" then return end
-		self:UpdatePetCards()
+		self:UpdatePetCards(value)
+	end))
+
+	self:AddToJanitor(self._background.EquipBest.MouseButton1Click:Connect(function()
+		self._pets:EquipBest()
 	end))
 	return
 end
@@ -138,11 +142,8 @@ function InventoryScreen:Height(card_amount: number): number
 	return height
 end
 
-function InventoryScreen:UpdatePetCards(): nil
-	-- cleanup old cards & their connections
+function InventoryScreen:UpdatePetCards(pets): nil
 	self._updateJanitor:Cleanup()
-	
-	local pets = self._data:GetValue("Pets")
 	local ownedPets: { [string]: Pet } = pets.OwnedPets
 
 	for _, pet in pairs(ownedPets) do
@@ -160,6 +161,9 @@ function InventoryScreen:UpdatePetCards(): nil
 			end))
 		end)
 	end
+
+	self._background.Equipped.Text = tostring(#pets.Equipped).."/"..tostring(pets.MaxEquip)
+	self._background.Storage.Text = tostring(#pets.OwnedPets).."/"..(tostring(pets.MaxStorage) or "200")
 
 	return
 end

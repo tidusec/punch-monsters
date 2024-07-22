@@ -350,6 +350,44 @@ function PetService:Upgrade(player, pet, weight)
 	end
 end
 
+function PetService:EquipBest(player)
+    AssertPlayer(player)  -- Ensure the player is valid
+
+    local pets = self._data:GetValue(player, "Pets")
+    local ownedPets = pets.OwnedPets
+    local equippedPets = pets.Equipped
+    local petSpace = self:GetPetSpace(player)
+    
+    -- Function to compare pets by StrengthMultiplier
+    local function comparePets(a, b)
+        return a.StrengthMultiplier > b.StrengthMultiplier
+    end
+
+    -- Sort ownedPets by StrengthMultiplier in descending order
+    table.sort(ownedPets, comparePets)
+
+    local equippedPetsMap = {}
+    for _, pet in ipairs(equippedPets) do
+        equippedPetsMap[pet.ID] = true
+    end
+
+    -- Equip the best pets until petSpace is filled
+    local newEquippedPets = {}
+    for _, pet in ipairs(ownedPets) do
+        if #newEquippedPets >= petSpace then
+            break
+        end
+        if not equippedPetsMap[pet.ID] then
+            table.insert(newEquippedPets, pet)
+            equippedPetsMap[pet.ID] = true
+        end
+    end
+
+    -- Update the pets table with the newly equipped pets
+    pets.Equipped = newEquippedPets
+    self._data:SetValue(player, "Pets", pets)
+end
+
 function PetService.Client:Equip(player, pet)
 	return self.Server:Equip(player, pet)
 end
@@ -360,6 +398,10 @@ end
 
 function PetService.Client:IsEquipped(player, pet)
 	return self.Server:IsEquipped(player, pet)
+end
+
+function PetService.Client:EquipBest(player)
+	return self.Server:EquipBest(player)
 end
 
 function PetService.Client:GetPetSpace(player)

@@ -244,12 +244,20 @@ function DataService:SetValue<T>(player: Player, name: string, value: T): Promis
 		if name == "Pets" then
 			if PetDuplicatesWereFound() then warn("Pet Duplicates") return end
 		end
-		
+
 		task.spawn(function(): nil
+			local old = self:GetValue(player, name)
 			if name ~= "Eggs" and name ~= "Strength" then
 				profile:Reconcile()
 			end
-			return self._quests:SetProgress(player, if name == "Eggs" then "OpenEggs" else "GainStrength", value)
+			if type(value) == "number" then
+				if old == value then return end
+				if value > old then
+					return self._quests:IncrementProgress(player, if name == "Eggs" then "OpenEggs" else "EarnStrength", value - old)
+				end
+			else
+				return
+			end
 		end)
 		
 		if type(value) == "number" then

@@ -37,7 +37,7 @@ function PlaytimeService:Get(player: Player): number
 	end
 
 	local playtime = math.round(tick() - joinedAt)
-	self._quests:SetProgress(player, "StayActive", playtime)
+	self._quests:SetProgress(player, "StayActive", playtime*60)
 	return playtime
 end
 

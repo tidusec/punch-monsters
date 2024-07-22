@@ -20,7 +20,7 @@ local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local characterRoot = character:WaitForChild("HumanoidRootPart")
 
-local MAX_STAND_DISTANCE = 5
+local MAX_STAND_DISTANCE = 13
 
 local HatchingStand: Component.Def = {
 	Name = script.Name;
@@ -46,6 +46,7 @@ function HatchingStand:Initialize(): nil
 	self._gamepass = Knit.GetService("GamepassService")
 	self._dumbell = Knit.GetService("DumbellService")
 	self._hatchingService = Knit.GetService("HatchingService")
+	self._schedulercontroller = Knit.GetController("SchedulerController")
 	self._ui = Knit.GetController("UIController")
 	self._hatching = false
 	
@@ -72,6 +73,7 @@ function HatchingStand:HatchAnimation(pets)
     end
 
     self._ui:SetScreen("EggUi", true)
+	self._ui:SetHatching(true)
     for _, pet in pets do
         local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
         if not petModel then
@@ -103,6 +105,7 @@ function HatchingStand:HatchAnimation(pets)
 
     -- No need to wait here anymore as the last pet's animation wait is included in the loop
     self._ui:SetScreen("MainUi", false)
+	self._ui:SetHatching(false)
 
     self._hatching = false
     self._chancesUI.Enabled = true
@@ -140,7 +143,10 @@ end
 
 function HatchingStand:Auto(): nil
 	if not self:IsClosest() then return end
-	-- do stuff
+	while self._hatching do
+		self:Hatch(3)
+		task.wait(1)
+	end
 	return
 end
 
@@ -149,8 +155,8 @@ local function getDistanceFromPlayer(stand: Model & { Egg: Model }): number
 	return if primaryPart then (primaryPart.Position - characterRoot.Position).Magnitude else 1000
 end
 
-function HatchingStand:IsClosest(): boolean
-	local closestStand= Array.new("Instance", CollectionService:GetTagged(self.Name))
+function HatchingStand:GetClosest(): Model & { Egg: Model }
+	local closestStand = Array.new("Instance", CollectionService:GetTagged(self.Name))
 		:Filter(function(stand)
 			local distance = getDistanceFromPlayer(stand)
 			return distance <= MAX_STAND_DISTANCE
@@ -162,6 +168,11 @@ function HatchingStand:IsClosest(): boolean
 		end)
 		:First()
 		
+	return closestStand
+end
+
+function HatchingStand:IsClosest(): boolean
+	local closestStand = self:GetClosest()
 	return closestStand == self.Instance
 end
 
@@ -204,9 +215,29 @@ function HatchingStand:AddPetCards(): nil
 		end
 	end)
 	
+	self._chancesUI.Background.BuyOne.MouseButton1Click:Connect(function()
+		self:BuyOne()
+	end)
+	self._chancesUI.Background.BuyThree.MouseButton1Click:Connect(function()
+		self:BuyThree()
+	end)
+	self._chancesUI.Background.Auto.MouseButton1Click:Connect(function()
+		self:Auto()
+	end)
 	self._chancesUI.Adornee = self._egg.PrimaryPart
 	self._chancesUI.Parent = player.PlayerGui
 	self._chancesUI.Enabled = true
+
+
+
+	self._schedulercontroller:Every("0.33s", function()
+		if not self:IsClosest() then
+			self._chancesUI.Enabled = false
+		else
+			if self._ui:GetHatching() then self._chancesUI.Enabled = false return end
+			self._chancesUI.Enabled = true
+		end
+	end)
 	return
 end
 
