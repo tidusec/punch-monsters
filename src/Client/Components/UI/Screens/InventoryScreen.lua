@@ -47,15 +47,32 @@ function InventoryScreen:Initialize(): nil
 	self._container = self._background.Pets
 	self._petStats = background.Stats
 	self._petStats.Visible = false
+	self.petsInventory = nil
+	self._sorting = "None"
 	
 	self._updateJanitor = Janitor.new()
 	self:AddToJanitor(self._data.DataUpdated:Connect(function(key, value)
 		if key ~= "Pets" then return end
+		self.petsInventory = value
 		self:UpdatePetCards(value)
 	end))
 
 	self:AddToJanitor(self._background.EquipBest.MouseButton1Click:Connect(function()
 		self._pets:EquipBest()
+	end))
+
+	self:AddToJanitor(self._background.Sort.MouseButton1Click:Connect(function()
+		if self._sorting == "None" then
+			self._sorting = "Rarity"
+		elseif self._sorting == "Rarity" then
+			self._sorting = "Strength"
+		elseif self._sorting == "Strength" then
+			self._sorting = "Name"
+		elseif self._sorting == "Name" then
+			self._sorting = "None"
+		end
+
+		self:AddPetCards()
 	end))
 
 	self:AddToJanitor(self._background.Delete.MouseButton1Click:Connect(function()
@@ -126,7 +143,7 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 			return warn(`Could not find pet model "{pet.Name}"`)
 		end
 		
-		self._ui:AddModelToViewport(self._petStats.Viewport, petModel, { replaceModel = true })
+		selectionJanitor:Add(self._ui:AddModelToViewport(self._petStats.Viewport, petModel, { replaceModel = true }))
 		return self:ToggleSelectionFrame(true)
 	end)
 	
@@ -155,7 +172,10 @@ function InventoryScreen:Height(card_amount: number): number
 	return height
 end
 
-function InventoryScreen:UpdatePetCards(pets): nil
+function InventoryScreen:UpdatePetCards(pets, sorting): nil
+	pets = pets or self.petsInventory
+	sorting = sorting or self._sorting or "None" --// None, Rarity, Strength, Name
+
 	self._updateJanitor:Cleanup()
 	local ownedPets: { [string]: Pet } = pets.OwnedPets
 
@@ -167,6 +187,11 @@ function InventoryScreen:UpdatePetCards(pets): nil
 			
 			local Viewport = Component.Get("Viewport")
 			Viewport:Add(card.Viewport)
+			if self._pets:IsEquipped(pet) then
+				card.Equipped.Visible = true
+			else
+				card.Equipped.Visible = false
+			end
 			self._ui:AddModelToViewport(card.Viewport, Assets.Pets[pet.Name])
 			self._updateJanitor:Add(card)
 			self._updateJanitor:Add(card.MouseButton1Click:Connect(function()

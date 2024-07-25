@@ -1,5 +1,3 @@
---!native
---!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Tween = game:GetService("TweenService")
 local StarterGui = game:GetService("StarterGui")
@@ -25,12 +23,12 @@ local LoadScreen: Component.Def = {
 			Background = {
 				ClassName = "Frame",
 				Children = {
-					Gloves = { ClassName = "ImageLabel" },
+					Gloves = { ClassName = "Frame" },
 					LoadingBar = {
 						ClassName = "Frame",
 						Children = {
 							Skip = { ClassName = "TextButton" },
-							Title = { ClassName = "TextLabel" }
+							--Title = { ClassName = "TextLabel" }
 						}
 					}
 				}
@@ -42,7 +40,7 @@ local LoadScreen: Component.Def = {
 function LoadScreen:Initialize(): nil
 	self._preloader = Knit.GetController("PreloadController")
 	self._finished = false
-	self._imageOffset = 0
+	self._imageOffset = Vector2.new(0, 0)
 	
 	local playerGui = self.Instance:FindFirstAncestorOfClass("PlayerGui")
 	self._mainUI = playerGui:WaitForChild("MainUi")
@@ -50,9 +48,14 @@ function LoadScreen:Initialize(): nil
 	local background = self.Instance.Background
 	self._background = background
 	self._bar = background.LoadingBar
-	self._gloves = background.Gloves
+	self._glovesFrame = background.Gloves
+	self._glovesImage = self._glovesFrame:FindFirstChildOfClass("ImageLabel")
 	self._transition = self.Instance.Transition
 	
+	-- Setting initial properties for the Gloves Frame and ImageLabel
+	self._glovesFrame.ClipsDescendants = true
+	self._glovesImage.Size = UDim2.new(2, 0, 2, 0) -- Make the ImageLabel larger than the frame for the effect
+
 	task.spawn(function()
 		self:Activate()
 	end)
@@ -61,10 +64,7 @@ function LoadScreen:Initialize(): nil
 end
 
 function LoadScreen:Update(): nil
-	(self :: any)._imageOffset %= 800
-	(self :: any)._imageOffset += 1	
-	local increment = if self._imageOffset < 400 then 1 else -1 
-	(self :: any)._gloves.Position += UDim2.fromOffset(increment, -increment)
+	-- Update function can be used to handle other updates if necessary
 	return
 end
 
@@ -73,8 +73,16 @@ function LoadScreen:Activate(): nil
 	self.Instance.Enabled = true
 	self:UpdateProgressBar(0)
 	self:AnimateBar()
+
+	-- Start the image animation
+	task.spawn(function()
+		while not self._finished do
+			self._glovesImage.Position = UDim2.new(0, 0, 0, 0)
+			self._glovesImage:TweenPosition(UDim2.new(-1, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Linear, 2, true)
+			wait(2)
+		end
+	end)
 	
-	self._bar.Title.Text = "Loading decals, sounds, meshes..."
 	task.delay(1, function(): nil
 		self._bar.Skip.Visible = true
 		return
@@ -116,7 +124,7 @@ function LoadScreen:Activate(): nil
 end
 
 function LoadScreen:UpdateProgressBar(progress: number): nil
-	self._bar.Title.Text = `Loading\n{math.round(progress * 100)}%`
+	--self._bar.Title.Text = `Loading\n{math.round(progress * 100)}%`
 	return self._bar.Progress:TweenSize(
 		UDim2.fromScale(math.max(progress, 0.05), 1),
 		Enum.EasingDirection.In,

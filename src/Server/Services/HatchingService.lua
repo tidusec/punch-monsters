@@ -45,7 +45,7 @@ function HatchingService:HatchServer(player: Player, map: string, name: string)
 	self._pets:Add(player, petName)
 	self._data:IncrementValue(player, "Eggs")
 
-	self.Client.PetHatched:Fire(player, petName)
+	self.Client.PetHatched:Fire(player, petName, map, name)
 
 	return
 end
@@ -65,7 +65,7 @@ function HatchingService:HatchManyServer(player: Player, map: string, name: stri
 		pets:Add(petName)
 	end
 
-	self.Client.PetHatched:Fire(player, pets:GetValues())
+	self.Client.PetHatched:Fire(player, pets:GetValues(), map, name)
 	
 	return
 end
@@ -123,8 +123,8 @@ function HatchingService:Hatch(player: Player, map: string, name: string): nil
   	return true
 end
 
-function HatchingService:ShowFakeHatch(player, petName)
-	self.Client.PetHatched:Fire(player, petName)
+function HatchingService:ShowFakeHatch(player, petName, map, egg)
+	self.Client.PetHatched:Fire(player, petName, map, egg)
 end
 
 function HatchingService:ReturnPet(player, egg): string

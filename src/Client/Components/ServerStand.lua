@@ -23,11 +23,11 @@ local characterRoot = character:WaitForChild("HumanoidRootPart")
 
 local MAX_STAND_DISTANCE = 13
 
-local HatchingStand: Component.Def = {
+local ServerStand: Component.Def = {
 	Name = script.Name;
 	IgnoreAncestors = { StarterGui };
 	Guards = {
-		Ancestors = { workspace:WaitForChild("Map1"):WaitForChild("Eggs"), workspace:WaitForChild("Map2"):WaitForChild("Eggs"), workspace:WaitForChild("Map3"):WaitForChild("Eggs") },
+		Ancestors = { workspace:WaitForChild("Server"):WaitForChild("Eggs") },
 		ClassName = "Model",
 		Children = {
 			Egg = {
@@ -40,7 +40,7 @@ local HatchingStand: Component.Def = {
 	};
 }
 
-function HatchingStand:Initialize(): nil
+function ServerStand:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 	self._pets = Knit.GetService("PetService")
 	self._boosts = Knit.GetService("BoostService")
@@ -62,13 +62,10 @@ function HatchingStand:Initialize(): nil
 		self:HatchAnimation(pets)
 		return
 	end))
-	
-	self:AddPetCards()
-	self._chancesUI.Enabled = true
 	return
 end
 
-function HatchingStand:HatchAnimation(pets)
+function ServerStand:HatchAnimation(pets)
 	-- Ensure pets is a table
 	if type(pets) == "string" then
 		pets = {pets}
@@ -186,136 +183,4 @@ function HatchingStand:HatchAnimation(pets)
 	janitor:Cleanup()
 end
 
-
-
-function HatchingStand:Hatch(amount :number): nil
-	assert(type(amount) == "number", "Amount must be a number")
-	assert(amount > 0, "Amount must be greater than 0")
-	if self._dumbell:IsEquipped() then return end
-	if self._hatching then return end
-	self._hatching = true
-
-	if amount == 1 then
-		self._hatchingService:Hatch(self._map, self.Instance.Name)
-	else
-		self._hatchingService:HatchMany(self._map, self.Instance.Name, amount)
-	end
-	
-	task.wait(0.5)
-	self._hatching = false
-	return
-end
-
-function HatchingStand:BuyOne(): nil
-	if not self:IsClosest() then return end
-	self:Hatch(1)
-	return
-end
-
-function HatchingStand:BuyThree(): nil
-	if not self:IsClosest() then return end
-	self:Hatch(3)
-	return
-end
-
-function HatchingStand:Auto(): nil
-	if not self:IsClosest() then return end
-	while self._hatching do
-		self:Hatch(3)
-		task.wait(1)
-	end
-	return
-end
-
-local function getDistanceFromPlayer(stand: Model & { Egg: Model }): number
-	local primaryPart = stand.Egg.PrimaryPart
-	return if primaryPart then (primaryPart.Position - characterRoot.Position).Magnitude else 1000
-end
-
-function HatchingStand:GetClosest(): Model & { Egg: Model }
-	local closestStand = Array.new("Instance", CollectionService:GetTagged(self.Name))
-		:Filter(function(stand)
-			local distance = getDistanceFromPlayer(stand)
-			return distance <= MAX_STAND_DISTANCE
-		end)
-		:Sort(function(a, b)
-			local distanceA = getDistanceFromPlayer(a)
-			local distanceB = getDistanceFromPlayer(b)
-			return distanceA < distanceB
-		end)
-		:First()
-		
-	return closestStand
-end
-
-function HatchingStand:IsClosest(): boolean
-	local closestStand = self:GetClosest()
-	return closestStand == self.Instance
-end
-
-function HatchingStand:AddPetCards(): nil
-	self._chancesUI = UserInterface.Hatching.HatchingUi:Clone()
-	self._chancesUI.Enabled = true
-	
-	local container: Frame = self._chancesUI.Background.PetChances
-	task.spawn(function()
-		local pets = Array.new("table")
-		type ChanceTable = {
-			Name: string;
-			Chance: number;
-		}
-
-		local chances: { [string]: number } = self._eggTemplate.Chances
-		for pet, chance in pairs(chances) do
-			pets:Push({
-				Name = pet, 
-				Chance = chance
-			})
-		end
-		
-		pets:Sort(function(a: ChanceTable, b: ChanceTable)
-			return a.Chance > b.Chance
-		end)
-		
-		for _, pet in pets:GetValues() do
-			self._chancesUI.Enabled = true
-			local petModel: Model? = ReplicatedStorage.Assets.Pets:FindFirstChild(pet.Name)		
-			local petCard: ImageLabel & { Viewport: ViewportFrame; Chance: TextLabel } = UserInterface.Hatching.PetChanceCard:Clone()
-			local viewport = petCard.Viewport
-			petCard.Chance.Text = `{pet.Chance}%`
-			petCard.Parent = container
-			
-			local Viewport = Component.Get("Viewport")
-			Viewport:Add(viewport)
-			self._ui:AddModelToViewport(viewport, petModel)
-			self:AddToJanitor(petCard)
-		end
-	end)
-	
-	self._chancesUI.Background.BuyOne.MouseButton1Click:Connect(function()
-		self:BuyOne()
-	end)
-	self._chancesUI.Background.BuyThree.MouseButton1Click:Connect(function()
-		self:BuyThree()
-	end)
-	self._chancesUI.Background.Auto.MouseButton1Click:Connect(function()
-		self:Auto()
-	end)
-	self._chancesUI.Adornee = self._egg.PrimaryPart
-	self._chancesUI.Parent = player.PlayerGui
-	self._chancesUI.Enabled = true
-
-
-
-	self._schedulercontroller:Every("0.33s", function()
-		if not self:IsClosest() then
-			self._chancesUI.Enabled = false
-		else
-			if self._ui:GetHatching() then self._chancesUI.Enabled = false return end
-			self._chancesUI.Enabled = true
-		end
-	end)
-	return
-end
-
-return Component.new(HatchingStand)
+return Component.new(ServerStand)

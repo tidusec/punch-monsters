@@ -25,6 +25,7 @@ local QuestService = Knit.CreateService {
 function QuestService:KnitStart(): nil
   self._data = Knit.GetService("DataService")
   self._pets = Knit.GetService("PetService")
+  self._hatch = Knit.GetService("HatchingService")
 
   self._data.DataUpdated.Event:Connect(function(player: Player, key): nil
     if key == "UpdatedQuestProgress" then

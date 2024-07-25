@@ -226,6 +226,62 @@ local module = {
 		Rarity = "Legendary Huge",
 		StrengthMultiplier = 12000,
 	},	
+
+	-- Ice/Frostbite Robux Egg --
+	["Panda"] = {
+		ID = nil,
+		Rarity = "Common",
+		StrengthMultiplier = 200,
+	},
+
+	["Lamb"] = {
+		ID = nil,
+		Rarity = "Uncommon",
+		StrengthMultiplier = 500,
+	},
+
+	["Yeti"] = {
+		ID = nil,
+		Rarity = "Epic",
+		StrengthMultiplier = 1000,
+	},
+
+	["Icy Hedgehog"] = {
+		ID = nil,
+		Rarity = "Legendary",
+		StrengthMultiplier = 3_000,
+	},
+
+	["Huge Snowman"] = {
+		ID = nil,
+		Rarity = "Huge",
+		StrengthMultiplier = 10_000,
+	},
+
+	-- Store Pets --
+	["Heart and Soul"] = {
+		ID = nil,
+		Rarity = "Common",
+		StrengthMultiplier = 199,
+	},
+
+	["Mystic Golden Pot"] = {
+		ID = nil,
+		Rarity = "Rare",
+		StrengthMultiplier = 850,
+	},
+
+	["Mystic Shattered Shard"] = {
+		ID = nil,
+		Rarity = "Epic",
+		StrengthMultiplier = 1_700,
+	},
+
+	["Mystic Crystal Demon"] = {
+		ID = nil,
+		Rarity = "Huge",
+		StrengthMultiplier = 6_500,
+	},
 	
 	-- Robux Pets --
 	["Mystical Pyra"] = {
@@ -234,42 +290,65 @@ local module = {
 		StrengthMultiplier = 1500,
 	},
 	
-	["Mystic Repear Heart"] = {
+	["Mystic Reaper Heart"] = {
 		ID = nil,
 		Rarity = "Huge",
 		StrengthMultiplier = 7000,
 	},
+
+	-- Robux Pets on Screen --
+	["Mystic Lunar Guard"] = {
+		ID = nil,
+		Rarity = "Huge",
+		StrengthMultiplier = 10000,
+	},
+
+	["Mystic Void Phoenix"] = {
+		ID = nil,
+		Rarity = "Huge",
+		StrengthMultiplier = 499,
+	},
+
+	-- Mega Quest --
+	["Magical Winged Wyvern"] = {
+		ID = nil,
+		Rarity = "Huge",
+		StrengthMultiplier = 2000,
+	}
 }
 
---// make a table meta that will include Golden pets with Strength x2
 local meta = {
-	__index = function(self, key)
-		local multiplier = 1
-		local petname = key
+    __index = function(self, key)
+        local multiplier = 1
+        local petname = key
 
-		if string.find("Golden ", petname) then 
-			multiplier *= 2 
-			petname = string.gsub(key, "Golden ", "")
-		end
+        if string.find(petname, "Golden ") then 
+            multiplier = multiplier * 2 
+            petname = string.gsub(petname, "Golden ", "")
+        end
 
-		if string.find("Mythic ", petname) then
-			multiplier *= 3
-			petname = string.gsub(key, "Mythic ", "")
-		end
+        if string.find(petname, "Mythic ") then
+            multiplier = multiplier * 3
+            petname = string.gsub(petname, "Mythic ", "")
+        end
 
-		local pet = self[petname]
-			
-		if pet then
-			local newPet = {
-				ID = nil,
-				Rarity = pet.Rarity,
-				StrengthMultiplier = pet.StrengthMultiplier * multiplier,
-			}
-			self[key] = newPet
-			return newPet
-		
-		end
-	end
+        -- Avoid infinite recursion by checking if petname has been modified
+        if petname == key or not self[petname] then
+            return nil -- Base case: petname is not modified or doesn't exist
+        end
+
+        local pet = self[petname]
+        
+        if pet then
+            local newPet = {
+                ID = nil,
+                Rarity = pet.Rarity,
+                StrengthMultiplier = pet.StrengthMultiplier * multiplier,
+            }
+            self[key] = newPet
+            return newPet
+        end
+    end
 }
 setmetatable(module, meta)
 

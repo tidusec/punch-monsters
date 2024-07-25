@@ -18,6 +18,7 @@ local TimedRewardService = Knit.CreateService {
 
 local FIRST_JOIN_CACHE = {}
 local CLAIMED_REWARDS_CACHE = {}
+local SESSION_START_CACHE = {}
 
 function TimedRewardService:KnitStart()
   self._data = Knit.GetService("DataService")
@@ -27,6 +28,14 @@ function TimedRewardService:KnitStart()
   self._data.DataUpdated.Event:Connect(function(player, key)
     if key ~= "FirstJoinToday" then return end
     self:_CheckReset(player)
+  end)
+
+  Players.PlayerAdded:Connect(function(player)
+    self:_OnPlayerAdded(player)
+  end)
+
+  Players.PlayerRemoving:Connect(function(player)
+    self:_OnPlayerRemoving(player)
   end)
 end
 
@@ -70,7 +79,11 @@ function TimedRewardService:IsClaimed(player: Player, crateNumber: number): bool
 end
 
 function TimedRewardService:GetElapsedTime(player: Player): number
-  return math.round(tick() - self:_GetFirstJoinToday(player))
+  local currentTime = tick()
+  local firstJoinTime = self:_GetFirstJoinToday(player)
+  local timePlayedToday = self._data:GetValue(player, "TimePlayedToday")
+  local sessionTime = currentTime - SESSION_START_CACHE[player.UserId]
+  return math.round(timePlayedToday + sessionTime)
 end
 
 function TimedRewardService:_CheckReset(player: Player): nil
@@ -78,6 +91,7 @@ function TimedRewardService:_CheckReset(player: Player): nil
   if self:GetElapsedTime(player) >= 12 * 60 * 60 then
     self:_SetFirstJoinToday(player, tick())
     self:_SetClaimedRewardsToday(player, {})
+    self._data:SetValue(player, "TimePlayedToday", 0)
   end
   return
 end
@@ -112,6 +126,27 @@ function TimedRewardService:_SetClaimedRewardsToday(player: Player, value: { num
   CLAIMED_REWARDS_CACHE[player.UserId] = value
   self._data:SetValue(player, "ClaimedRewardsToday", value)
   return
+end
+
+function TimedRewardService:_OnPlayerAdded(player: Player): nil
+  local firstJoinToday = self:_GetFirstJoinToday(player)
+  if not firstJoinToday then
+    self:_SetFirstJoinToday(player, tick())
+    self._data:SetValue(player, "TimePlayedToday", 0)
+  end
+  SESSION_START_CACHE[player.UserId] = tick()
+end
+
+function TimedRewardService:_OnPlayerRemoving(player: Player): nil
+  local sessionStartTime = SESSION_START_CACHE[player.UserId]
+  local sessionTime = tick() - sessionStartTime
+  local timePlayedToday = self._data:GetValue(player, "TimePlayedToday")
+  local timePlayedTotal = self._data:GetValue(player, "TimePlayedTotal")
+
+  self._data:SetValue(player, "TimePlayedToday", timePlayedToday + sessionTime)
+  self._data:SetValue(player, "TimePlayedTotal", timePlayedTotal + sessionTime)
+  
+  SESSION_START_CACHE[player.UserId] = nil
 end
 
 function TimedRewardService.Client:GetElapsedTime(player: Player): number

@@ -18,7 +18,7 @@ local Janitor = require(Packages.Janitor)
 local Array = require(ReplicatedStorage.Modules.NewArray)
 local ProfileTemplate = require(ReplicatedStorage.Templates.ProfileTemplate)
 
-local FOLLOW_SPEED = 15
+local FOLLOW_SPEED = 12
 local Y_OFFSET = 0
 local PET_POSITIONS = Array.new("vector", {
 	Vector3.new(2, Y_OFFSET, 3),
@@ -252,7 +252,7 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		janitor:Add(petAttachment)
 
 		local positionAligner = Instance.new("AlignPosition")
-		positionAligner.MaxForce = 25_000
+		positionAligner.MaxForce = 100_000
 		positionAligner.Attachment0 = petAttachment
 		positionAligner.Attachment1 = characterAttachment
 		positionAligner.Responsiveness = FOLLOW_SPEED
@@ -260,7 +260,7 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		janitor:Add(positionAligner)
 
 		local orientationAligner = Instance.new("AlignOrientation")
-		orientationAligner.MaxTorque = 25_000
+		orientationAligner.MaxTorque = 100_000
 		orientationAligner.Attachment0 = petAttachment
 		orientationAligner.Attachment1 = characterAttachment
 		orientationAligner.Responsiveness = FOLLOW_SPEED
@@ -394,6 +394,9 @@ function PetService:Delete(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 		local pets = self._data:GetValue(player, "Pets")
 		local ownedPets = Array.new("table", pets.OwnedPets)
 		ownedPets:RemoveValue(pet)
+		local equippedPets = Array.new("table", pets.Equipped)
+		equippedPets:RemoveValue(pet)
+		pets.Equipped = equippedPets:ToTable()
 		pets.OwnedPets = ownedPets:ToTable()
 		self._data:SetValue(player, "Pets", pets)
 		return

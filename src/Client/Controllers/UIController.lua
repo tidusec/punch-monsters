@@ -10,6 +10,7 @@ local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 
 local Tween = require(ReplicatedStorage.Modules.Tween)
+local ViewportModel = require(ReplicatedStorage.Modules.ViewportModel)
 
 local player = Players.LocalPlayer
 
@@ -103,7 +104,8 @@ function UIController:SetShiftLock(on: boolean): nil
 end
 
 function UIController:AddModelToViewport(viewport: ViewportFrame, modelTemplate: Model, options: { replaceModel: boolean? }?): nil
-	task.spawn(function()
+	local connection
+    task.spawn(function()
 		if not modelTemplate then error("Missing viewport model template") end
 		
 		local replaceModel = if options then options.replaceModel else false
@@ -118,25 +120,143 @@ function UIController:AddModelToViewport(viewport: ViewportFrame, modelTemplate:
 		local model: Model = modelTemplate:Clone()
 		model.Name = "model"
 		model.Parent = viewport
+
+        if not modelTemplate.PrimaryPart.Name then
+			print(modelTemplate.Name)
+			print(modelTemplate.PrimaryPart.Name)
+			return
+		end
 		
-		local camera = viewport:WaitForChild("Camera") :: Camera
-		local modelCFrame = CFrame.lookAt(Vector3.zero, camera.CFrame.Position)
-		local fitModel = viewport:GetAttribute("FitModel")
-		if fitModel then
-			local cf, size = model:GetBoundingBox()
-			modelCFrame *= CFrame.new(0, cf.Position.Y / 2, 0)
-			camera.FieldOfView = viewport:GetAttribute("DefaultFOV") + size.Magnitude ^ 1.55
-		end
-
-		local modelRotation = viewport:GetAttribute("ModelRotation")
-		if modelRotation then
-			modelCFrame *= CFrame.Angles(0, math.rad(modelRotation or 0), 0)
-		end
-
-		model:PivotTo(modelCFrame)
+		local camera = viewport:FindFirstChildOfClass("Camera") or Instance.new("Camera")
+		camera.Parent = viewport
+		viewport.CurrentCamera = camera
+		
+		local vpfModel = ViewportModel.new(viewport, camera)
+		vpfModel:SetModel(model)
+		
+		local cf, size = model:GetBoundingBox()
+		local defaultFOV = viewport:GetAttribute("DefaultFOV") or 70
+		camera.FieldOfView = defaultFOV
+		
+		local theta = 0
+		local orientation = CFrame.new()
+		
+		connection = game:GetService("RunService").RenderStepped:Connect(function(dt)
+			theta = theta + math.rad(20 * dt)
+			orientation = CFrame.fromEulerAnglesYXZ(math.rad(-20), theta, 0)
+			local newCFrame = vpfModel:GetMinimumFitCFrame(orientation)
+			
+			-- Calculate the optimal FieldOfView
+			local distance = (newCFrame.Position - cf.Position).Magnitude
+			local fitFOV = 2 * math.deg(math.atan(size.Magnitude / (2 * distance)))
+			camera.FieldOfView = math.min(defaultFOV, fitFOV)
+			
+			camera.CFrame = newCFrame
+		end)
 	end)
-	return
+	return connection
 end
+
+
+function UIController:AddModelToFastViewport(viewport: ViewportFrame, modelTemplate: Model, options: { replaceModel: boolean? }?)
+    local connection
+    task.spawn(function()
+		if not modelTemplate then error("Missing viewport model template") end
+		
+		local replaceModel = if options then options.replaceModel else false
+		if viewport:FindFirstChild("model") and not replaceModel then
+			return warn(`Attempt to add model to viewport already containing a model. Viewport location: {viewport:GetFullName()}`)
+		end
+		
+		if replaceModel and viewport:FindFirstChild("model") then
+			(viewport :: any).model:Destroy()
+		end
+		
+		local model: Model = modelTemplate:Clone()
+		model.Name = "model"
+		model.Parent = viewport
+
+        print(modelTemplate.Name)
+        print(modelTemplate.PrimaryPart.Name)
+		
+		local camera = viewport:FindFirstChildOfClass("Camera") or Instance.new("Camera")
+		camera.Parent = viewport
+		viewport.CurrentCamera = camera
+		
+		local vpfModel = ViewportModel.new(viewport, camera)
+		vpfModel:SetModel(model)
+		
+		local cf, size = model:GetBoundingBox()
+		local defaultFOV = viewport:GetAttribute("DefaultFOV") or 70
+		camera.FieldOfView = defaultFOV
+		
+		local theta = - 3* math.pi / 4
+		local orientation = CFrame.Angles(0, 0, 0)
+		
+		connection = game:GetService("RunService").RenderStepped:Connect(function(dt)
+			theta = theta + math.rad(25 * dt)
+			orientation = CFrame.fromEulerAnglesYXZ(math.rad(-20), theta, 0)
+			local newCFrame = vpfModel:GetMinimumFitCFrame(orientation)
+			local distance = (newCFrame.Position - cf.Position).Magnitude
+			local fitFOV = 2 * math.deg(math.atan(size.Magnitude / (2 * distance)))
+			camera.FieldOfView = math.min(defaultFOV, fitFOV)
+			
+			camera.CFrame = newCFrame
+		end)
+	end)
+	return connection
+end
+
+
+function UIController:AddModelToViewortNoRotation(viewport: ViewportFrame, modelTemplate: Model, options: { replaceModel: boolean? }?)
+    local vp
+    task.spawn(function()
+		if not modelTemplate then error("Missing viewport model template") end
+		
+		local replaceModel = if options then options.replaceModel else false
+		if viewport:FindFirstChild("model") and not replaceModel then
+			return warn(`Attempt to add model to viewport already containing a model. Viewport location: {viewport:GetFullName()}`)
+		end
+		
+		if replaceModel and viewport:FindFirstChild("model") then
+			(viewport :: any).model:Destroy()
+		end
+		
+		local model: Model = modelTemplate:Clone()
+		model.Name = "model"
+		model.Parent = viewport
+
+        print(modelTemplate.Name)
+        print(modelTemplate.PrimaryPart.Name)
+		
+		local camera = viewport:FindFirstChildOfClass("Camera") or Instance.new("Camera")
+		camera.Parent = viewport
+		viewport.CurrentCamera = camera
+		
+		local vpfModel = ViewportModel.new(viewport, camera)
+		vpfModel:SetModel(model)
+		
+		local cf, size = model:GetBoundingBox()
+		local defaultFOV = viewport:GetAttribute("DefaultFOV") or 70
+		camera.FieldOfView = defaultFOV
+		
+		local theta = 0
+		local orientation = CFrame.new()
+	
+        orientation = CFrame.fromEulerAnglesYXZ(math.rad(-20), theta, 0)
+		local newCFrame = vpfModel:GetMinimumFitCFrame(orientation)
+		local distance = (newCFrame.Position - cf.Position).Magnitude
+		local fitFOV = 2 * math.deg(math.atan(size.Magnitude / (2 * distance)))
+		camera.FieldOfView = math.min(defaultFOV, fitFOV)	
+		camera.CFrame = newCFrame
+
+        vp = vpfModel
+	end)
+	return vp
+end
+
+
+
 
 function UIController:AnimateButton(buttonInstance, frameInstance, amount)
     frameInstance = frameInstance or buttonInstance

@@ -52,10 +52,12 @@ function RewardsScreen:Initialize(): nil
 	local data = Knit.GetService("DataService")
 	local scheduler = Knit.GetController("SchedulerController")
 
-	self._crateButtons = Array.new("userdata", self.Instance.Background.Crates:GetChildren())
+	self._crateButtons = Array.new("Instance", self.Instance.Background.Crates:GetChildren())
 		:Filter(function(element: Instance): boolean
 			return element.ClassName == "ImageButton"
 		end)
+
+	self._crateList = self._crateButtons:ToTable()
 
 	for _, crateButton: CrateButton in self._crateButtons:GetValues() do
 		local db = Debounce.new(0.5)
@@ -71,7 +73,7 @@ function RewardsScreen:Initialize(): nil
 		self:UpdateScreen()
 	end))
 
-	self:AddToJanitor(scheduler:Every("1 second", function(): nil
+	self:AddToJanitor(scheduler:Every("0.5s", function(): nil
 		self:UpdateScreen()
 		return
 	end))
@@ -81,7 +83,10 @@ end
 
 function RewardsScreen:UpdateScreen(): nil
 	task.spawn(function(): nil
-		local hasUnclaimed = self._crateButtons
+		local hasUnclaimed = Array.new("Instance", self.Instance.Background.Crates:GetChildren())
+			:Filter(function(element: Instance): boolean
+				return element.ClassName == "ImageButton"
+			end)
 			:Filter(function(crateButton: CrateButton): boolean
 				return self:GetRemainingTime(crateButton) == 0
 			end)
@@ -93,8 +98,7 @@ function RewardsScreen:UpdateScreen(): nil
 		self._rewardsButton:ToggleNotification(hasUnclaimed)
 		return
 	end)
-
-	for _, crateButton: CrateButton in self._crateButtons:GetValues() do
+	for _, crateButton: CrateButton in self._crateList do
 		task.spawn(function(): nil
 			local isClaimed = self._timedRewards:IsClaimed(crateButton.LayoutOrder)
 			local collectText = if isClaimed then "Collected!" else "Collect"

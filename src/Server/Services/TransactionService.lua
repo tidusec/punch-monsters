@@ -25,6 +25,7 @@ function TransactionService:KnitStart()
 	local rebirths = Knit.GetService("RebirthService")
 	local hatching = Knit.GetService("HatchingService")
 	local purchaseLogger = Knit.GetService("PurchaseLogService")
+	local pets = Knit.GetService("PetService")
 	
 	local ProductFunctions = {
 		[1631383839] = function(player: Player): nil -- win1
@@ -82,7 +83,27 @@ function TransactionService:KnitStart()
 		[1631383837] = function(player: Player): nil -- skip rebirth
 			hatching:HatchManyServer(player, "Map1", "Egg3Robux", 5)
 			return
-		end
+		end,
+		[1884295167] = function(player: Player): nil --give mega quest
+			local questprogress = data:GetValue(player, "MegaQuestProgress")
+			questprogress["Completed"] = true
+			data:SetValue(player, "MegaQuestProgress", questprogress)
+			pets:Add(player, "Magical Winged Wyvern")
+			hatching:ShowFakeHatch(player, "Magical Winged Wyvern")
+			return
+		end,
+
+		[1631387975] = function(player: Player): nil -- give best pet
+			pets:Add(player, "Mystic Lunar Guard")
+			hatching:ShowFakeHatch(player, "Mystic Lunar Guard")
+		end,
+
+		[1631387976] = function(player: Player): nil --give limited pet
+			pets:Add(player, "Mystic Void Phoenix")
+			hatching:ShowFakeHatch(player, "Mystic Void Phoenix")
+		end,
+
+		
 	}
 	
 	MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passID, wasPurchased)
@@ -118,11 +139,10 @@ function TransactionService:KnitStart()
 				end
 
 				local success, err = pcall(function()
-					task.defer(handleProduct, player)
+					handleProduct(player)
 				end)
 				if not success then
-					error(`Failed to process a product purchase for {player.Name}, ProductId: {receipt.ProductId}.  Error: {err}`)
-					return nil
+					return error(`Failed to process a product purchase for {player.Name}, ProductId: {receipt.ProductId}. Error: {err}`)
 				end
 				
 				task.defer(function()
@@ -141,7 +161,6 @@ function TransactionService:KnitStart()
 
 
 		if not success then
-			error(isPurchaseRecorded)
 			return Enum.ProductPurchaseDecision.NotProcessedYet
 		elseif isPurchaseRecorded == nil then
 			return Enum.ProductPurchaseDecision.NotProcessedYet

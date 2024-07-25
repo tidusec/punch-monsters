@@ -63,6 +63,7 @@ function MegaQuestScreen:Initialize(): nil
 	self._quests = Knit.GetService("QuestService")
 	self._time = Knit.GetService("PlaytimeService")
 	self._schedulercontroller = Knit.GetController("SchedulerController")
+	self._ui = Knit.GetController("UIController")
 	self._questGoals = self._quests:GetQuestGoals()
 	self._background = self.Instance.Background
 	self._claimed = false
@@ -84,7 +85,9 @@ function MegaQuestScreen:Initialize(): nil
 		self._time:Get()
 	end)
 
-  return self:UpdateProgress()
+	self._ui:AddModelToViewport(self._background.Pet.Viewport, ReplicatedStorage.Assets.Pets["Magical Winged Wyvern"])
+
+  	return self:UpdateProgress()
 end
 
 function MegaQuestScreen:UpdateProgress(): nil
@@ -99,13 +102,17 @@ function MegaQuestScreen:UpdateProgress(): nil
 		local collected = false
 		local done = false
 
-		if collected then
-			self._claimed = true
-			self._background.Claim.Text = "Claimed!"
-		end
-
 		if progressData["Completed"] then collected = true end
 		if progressData["Done"] then done = true end
+
+		if collected then
+			self._claimed = true
+			self._background.Claim.Title.Text = "Claimed!"
+		end
+
+		if collected or done then
+			self._background.Buy.Visible = false
+		end
 
         local barContainer = self._background:FindFirstChild(`Goal{index}Progress`)
 		local title = self._background:FindFirstChild(`Goal{index}Title`)
