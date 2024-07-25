@@ -3,6 +3,15 @@
 local ChancesTemplate = require(script.ChanceTemplate)
 
 local module = {
+	['Server'] = {
+		["Frostbite Egg"] = {
+			['Robux1'] = 1887043767,
+			['Robux3'] = 1887044006,
+			['Robux8'] = 1887044205,
+			['Chances'] = ChancesTemplate.Server["Frostbite Egg"]
+		}
+	},
+	
 	['Map1'] = {
 		['Egg1'] = {
 			['WinsCost'] = 15,

@@ -1,6 +1,16 @@
 --!native
 --!strict
 local module = {
+	["Server"] = {
+		["Frostbite Egg"] = {
+			["Panda"] = 40,
+			["Lamb"] = 25,
+			["Yeti"] = 20,
+			["Icy Hedgehog"] = 15,
+			["Huge Snowman"] = 1/20,
+		},
+	},
+	
 	["Map1"] = {
 		["Egg1"] = {
 			["Dog"] = 35,

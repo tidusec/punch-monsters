@@ -122,8 +122,8 @@ function UIController:AddModelToViewport(viewport: ViewportFrame, modelTemplate:
 		model.Parent = viewport
 
         if not modelTemplate.PrimaryPart.Name then
-			print(modelTemplate.Name)
-			print(modelTemplate.PrimaryPart.Name)
+			warn(modelTemplate.Name)
+			warn(modelTemplate.PrimaryPart.Name)
 			return
 		end
 		
@@ -176,8 +176,11 @@ function UIController:AddModelToFastViewport(viewport: ViewportFrame, modelTempl
 		model.Name = "model"
 		model.Parent = viewport
 
-        print(modelTemplate.Name)
-        print(modelTemplate.PrimaryPart.Name)
+        if not modelTemplate.PrimaryPart.Name then
+			warn(modelTemplate.Name)
+			warn(modelTemplate.PrimaryPart.Name)
+			return
+		end
 		
 		local camera = viewport:FindFirstChildOfClass("Camera") or Instance.new("Camera")
 		camera.Parent = viewport
@@ -226,8 +229,11 @@ function UIController:AddModelToViewortNoRotation(viewport: ViewportFrame, model
 		model.Name = "model"
 		model.Parent = viewport
 
-        print(modelTemplate.Name)
-        print(modelTemplate.PrimaryPart.Name)
+        if not modelTemplate.PrimaryPart.Name then
+			warn(modelTemplate.Name)
+			warn(modelTemplate.PrimaryPart.Name)
+			return
+		end
 		
 		local camera = viewport:FindFirstChildOfClass("Camera") or Instance.new("Camera")
 		camera.Parent = viewport

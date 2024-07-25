@@ -103,6 +103,37 @@ function TransactionService:KnitStart()
 			hatching:ShowFakeHatch(player, "Mystic Void Phoenix", "Server", "Server1")
 		end,
 
+		[1631382544] = function(player: Player): nil
+			pets:Add(player, "Heart and Soul")
+			hatching:ShowFakeHatch(player, "Heart and Soul", "Server", "ShopEgg")
+		end,
+
+		[1631383147] = function(player: Player): nil
+			pets:Add(player, "Mystic Golden Pot")
+			hatching:ShowFakeHatch(player, "Mystic Golden Pot", "Server", "ShopEgg")
+		end,
+
+		[1631383149] = function(player: Player): nil
+			pets:Add(player, "Mystic Shattered Shard")
+			hatching:ShowFakeHatch(player, "Mystic Shattered Shard", "Server", "ShopEgg")
+		end,
+
+		[1631383145] = function(player: Player): nil
+			pets:Add(player, "Mystic Crystal Demon")
+			hatching:ShowFakeHatch(player, "Mystic Crystal Demon", "Server", "ShopEgg")
+		end,
+
+		[1887043767] = function(player: Player): nil
+			hatching:HatchManyServer(player, "Server", "Frostbite Egg", 1)
+		end,
+
+		[1887044006] = function(player: Player): nil
+			hatching:HatchManyServer(player, "Server", "Frostbite Egg", 3)
+		end,
+
+		[1887044205] = function(player: Player): nil
+			hatching:HatchManyServer(player, "Server", "Frostbite Egg", 8)
+		end,
 		
 	}
 	

@@ -64,15 +64,19 @@ function InventoryScreen:Initialize(): nil
 	self:AddToJanitor(self._background.Sort.MouseButton1Click:Connect(function()
 		if self._sorting == "None" then
 			self._sorting = "Rarity"
+			self._background.Sort.TextLabel.Text = "Sort: Rarity"
 		elseif self._sorting == "Rarity" then
 			self._sorting = "Strength"
+			self._background.Sort.TextLabel.Text = "Sort: Strength"
 		elseif self._sorting == "Strength" then
 			self._sorting = "Name"
+			self._background.Sort.TextLabel.Text = "Sort: Name"
 		elseif self._sorting == "Name" then
 			self._sorting = "None"
+			self._background.Sort.TextLabel.Text = "Sort: None"
 		end
 
-		self:AddPetCards()
+		self:UpdatePetCards()
 	end))
 
 	self:AddToJanitor(self._background.Delete.MouseButton1Click:Connect(function()

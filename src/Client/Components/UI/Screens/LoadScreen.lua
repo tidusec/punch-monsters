@@ -57,9 +57,6 @@ function LoadScreen:Initialize(): nil
     self._glovesImage.Position = UDim2.new(0, 0, 0, 0)
     self._glovesImage.AnchorPoint = Vector2.new(0, 0)
 
-    -- Debug: Print initial position
-    print("Initial Gloves Image Position:", self._glovesImage.Position)
-
     -- Enhance background
     self._background.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self._background.BackgroundTransparency = 0
@@ -103,19 +100,14 @@ function LoadScreen:Activate(): nil
     -- Start the image animation
     task.spawn(function()
         while not self._finished do
-            print("Starting image animation")
             local targetPosition = UDim2.new(0, 0, -1, 0)
             local tweenInfo = TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
             
             local tween = TweenService:Create(self._glovesImage, tweenInfo, {Position = targetPosition})
             tween:Play()
             
-            print("Tween started. Target position:", targetPosition)
-            
             tween.Completed:Connect(function()
-                print("Tween completed. Current position:", self._glovesImage.Position)
                 self._glovesImage.Position = UDim2.new(0, 0, 0, 0)
-                print("Reset position:", self._glovesImage.Position)
             end)
             
             task.wait(4)
