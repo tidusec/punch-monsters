@@ -46,6 +46,9 @@ function UIController:SetScreen(name: string, blur: boolean?): ScreenGui?
     local setScreen: ScreenGui
     for _, screen in player:WaitForChild("PlayerGui"):GetChildren() do
         local on = screen.Name == name
+		if screen.Name == "Cmdr" then
+			on = true
+		end
         task.spawn(function()
             screen.Enabled = on
         end)

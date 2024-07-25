@@ -28,6 +28,7 @@ local PROFILE_TEMPLATE = {
 	AbsStrength = 0,
 
 	ProductsLog = {},
+	GamePasses = {},
 	RedeemedCodes = {},
 	MegaQuestProgress = {},
 	UpdatedQuestProgress = false,

@@ -231,31 +231,31 @@ local module = {
 	["Panda"] = {
 		ID = nil,
 		Rarity = "Common",
-		StrengthMultiplier = 200,
+		StrengthMultiplier = 50,
 	},
 
 	["Lamb"] = {
 		ID = nil,
 		Rarity = "Uncommon",
-		StrengthMultiplier = 500,
+		StrengthMultiplier = 80,
 	},
 
 	["Yeti"] = {
 		ID = nil,
 		Rarity = "Epic",
-		StrengthMultiplier = 1000,
+		StrengthMultiplier = 100,
 	},
 
 	["Icy Hedgehog"] = {
 		ID = nil,
 		Rarity = "Legendary",
-		StrengthMultiplier = 3_000,
+		StrengthMultiplier = 150,
 	},
 
 	["Huge Snowman"] = {
 		ID = nil,
 		Rarity = "Huge",
-		StrengthMultiplier = 10_000,
+		StrengthMultiplier = 12_000,
 	},
 
 	-- Store Pets --
@@ -300,12 +300,13 @@ local module = {
 	["Mystic Lunar Guard"] = {
 		ID = nil,
 		Rarity = "Huge",
-		StrengthMultiplier = 10000,
+		StrengthMultiplier = 4000,
 	},
 
 	["Mystic Void Phoenix"] = {
 		ID = nil,
 		Rarity = "Huge",
+		Limited = true,
 		StrengthMultiplier = 499,
 	},
 

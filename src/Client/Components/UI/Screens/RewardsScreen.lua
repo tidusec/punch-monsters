@@ -82,6 +82,8 @@ function RewardsScreen:Initialize(): nil
 end
 
 function RewardsScreen:UpdateScreen(): nil
+	local ObjectOfTime = TFM.Convert(self._timedRewards:GetTimeLeft())
+	self.Instance.Background.TimeLeft.Text = TFM.FormatStr(ObjectOfTime, "%02h:%02m:%02S").." Remaining"
 	task.spawn(function(): nil
 		local hasUnclaimed = Array.new("Instance", self.Instance.Background.Crates:GetChildren())
 			:Filter(function(element: Instance): boolean

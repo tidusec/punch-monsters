@@ -4,28 +4,28 @@ local module = {
 	-- Map1
 	
 	Nerd = {
-		Wins = 1,
-		Strength = 100,
+		Wins = 5,
+		Strength = 500,
 		Boss = false
 	},
 	Businessman = {
 		Wins = 25,
-		Strength = 1200,
+		Strength = 4_500,
 		Boss = false
 	},
 	Bodybuilder = {
-		Wins = 75,
-		Strength = 8700,
+		Wins = 80,
+		Strength = 30_000,
 		Boss = false
 	},
 	Hitman = {
-		Wins = 150,
-		Strength = 18000,
+		Wins = 200,
+		Strength = 160_000,
 		Boss = false
 	},
 	Powerlifter = {
-		Wins = 300,
-		Strength = 45000,
+		Wins = 550,
+		Strength = 1_200_000,
 		Boss = true,
 		Map = 1,
 	},
@@ -33,28 +33,28 @@ local module = {
 	-- Map2
 	
 	Mummy = {
-		Wins = 2000,
-		Strength = 380000,
+		Wins = 1_000,
+		Strength = 1_500_000,
 		Boss = false
 	},
 	DesertExplorer = {
-		Wins = 10000,
-		Strength = 640000,
+		Wins = 4_000,
+		Strength = 5_000_000,
 		Boss = false
 	},
 	DesertScout = {
-		Wins = 22000,
-		Strength = 11000000,
+		Wins = 15_000,
+		Strength = 30_000_000,
 		Boss = false
 	},
 	Soldier = {
-		Wins = 50000,
-		Strength = 45000000,
+		Wins = 45_000,
+		Strength = 150_000_000,
 		Boss = false
 	},
 	Pharaoh = {
-		Wins = 225000,
-		Strength = 120000000,
+		Wins = 300_000,
+		Strength = 900_000_000,
 		Boss = true,
 		Map = 2,
 	},
@@ -62,29 +62,29 @@ local module = {
 	-- Map3
 	
 	Zombie = {
-		Wins = 4500000,
-		Strength = 400000000,
+		Wins = 450_000,
+		Strength = 1_000_000_000,
 		Boss = false
 	},
 	Golem = {
-		Wins = 35000000,
-		Strength = 1200000000,
+		Wins = 1_500_000,
+		Strength = 5_000_000_000,
 		Boss = false
 	},
 	Skeleton = {
-		Wins = 115000000,
-		Strength = 8100000000,
+		Wins = 5_000_000,
+		Strength = 30_000_000_000,
 		Boss = false
 	},
 	Reaper = {
-		Wins = 375000000,
-		Strength = 25000000000,
+		Wins = 25_000_000,
+		Strength = 150_000_000_000,
 		Boss = false
 	},
 	Demon = {
-		Wins = 1800000000,
-		Strength = 92000000000,
-		Boss = false,
+		Wins = 250_000_000,
+		Strength = 1_000_000_000_000,
+		Boss = true,
 		Map = 3,
 	},
 }

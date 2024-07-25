@@ -28,7 +28,7 @@ local module = {
 		},
 		PunchBag6VIP = {
 			PunchRequirement = 0,
-			Hit = 15,
+			Hit = 10,
 
 			Vip = true,
 		}

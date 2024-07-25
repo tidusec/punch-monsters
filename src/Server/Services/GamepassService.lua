@@ -57,6 +57,12 @@ local function getPassIDByName(name: string): number?
 end
 
 local PLAYER_OWNS_CACHE = {}
+
+function GamepassService:KnitStart(): nil
+	self._data = Knit.GetService("DataService")
+	return
+end
+
 function GamepassService:UpdatePlayerOwnedCache(player: Player, id: number): nil
 	AssertPlayer(player)
 	if not PLAYER_OWNS_CACHE[player.UserId] then
@@ -72,10 +78,16 @@ function GamepassService:DoesPlayerOwn(player: Player, passName: string): boolea
 	local id = getPassIDByName(passName)
 	assert(id, `Failed to find gamepass ID for {passName}`)
 
+	local owned = self._data:GetGamePasses(player)
+
 	if not PLAYER_OWNS_CACHE[player.UserId] then
 		PLAYER_OWNS_CACHE[player.UserId] = {}
 	end
 
+	if owned[passName] then
+		return true
+	end
+	
 	return PLAYER_OWNS_CACHE[player.UserId][id] or MarketplaceService:UserOwnsGamePassAsync(player.UserId, id)
 end
 

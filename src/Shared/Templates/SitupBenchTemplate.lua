@@ -12,15 +12,15 @@ local module = {
 		},
 		SitupBench3 = {
 			AbsRequirement = 4000,
-			Hit = 3,
+			Hit = 4,
 		},
 		SitupBench4 = {
 			AbsRequirement = 22000,
-			Hit = 4,
+			Hit = 6,
 		},
 		SitupBench5 = {
 			AbsRequirement = 100000,
-			Hit = 5,
+			Hit = 8,
 		},
 		SitupBench6VIP = {
 			AbsRequirement = 0,

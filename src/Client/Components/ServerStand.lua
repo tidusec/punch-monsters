@@ -239,7 +239,7 @@ function ServerStand:HatchAnimation(pets)
         viewportFrame:Destroy()
     end
 
-    janitor:Cleanup()
+    janitor:Destroy()
 end
 
 return Component.new(ServerStand)

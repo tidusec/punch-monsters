@@ -300,7 +300,7 @@ function HatchingStand:HatchAnimation(pets)
         viewportFrame:Destroy()
     end
 
-    janitor:Cleanup()
+    janitor:Destroy()
 end
 
 function HatchingStand:Hatch(amount :number): nil

@@ -88,7 +88,7 @@ end
 
 function TimedRewardService:_CheckReset(player: Player): nil
   -- resets every 12 hours
-  if self:GetElapsedTime(player) >= 12 * 60 * 60 then
+  if tick() - self:_GetFirstJoinToday(player) >= 12 * 60 * 60 then
     self:_SetFirstJoinToday(player, tick())
     self:_SetClaimedRewardsToday(player, {})
     self._data:SetValue(player, "TimePlayedToday", 0)
@@ -149,6 +149,10 @@ function TimedRewardService:_OnPlayerRemoving(player: Player): nil
   SESSION_START_CACHE[player.UserId] = nil
 end
 
+function TimedRewardService:GetTimeLeft(player: Player): number
+  return math.floor(12 * 60 * 60 - (tick() - self:_GetFirstJoinToday(player)))
+end
+
 function TimedRewardService.Client:GetElapsedTime(player: Player): number
   return self.Server:GetElapsedTime(player)
 end
@@ -159,6 +163,10 @@ end
 
 function TimedRewardService.Client:IsClaimed(player: Player, crateNumber: number): boolean
   return self.Server:IsClaimed(player, crateNumber)
+end
+
+function TimedRewardService.Client:GetTimeLeft(player: Player): number
+  return self.Server:GetTimeLeft(player)
 end
 
 return TimedRewardService

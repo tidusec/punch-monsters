@@ -144,10 +144,14 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 
 		if pet.Rarity == "Huge" then
 			self._petStats.Stars.Huge.Visible = true
+		else
+			self._petStats.Stars.Huge.Visible = false
 		end
 
 		if pet["Limited"] then
 			self._petStats.Stars.Limited.Visible = true
+		else
+			self._petStats.Stars.Limited.Visible = false
 		end
 
 		
@@ -200,10 +204,14 @@ function InventoryScreen:UpdatePetCards(pets, sorting): nil
 
 			if pet.Rarity == "Huge" then
 				card.Stars.Huge.Visible = true
+			else
+				card.Stars.Huge.Visible = false
 			end
 
 			if pet["Limited"] then
 				card.Stars.Limited.Visible = true
+			else
+				card.Stars.Limited.Visible = false
 			end
 			
 			local Viewport = Component.Get("Viewport")
@@ -221,7 +229,7 @@ function InventoryScreen:UpdatePetCards(pets, sorting): nil
 		end)
 	end
 
-	self._background.Equipped.Text = tostring(#pets.Equipped).."/"..tostring(pets.MaxEquip)
+	self._background.Equipped.Text = tostring(#pets.Equipped).."/"..tostring(self._pets:GetPetSpace() or 4)
 	self._background.Storage.Text = tostring(#pets.OwnedPets).."/"..(tostring(pets.MaxStorage) or "200")
 
 	return

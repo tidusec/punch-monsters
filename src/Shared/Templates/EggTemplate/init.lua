@@ -30,21 +30,21 @@ local module = {
 	},
 	['Map2'] = {
 		['Egg1'] = {
-			['WinsCost'] = 10000,
+			['WinsCost'] = 10_000,
 			['Chances'] = ChancesTemplate.Map2.Egg1
 		},
 		['Egg2'] = {
-			['WinsCost'] = 1000000,
+			['WinsCost'] = 85_000,
 			['Chances'] = ChancesTemplate.Map2.Egg2
 		}
 	},
 	['Map3'] = {
 		['Egg1'] = {
-			['WinsCost'] = 15000000,
+			['WinsCost'] = 1_000_000,
 			['Chances'] = ChancesTemplate.Map3.Egg1
 		},
 		['Egg2'] = {
-			['WinsCost'] = 250000000,
+			['WinsCost'] = 65_000_000,
 			['Chances'] = ChancesTemplate.Map3.Egg2
 		}
 	}

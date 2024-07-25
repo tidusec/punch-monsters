@@ -369,6 +369,10 @@ function DataService:AddDefeatedBoss(player: Player, bossMap: string): nil
 	return
 end
 
+function DataService:GetGamePasses(player: Player)
+	return self:GetValue(player, "GamePasses")
+end
+
 -- client
 
 function DataService.Client:GetValue(player, name)
