@@ -137,6 +137,15 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 		self._petStats.PetName.Text = pet.Name
 		self._petStats.Rarity.Text = pet.Rarity
 		self._petStats.Strength.Text = `{pet.StrengthMultiplier}x`
+
+		if pet.Rarity == "Huge" then
+			self._petStats.Stars.Huge.Visible = true
+		end
+
+		if pet["Limited"] then
+			self._petStats.Stars.Limited.Visible = true
+		end
+
 		
 		local petModel = Assets.Pets:FindFirstChild(pet.Name)
 		if not petModel then
@@ -184,6 +193,14 @@ function InventoryScreen:UpdatePetCards(pets, sorting): nil
 			local card: ImageButton & { Viewport: ViewportFrame; StrengthMultiplier: TextLabel } = Assets.UserInterface.Inventory.PetCard:Clone()
 			card.StrengthMultiplier.Text = `{pet.StrengthMultiplier}x`
 			card.Parent = self._container.Frame
+
+			if pet.Rarity == "Huge" then
+				card.Stars.Huge.Visible = true
+			end
+
+			if pet["Limited"] then
+				card.Stars.Limited.Visible = true
+			end
 			
 			local Viewport = Component.Get("Viewport")
 			Viewport:Add(card.Viewport)

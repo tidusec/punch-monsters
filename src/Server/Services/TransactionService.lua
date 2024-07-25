@@ -95,12 +95,12 @@ function TransactionService:KnitStart()
 
 		[1631387975] = function(player: Player): nil -- give best pet
 			pets:Add(player, "Mystic Lunar Guard")
-			hatching:ShowFakeHatch(player, "Mystic Lunar Guard")
+			hatching:ShowFakeHatch(player, "Mystic Lunar Guard", "Server", "Server1")
 		end,
 
 		[1631387976] = function(player: Player): nil --give limited pet
 			pets:Add(player, "Mystic Void Phoenix")
-			hatching:ShowFakeHatch(player, "Mystic Void Phoenix")
+			hatching:ShowFakeHatch(player, "Mystic Void Phoenix", "Server", "Server1")
 		end,
 
 		

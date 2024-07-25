@@ -367,9 +367,6 @@ function PetService:EquipBest(player)
     table.sort(ownedPets, comparePets)
 
     local equippedPetsMap = {}
-    for _, pet in ipairs(equippedPets) do
-        equippedPetsMap[pet.ID] = true
-    end
 
     local newEquippedPets = {}
     for _, pet in ipairs(ownedPets) do

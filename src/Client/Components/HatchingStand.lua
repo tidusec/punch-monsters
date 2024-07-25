@@ -67,126 +67,241 @@ function HatchingStand:Initialize(): nil
 	self._chancesUI.Enabled = true
 	return
 end
-
 function HatchingStand:HatchAnimation(pets)
-	-- Ensure pets is a table
-	if type(pets) == "string" then
-		pets = {pets}
-	end
+    if type(pets) == "string" then
+        pets = {pets}
+    end
 
-	local janitor = Janitor.new()
+    local janitor = Janitor.new()
+    local TweenService = game:GetService("TweenService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-	-- Initialize UI
-	self._ui:SetScreen("EggUi", true)
-	self._ui:SetHatching(true)
-	self._chancesUI.Enabled = false
+    self._ui:SetScreen("EggUi", true)
+    self._ui:SetHatching(true)
+    self._chancesUI.Enabled = false
 
-	local numPets = #pets
-	local viewportFrames = {}
+    local numPets = #pets
+    local viewportFrames = {}
 
-	-- Create viewport frames for each pet
-	for i, pet in ipairs(pets) do
-		local viewportFrame = Instance.new("ViewportFrame")
-		janitor:Add(viewportFrame)
-		viewportFrame.BackgroundTransparency = 1
-		viewportFrame.Size = UDim2.new(1 / numPets, -10, 1, 0)
-		viewportFrame.Position = UDim2.new((i - 1) / numPets, 5, 0, 0)
-		viewportFrame.BackgroundTransparency = 1
-		viewportFrame.Parent = self._eggViewport
+    -- Create viewport frames for each pet
+    for i, pet in ipairs(pets) do
+        local viewportFrame = Instance.new("ViewportFrame")
+        janitor:Add(viewportFrame)
+        viewportFrame.BackgroundTransparency = 1
+        viewportFrame.Size = UDim2.new(1 / numPets, -10, 1, 0)
+        viewportFrame.Position = UDim2.new((i - 1) / numPets, 5, 0, 0)
+        viewportFrame.Parent = self._eggViewport
 
-		table.insert(viewportFrames, viewportFrame)
+        table.insert(viewportFrames, viewportFrame)
 
-		local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
-		if not petModel then
-			self._hatching = false
-			return warn(string.format("Could not find pet model \"%s\"", tostring(pet)))
-		end
+        local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
+        if not petModel then
+            self._hatching = false
+            return warn(string.format("Could not find pet model \"%s\"", tostring(pet)))
+        end
 
-		local petTemplate = PetsTemplate[pet]
-		if petTemplate.Rarity == "Legendary" then
-			Sound.Master.LegendaryHatch:Play()
-		end
+        local petTemplate = PetsTemplate[pet]
+        if petTemplate.Rarity == "Legendary" then
+            Sound.Master.LegendaryHatch:Play()
+        end
 
-		viewportFrame:SetAttribute("FitModel", false)
-		viewportFrame:SetAttribute("FOV", 70)
-		viewportFrame:SetAttribute("ModelRotation", 0)
-		self._ui:AddModelToViewortNoRotation(viewportFrame, self._egg, { replaceModel = true })
-	end
+        viewportFrame:SetAttribute("FitModel", false)
+        viewportFrame:SetAttribute("FOV", 70)
+        viewportFrame:SetAttribute("ModelRotation", 0)
+        self._ui:AddModelToViewortNoRotation(viewportFrame, self._egg, { replaceModel = true })
+    end
 
-	-- Enhanced egg shaking animation with TweenService
-	local TweenService = game:GetService("TweenService")
-	for _, viewportFrame in ipairs(viewportFrames) do
-		task.spawn(function()
-			local shakeDuration = 1.5
-			local startTime = tick()
-			local originalPosition = viewportFrame.Position
-			while tick() - startTime < shakeDuration do
-				local shakeOffset = UDim2.new(0, math.random(-10, 10), 0, math.random(-10, 10))
-				local tween = TweenService:Create(viewportFrame, TweenInfo.new(0.05, Enum.EasingStyle.Bounce, Enum.EasingDirection.InOut), { Position = originalPosition + shakeOffset })
-				tween:Play()
-				tween.Completed:Wait()
-				task.wait(0.05)
-			end
-			viewportFrame.Position = originalPosition
-		end)
-	end
+    -- Egg pulsing and sparkling animation
+    local function pulseEgg(viewportFrame)
+        local originalSize = viewportFrame.Size
+        local sparkles = Instance.new("ParticleEmitter")
+        sparkles.Texture = "rbxassetid://6333823"  -- Sparkle texture
+        sparkles.Size = NumberSequence.new(0.1, 0.5)
+        sparkles.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+        sparkles.Speed = NumberRange.new(1, 3)
+        sparkles.Lifetime = NumberRange.new(0.5, 1)
+        sparkles.Rate = 20
+        sparkles.Parent = viewportFrame
 
-	-- Wait for shaking animation to finish
-	task.wait(1.5)
+        local function scaleUDim2(udim2, scale)
+            return UDim2.new(
+                udim2.X.Scale * scale, udim2.X.Offset * scale,
+                udim2.Y.Scale * scale, udim2.Y.Offset * scale
+            )
+        end
 
-	-- Add particle effects and smooth transitions to pet models
-	for i, pet in ipairs(pets) do
-		local viewportFrame = viewportFrames[i]
-		local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
+        local pulseTween = TweenService:Create(viewportFrame, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+            Size = scaleUDim2(originalSize, 1.05)
+        })
+        pulseTween:Play()
 
-		-- Particle effects
-		local particleEmitter = Instance.new("ParticleEmitter")
-		particleEmitter.Texture = "rbxassetid://1454292685" -- Replace with actual particle texture ID
-		particleEmitter.Rate = 100
-		particleEmitter.Lifetime = NumberRange.new(0.5, 1)
-		particleEmitter.Speed = NumberRange.new(5, 10)
-		particleEmitter.Parent = viewportFrame
+        return function()
+            pulseTween:Cancel()
+            sparkles:Destroy()
+            viewportFrame.Size = originalSize
+        end
+    end
 
-		-- Smooth transition to show pet model
-		viewportFrame:SetAttribute("FitModel", true)
-		viewportFrame:SetAttribute("FOV", 70)
-		viewportFrame:SetAttribute("ModelRotation", 90)
-		janitor:Add(self._ui:AddModelToFastViewport(viewportFrame, petModel, { replaceModel = true }))
+    local stopPulsing = {}
+    for _, viewportFrame in ipairs(viewportFrames) do
+        table.insert(stopPulsing, pulseEgg(viewportFrame))
+    end
 
-		-- Lighting effect
-		local pointLight = Instance.new("PointLight")
-		pointLight.Brightness = 2
-		pointLight.Range = 10
-		pointLight.Parent = petModel.PrimaryPart
+    -- Dramatic pause
+    task.wait(2)
 
-		-- Additional particle effects
-		local burstEmitter = Instance.new("ParticleEmitter")
-		burstEmitter.Texture = "rbxassetid://1454292685" -- Replace with actual burst texture ID
-		burstEmitter.Rate = 0
-		burstEmitter.Lifetime = NumberRange.new(0.2, 0.5)
-		burstEmitter.Speed = NumberRange.new(20, 30)
-		burstEmitter.Parent = viewportFrame
-		burstEmitter:Emit(100)
-	end
+    -- Egg hatching animation
+    local function hatchEgg(viewportFrame)
+        local hatchEffect = Instance.new("ParticleEmitter")
+        hatchEffect.Texture = "rbxassetid://6333823"  -- Sparkle texture
+        hatchEffect.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0)})
+        hatchEffect.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+        hatchEffect.Speed = NumberRange.new(5, 10)
+        hatchEffect.Lifetime = NumberRange.new(0.5, 1)
+        hatchEffect.Rate = 100
+        hatchEffect.Parent = viewportFrame
 
-	-- Wait for pet animations to finish
-	task.wait(3)
+        local crackSound = Instance.new("Sound")
+        crackSound.SoundId = "rbxassetid://5771441412"
+        crackSound.Parent = viewportFrame
+        crackSound:Play()
 
-	-- Smoothly transition back to main UI
-	self._ui:SetScreen("MainUi", false)
-	self._ui:SetHatching(false)
-	self._hatching = false
-	self._chancesUI.Enabled = true
+        local shakeDuration = 1
+        local startTime = tick()
+        local originalPosition = viewportFrame.Position
+        while tick() - startTime < shakeDuration do
+            local shakeOffset = UDim2.new(0, math.random(-3, 3), 0, math.random(-3, 3))
+            TweenService:Create(viewportFrame, TweenInfo.new(0.05, Enum.EasingStyle.Sine), {Position = originalPosition + shakeOffset}):Play()
+            task.wait(0.05)
+        end
+        viewportFrame.Position = originalPosition
 
-	-- Cleanup viewport frames to prevent grey screen
-	for _, viewportFrame in ipairs(viewportFrames) do
-		viewportFrame:Destroy()
-	end
+        task.wait(0.5)
+        hatchEffect:Destroy()
+    end
 
-	janitor:Cleanup()
+    for _, viewportFrame in ipairs(viewportFrames) do
+        hatchEgg(viewportFrame)
+    end
+
+    -- Stop pulsing animation
+    for _, stopPulse in ipairs(stopPulsing) do
+        stopPulse()
+    end
+
+    -- Reveal pet with sparkle burst
+    for i, pet in ipairs(pets) do
+        local viewportFrame = viewportFrames[i]
+        local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
+
+        local burstEffect = Instance.new("ParticleEmitter")
+        burstEffect.Texture = "rbxassetid://6333823"  -- Sparkle texture
+        burstEffect.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0)})
+        burstEffect.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+        burstEffect.Speed = NumberRange.new(10, 20)
+        burstEffect.Lifetime = NumberRange.new(0.5, 1)
+        burstEffect.Rate = 0
+        burstEffect.Parent = viewportFrame
+        burstEffect:Emit(100)
+
+        viewportFrame:SetAttribute("FitModel", true)
+        viewportFrame:SetAttribute("FOV", 70)
+        viewportFrame:SetAttribute("ModelRotation", 90)
+        janitor:Add(self._ui:AddModelToFastViewport(viewportFrame, petModel, { replaceModel = true }))
+
+        local rotationTween = TweenService:Create(viewportFrame, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1), {
+            Rotation = 360
+        })
+        rotationTween:Play()
+
+        local sparkles = Instance.new("ParticleEmitter")
+        sparkles.Texture = "rbxassetid://6333823"  -- Sparkle texture
+        sparkles.Size = NumberSequence.new(0.1, 0.3)
+        sparkles.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+        sparkles.Speed = NumberRange.new(1, 3)
+        sparkles.Lifetime = NumberRange.new(1, 2)
+        sparkles.Rate = 20
+        sparkles.Parent = viewportFrame
+
+        -- Add text labels for pet information
+        local petInfo = PetsTemplate[pet]
+        if petInfo then
+            local infoFrame = Instance.new("Frame")
+            infoFrame.Size = UDim2.new(1, 0, 0.3, 0)
+            infoFrame.Position = UDim2.new(0, 0, 0.7, 0)
+            infoFrame.BackgroundTransparency = 0.5
+            infoFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+            infoFrame.Parent = viewportFrame
+
+            local nameLabel = Instance.new("TextLabel")
+            nameLabel.Size = UDim2.new(1, 0, 0.33, 0)
+            nameLabel.Position = UDim2.new(0, 0, 0, 0)
+            nameLabel.BackgroundTransparency = 1
+            nameLabel.TextColor3 = Color3.new(1, 1, 1)
+            nameLabel.Font = Enum.Font.GothamBold
+            nameLabel.TextScaled = true
+            nameLabel.Text = pet
+            nameLabel.Parent = infoFrame
+
+            local rarityLabel = Instance.new("TextLabel")
+            rarityLabel.Size = UDim2.new(1, 0, 0.33, 0)
+            rarityLabel.Position = UDim2.new(0, 0, 0.33, 0)
+            rarityLabel.BackgroundTransparency = 1
+            rarityLabel.TextColor3 = Color3.new(1, 1, 1)
+            rarityLabel.Font = Enum.Font.Gotham
+            rarityLabel.TextScaled = true
+            rarityLabel.Text = "Rarity: " .. petInfo.Rarity
+            rarityLabel.Parent = infoFrame
+
+            local strengthLabel = Instance.new("TextLabel")
+            strengthLabel.Size = UDim2.new(1, 0, 0.33, 0)
+            strengthLabel.Position = UDim2.new(0, 0, 0.66, 0)
+            strengthLabel.BackgroundTransparency = 1
+            strengthLabel.TextColor3 = Color3.new(1, 1, 1)
+            strengthLabel.Font = Enum.Font.Gotham
+            strengthLabel.TextScaled = true
+            strengthLabel.Text = "Strength: " .. petInfo.StrengthMultiplier
+            strengthLabel.Parent = infoFrame
+
+            -- Add text appearance effect
+            local function fadeInText(label)
+                label.TextTransparency = 1
+                local tween = TweenService:Create(label, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    TextTransparency = 0
+                })
+                tween:Play()
+            end
+
+            fadeInText(nameLabel)
+            task.wait(0.3)
+            fadeInText(rarityLabel)
+            task.wait(0.3)
+            fadeInText(strengthLabel)
+        end
+    end
+
+    -- Celebration sound
+    local celebrationSound = Instance.new("Sound")
+    celebrationSound.SoundId = "rbxassetid://6333015935"
+    celebrationSound.Parent = self._eggViewport
+    celebrationSound:Play()
+
+    -- Wait for pet animations to finish
+    task.wait(5)
+
+    -- Smoothly transition back to main UI
+    self._ui:SetScreen("MainUi", false)
+    self._ui:SetHatching(false)
+    self._hatching = false
+    self._chancesUI.Enabled = true
+
+    -- Cleanup viewport frames
+    for _, viewportFrame in ipairs(viewportFrames) do
+        viewportFrame:Destroy()
+    end
+
+    janitor:Cleanup()
 end
-
-
 
 function HatchingStand:Hatch(amount :number): nil
 	assert(type(amount) == "number", "Amount must be a number")
