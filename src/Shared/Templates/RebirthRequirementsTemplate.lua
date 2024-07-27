@@ -1,7 +1,7 @@
 --!native
 --!strict
--- each number is in wins
-return {
+
+local WinRequirements = {
   [1] = 750,
   [2] = 1250,
   [3] = 2000,
@@ -36,5 +36,27 @@ return {
   [32] = 19_250_000,
   [33] = 24_500_000,
   [34] = 28_850_000,
-  [35] = 31_500_000
+  [35] = 31_500_000,
 }
+
+local base = WinRequirements[35]
+local growthFactor = 1.15
+
+local mt = {
+  __index = function(_, index)
+      if type(index) ~= "number" or index < 1 then
+          return nil
+      end
+      
+      if index <= 35 then
+          return WinRequirements[index]
+      else
+          local exponentialGrowth = base * (growthFactor ^ (index - 35))
+          return math.floor(exponentialGrowth)
+      end
+  end
+}
+
+setmetatable(WinRequirements, mt)
+
+return WinRequirements

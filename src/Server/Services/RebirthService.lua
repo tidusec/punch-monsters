@@ -36,27 +36,27 @@ function RebirthService:Rebirth(player: Player): nil
   if wins < winRequirement then return end
 
   self:_AddRebirth(player)
+
+  self._data:SetValue(player, "Wins", wins - winRequirement):await()
   return
 end
 
 function RebirthService:_AddRebirth(player: Player): nil
+  self._data:SetValue(player, "BicepsStrength", 0)
+  self._data:SetValue(player, "PunchStrength", 0)
+  self._data:SetValue(player, "AbsStrength", 0)
+
+  if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+      player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(-234.229, 5.649, 469.217))
+  end
+
   local boosts = self:GetBeforeAndAfter(player)
-  self._data:IncrementValue(player, "Rebirths"):await()
+  self._data:IncrementValue(player, "Rebirths")
   self._data:SetValue(player, "RebirthBoosts", {
-    Wins = boosts.Wins.AfterRebirth,
-    Strength = boosts.Strength.AfterRebirth
-  }):await()
-
-  self._data:SetValue(player, "BicepsStrength", 0):await()
-  self._data:SetValue(player, "PunchStrength", 0):await()
-  self._data:SetValue(player, "AbsStrength", 0):await()
-  self._data:SetValue(player, "Wins", 0):await()
-
-  player:LoadCharacter()
-
-  return
+      Wins = boosts.Wins.AfterRebirth,
+      Strength = boosts.Strength.AfterRebirth
+  })
 end
-
   
 
 function RebirthService:GetBeforeAndAfter(player: Player): BeforeAndAfterBoosts

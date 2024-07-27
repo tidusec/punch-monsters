@@ -104,7 +104,7 @@ function ServerStand:HatchAnimation(pets)
         viewportFrame:SetAttribute("FitModel", false)
         viewportFrame:SetAttribute("FOV", 70)
         viewportFrame:SetAttribute("ModelRotation", 0)
-        self._ui:AddModelToViewortNoRotation(viewportFrame, self._egg, { replaceModel = true })
+        self._ui:AddModelToViewportNoRotation(viewportFrame, self._egg, { replaceModel = true })
     end
 
     -- Egg pulsing and sparkling animation

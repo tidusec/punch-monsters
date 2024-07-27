@@ -162,7 +162,7 @@ function TransactionService:KnitStart()
 				if alreadyPurchased then return true end
 				
 				local player = Players:GetPlayerByUserId(receipt.PlayerId)
-				if not player then return nil end
+				if not player then return end
 
 				local handleProduct = ProductFunctions[receipt.ProductId]
 				if not handleProduct then

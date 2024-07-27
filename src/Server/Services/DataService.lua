@@ -213,6 +213,17 @@ function DataService:DataUpdate<T>(player: Player, key: string, value: T): nil
 	return
 end
 
+function DataService:Wipe(player: Player): nil
+	AssertPlayer(player)
+	if not player:IsDescendantOf(Players) then return end
+	local profile = PROFILE_CACHE[player]
+	if not profile then return end
+
+	for key, _ in pairs(profile.Data) do
+		self:SetValue(player, key, PROFILE_TEMPLATE[key])
+	end
+end
+
 --// General Functions
 
 local function PetDuplicatesWereFound(): boolean

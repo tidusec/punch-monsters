@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
 
-local TFM = require(script.Parent.Parent.Parent.Parent.Modules.TFMv2)
+local TFM = require(ReplicatedStorage.Modules.TFMv2)
 local Debounce = require(ReplicatedStorage.Modules.Debounce)
 local parseTime = require(ReplicatedStorage.Modules.ParseTime)
 

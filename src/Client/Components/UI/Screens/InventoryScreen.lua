@@ -10,6 +10,8 @@ local PetsTemplate = require(ReplicatedStorage.Templates.PetsTemplate)
 local Packages = ReplicatedStorage.Packages
 local Assets = ReplicatedStorage.Assets
 
+local RarityStrokes = ReplicatedStorage.Assets.UIStrokes.Rarities
+
 local Knit = require(Packages.Knit)
 local Janitor = require(Packages.Janitor)
 local Component = require(Packages.Component)
@@ -59,6 +61,10 @@ function InventoryScreen:Initialize(): nil
 
 	self:AddToJanitor(self._background.EquipBest.MouseButton1Click:Connect(function()
 		self._pets:EquipBest()
+	end))
+
+	self:AddToJanitor(self._background.UnequipAll.MouseButton1Click:Connect(function()
+		self._pets:UnequipAll()
 	end))
 
 	self:AddToJanitor(self._background.Sort.MouseButton1Click:Connect(function()
@@ -140,6 +146,17 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 	task.spawn(function(): nil
 		self._petStats.PetName.Text = pet.Name
 		self._petStats.Rarity.Text = pet.Rarity
+		self._petStats.Rarity:ClearAllChildren()
+		if RarityStrokes:FindFirstChild(pet.Rarity) then
+			local clone = RarityStrokes:FindFirstChild(pet.Rarity):Clone()
+			clone.Parent = self._petStats.Rarity
+			clone.Name = "RarityStroke"
+		else
+			local clone = RarityStrokes:FindFirstChild("Common"):Clone()
+			clone.Parent = self._petStats.Rarity
+			clone.Name = "RarityStroke"
+		end
+		RarityStrokes:FindFirstChild("UIStroke"):Clone().Parent = self._petStats.Rarity
 		self._petStats.Strength.Text = `{pet.StrengthMultiplier}x`
 
 		if pet.Rarity == "Huge" then
@@ -189,50 +206,107 @@ function InventoryScreen:Height(card_amount: number): number
 	return height
 end
 
-function InventoryScreen:UpdatePetCards(pets, sorting): nil
-	pets = pets or self.petsInventory
-	sorting = sorting or self._sorting or "None" --// None, Rarity, Strength, Name
+function InventoryScreen:UpdatePetCards(pets, sorting)
+    pets = pets or self.petsInventory
+    sorting = sorting or self._sorting or "None"
 
-	self._updateJanitor:Cleanup()
-	local ownedPets: { [string]: Pet } = pets.OwnedPets
+    self._updateJanitor:Cleanup()
+    local ownedPets = pets.OwnedPets
+    local equippedPets = {}
+    for _, pet in ipairs(pets.Equipped) do
+        equippedPets[pet.ID] = true
+    end
 
-	for _, pet in pairs(ownedPets) do
-		task.spawn(function()
-			local card: ImageButton & { Viewport: ViewportFrame; StrengthMultiplier: TextLabel } = Assets.UserInterface.Inventory.PetCard:Clone()
-			card.StrengthMultiplier.Text = `{pet.StrengthMultiplier}x`
-			card.Parent = self._container.Frame
+    local sortedPets = {}
+    for _, pet in pairs(ownedPets) do
+        table.insert(sortedPets, pet)
+    end
 
-			if pet.Rarity == "Huge" then
-				card.Stars.Huge.Visible = true
-			else
-				card.Stars.Huge.Visible = false
-			end
+    local function isEquipped(petID)
+        return equippedPets[petID] or false
+    end
 
-			if pet["Limited"] then
-				card.Stars.Limited.Visible = true
-			else
-				card.Stars.Limited.Visible = false
-			end
-			
-			local Viewport = Component.Get("Viewport")
-			Viewport:Add(card.Viewport)
-			if self._pets:IsEquipped(pet) then
-				card.Equipped.Visible = true
-			else
-				card.Equipped.Visible = false
-			end
-			self._ui:AddModelToViewport(card.Viewport, Assets.Pets[pet.Name])
-			self._updateJanitor:Add(card)
-			self._updateJanitor:Add(card.MouseButton1Click:Connect(function()
-				self:SelectPet(pet)
-			end))
-		end)
-	end
+    table.sort(sortedPets, function(a, b)
+        local aEquipped = isEquipped(a.ID)
+        local bEquipped = isEquipped(b.ID)
 
-	self._background.Equipped.Text = tostring(#pets.Equipped).."/"..tostring(self._pets:GetPetSpace() or 4)
-	self._background.Storage.Text = tostring(#pets.OwnedPets).."/"..(tostring(pets.MaxStorage) or "200")
+        if aEquipped ~= bEquipped then
+            return aEquipped and not bEquipped
+        end
 
-	return
+        if sorting == "Rarity" then
+            local rarityOrder = {
+                Common = 1,
+                Uncommon = 2,
+                Rare = 3,
+                Epic = 4,
+                Legendary = 5,
+                Huge = 6
+            }
+            return rarityOrder[a.Rarity] > rarityOrder[b.Rarity]
+        elseif sorting == "Strength" then
+            return a.StrengthMultiplier > b.StrengthMultiplier
+        elseif sorting == "Name" then
+            if a.Name ~= b.Name then
+                return a.Name < b.Name
+            else
+                if a.Rarity ~= b.Rarity then
+                    local rarityOrder = {
+                        Common = 1,
+                        Uncommon = 2,
+                        Rare = 3,
+                        Epic = 4,
+                        Legendary = 5,
+                        Huge = 6
+                    }
+                    return rarityOrder[a.Rarity] > rarityOrder[b.Rarity]
+                else
+                    return a.StrengthMultiplier > b.StrengthMultiplier
+                end
+            end
+        end
+
+        return false
+    end)
+
+    coroutine.wrap(function()
+        for _, pet in ipairs(sortedPets) do
+            local card = Assets.UserInterface.Inventory.PetCard:Clone()
+            card.StrengthMultiplier.Text = `{pet.StrengthMultiplier}x`
+            card.Parent = self._container.Frame
+
+            if pet.Rarity == "Huge" then
+                card.Stars.Huge.Visible = true
+            else
+                card.Stars.Huge.Visible = false
+            end
+
+            if pet["Limited"] then
+                card.Stars.Limited.Visible = true
+            else
+                card.Stars.Limited.Visible = false
+            end
+
+            local Viewport = Component.Get("Viewport")
+            Viewport:Add(card.Viewport)
+            card.Equipped.Visible = equippedPets[pet.ID]
+
+            self._ui:AddModelToViewport(card.Viewport, Assets.Pets[pet.Name], { replaceModel = true })
+            self._updateJanitor:Add(card)
+            self._updateJanitor:Add(card.MouseButton1Click:Connect(function()
+                self:SelectPet(pet)
+            end))
+
+            task.wait()
+        end
+    end)()
+
+    self._background.Equipped.Text = tostring(#pets.Equipped).."/"..tostring(pets.MaxEquip or 4)
+    self._background.Storage.Text = tostring(#pets.OwnedPets).."/"..(tostring(pets.MaxStorage) or "200")
+
+    return
 end
+
+
 
 return Component.new(InventoryScreen)

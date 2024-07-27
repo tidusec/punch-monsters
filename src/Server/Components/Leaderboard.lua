@@ -1,8 +1,8 @@
---!native
---!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local MemoryStoreService = game:GetService("MemoryStoreService")
 
+local TFM = require(ReplicatedStorage.Modules.TFMv2)
 local abbreviate = require(ReplicatedStorage.Modules.Abbreviate)
 
 local Packages = ReplicatedStorage.Packages
@@ -30,26 +30,27 @@ function Leaderboard:Initialize(): nil
 
   self._leaderboardEntry = ReplicatedStorage.Assets.UserInterface.Leaderboard.Entry
   self._updateTime = 0
-  self._dataInitialized = false
+  self._memoryStore = MemoryStoreService:GetSortedMap("Leaderboard_" .. self.Attributes.Type)
 
-  if self.Attributes.Type == "Strength" then
-    self:AddToJanitor(self._data.DataUpdated.Event:Connect(function(_, key): nil
-      if key ~= "PunchStrength" and key ~= "AbsStrength" and key ~= "BicepsStrength" then return end
-      self._dataInitialized = true
-      return self:UpdateEntries()
-    end))
-  end
+  self:StartUpdateLoop()
   return
 end
 
-function Leaderboard:Update(dt: number): nil
-  if self.Attributes.Type ~= "Playtime" then return end
-  if not self._dataInitialized then return end
-  if self._updateTime >= 5 then
-    self._updateTime = 0
-    self:UpdateEntries()
-  else
-    self._updateTime += dt
+function Leaderboard:StartUpdateLoop(): nil
+  task.spawn(function()
+    while true do
+      self:UpdateMemoryStore()
+      self:UpdateEntries()
+      task.wait(15)
+    end
+  end)
+  return
+end
+
+function Leaderboard:UpdateMemoryStore(): nil
+  for _, player in ipairs(Players:GetPlayers()) do
+    local score = self:_GetScore(player)
+    self._memoryStore:SetAsync(tostring(player.UserId), score, 30) -- 20 second expiration
   end
   return
 end
@@ -59,20 +60,32 @@ function Leaderboard:UpdateEntries(): nil
     self.Instance.Content:ClearAllChildren()
   end)
 
-  local bestPlayers = Array.new("Instance", Players:GetPlayers())
-    :Sort(function(a, b)
-      return self:_GetScore(a) > self:_GetScore(b)
-    end)
-    :Truncate(50)
+  local success, result = pcall(function()
+    return self._memoryStore:GetRangeAsync(Enum.SortDirection.Descending, 50)
+  end)
 
-  for i, player in bestPlayers:GetValues() do
+  if not success then
+    warn(result)
+    warn("Failed to get sorted data from MemoryStore")
+    return
+  end
+
+  for i, data in ipairs(result) do
     task.spawn(function()
-      local entryFrame = self._leaderboardEntry:Clone()
-      entryFrame.PlayerName.Text = player.DisplayName
-      entryFrame.Score.Text = abbreviate(self:_GetScore(player))
-      entryFrame.Icon.Image = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
-      entryFrame.LayoutOrder = i
-      entryFrame.Parent = self.Instance.Content
+      local userId = tonumber(data.key)
+      local player = Players:GetPlayerByUserId(userId)
+      if player then
+        local entryFrame = self._leaderboardEntry:Clone()
+        entryFrame.PlayerName.Text = player.DisplayName
+        if self.Attributes.Type == "Playtime" then
+          entryFrame.Score.Text = TFM.FormatStr(TFM.Convert(data.value), "%02h:%02m:%02S")
+        else
+          entryFrame.Score.Text = abbreviate(data.value)
+        end
+        entryFrame.Icon.Image = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
+        entryFrame.LayoutOrder = i
+        entryFrame.Parent = self.Instance.Content
+      end
     end)
   end
 
@@ -80,10 +93,11 @@ function Leaderboard:UpdateEntries(): nil
 end
 
 function Leaderboard:_GetScore(player: Player): number
-  return if self.Attributes.Type == "Strength" then
-    self._data:GetValue(player, "Strength")
+  if self.Attributes.Type == "Strength" then
+    return self._data:GetValue(player, "Strength")
   else
-    self._playtime:Get(player)
+    return self._playtime:GetTotalPlaytime(player)
+  end
 end
 
 return Component.new(Leaderboard)

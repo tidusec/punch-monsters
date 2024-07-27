@@ -49,12 +49,8 @@ local PROFILE_TEMPLATE = {
 		LowQuality = false
 	},
 
-	--// Roman Numerals because GameAnalytics doesn't allow numbers as keys
-	MapI = 0,
-	MapII = 0,
-	MapIII = 0,
-	MapIV = 0,
-	MapV = 0,
+	Map = 0,
+	TotalPlaytime = 0,
 }
 
 return PROFILE_TEMPLATE

@@ -183,6 +183,14 @@ function PetService:Unequip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 	return
 end
 
+function PetService:UnequipAll(player: Player): nil
+	AssertPlayer(player)
+	local pets = self._data:GetValue(player, "Pets")
+	pets.Equipped = {}
+	self._data:SetValue(player, "Pets", pets)
+	return
+end
+
 function PetService:IsEquipped(player: Player, pet: typeof(PetsTemplate.Dog)): boolean
 	AssertPlayer(player)
 	VerifyID(player, pet.ID)
@@ -407,6 +415,10 @@ end
 
 function PetService.Client:Unequip(player, pet)
 	return self.Server:Unequip(player, pet)
+end
+
+function PetService.Clinet:UnequipAll(player)
+	return self.Server:UnequipAll(player)
 end
 
 function PetService.Client:IsEquipped(player, pet)

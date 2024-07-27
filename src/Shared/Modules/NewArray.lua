@@ -193,7 +193,8 @@ function Array:Unshift(value)
 end
 
 function Array:Truncate(amount)
-    for i = 1, amount do
+    local numToRemove = #self.Values - amount
+    for i = 1, numToRemove do
         table.remove(self.Values)
     end
     return self
