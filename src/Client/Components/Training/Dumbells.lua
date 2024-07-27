@@ -32,7 +32,6 @@ function Dumbells:Initialize(): nil
 
   self:AddToJanitor(pad.Touched:Connect(function(hit: BasePart)
     if touching then return end
-    if db:IsActive() then return end
 
     local char = hit:FindFirstAncestorOfClass("Model")
     if not char then return end
@@ -40,6 +39,8 @@ function Dumbells:Initialize(): nil
     if not humanoid then return end
     local player = Players:GetPlayerFromCharacter(char)
     if not player then return end
+
+    if db:IsActive() then return end
 
     touching = true
     local mapName = self.Instance.Parent.Name

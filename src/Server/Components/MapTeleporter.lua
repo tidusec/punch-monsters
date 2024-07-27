@@ -48,10 +48,10 @@ function MapTeleporter:Initialize(): nil
 
   local function getPlayerFromPart(hit: BasePart): Player?
     local character = hit:FindFirstAncestorOfClass("Model")
-    if not character then return end
+    if not character then return false end
     local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-    return Players:GetPlayerFromCharacter(character)
+    if not humanoid then return false end
+    return true, Players:GetPlayerFromCharacter(character)
   end
 
   if self._mapName ~= "Map3" then
@@ -64,7 +64,8 @@ function MapTeleporter:Initialize(): nil
     self:AddToJanitor(self.Instance.Portal.Touched:Connect(function(hit: BasePart): nil
       if self._mapName == "Map3" then return end
   
-      local player = getPlayerFromPart(hit)
+      local success, player = getPlayerFromPart(hit)
+      if not success then return end
       AssertPlayer(player)
 
       if not playerTeleporterDebounces[player.UserId] then
@@ -92,7 +93,8 @@ function MapTeleporter:Initialize(): nil
     local previousOffset = previousCFrame.LookVector * 5
 
     self:AddToJanitor(self.Instance.Back.Circle.Touched:Connect(function(hit: BasePart): nil
-      local player = getPlayerFromPart(hit)
+      local success, player = getPlayerFromPart(hit)
+      if not success then return end
       if not player then return end
       if not playerBackTeleporterDebounces[player.UserId] then
         local db = Debounce.new(2)
