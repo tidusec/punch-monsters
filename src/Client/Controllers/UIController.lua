@@ -288,4 +288,13 @@ function UIController:Destroy(): nil
     return nil
 end
 
+function UIController:ShowError(message: string): nil
+    task.spawn(function()
+        local errorScreen = self:SetScreen("ErrorScreen", true)
+        local errorText = errorScreen:WaitForChild("Background"):WaitForChild("Description") :: TextLabel
+        errorText.Text = message
+    end)
+    return nil
+end
+
 return UIController

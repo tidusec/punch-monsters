@@ -98,7 +98,10 @@ function HatchingService:HatchMany(player: Player, map: string, name: string, am
 	AssertPlayer(player)
 	assert(type(map) == "string", "Map must be a string")
 	assert(type(name) == "string", "Name must be a string")
-	
+	local pets = self._data:GetValue(player, "Pets")
+	if #pets.OwnedPets > pets.MaxStorage then
+		return
+	end
 	local egg = self._eggTemplate[map][name]
 	if not egg then return end
 
@@ -114,6 +117,10 @@ function HatchingService:Hatch(player: Player, map: string, name: string): nil
   	AssertPlayer(player)
   	assert(type(map) == "string", "Map must be a string")
   	assert(type(name) == "string", "Name must be a string")
+	local pets = self._data:GetValue(player, "Pets")
+	if #pets.OwnedPets > pets.MaxStorage then
+		return
+	end
 	local egg = self._eggTemplate[map][name]
 	if not egg then return end
 	

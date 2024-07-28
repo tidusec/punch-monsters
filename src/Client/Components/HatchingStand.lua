@@ -87,8 +87,8 @@ function HatchingStand:HatchAnimation(pets)
     local numPets = #pets
     local viewportFrames = {}
 
-    local rows = math.floor(numPets / 4)
-    local cols = math.ceil(numPets / rows)
+    local rows = math.min(2, math.floor(numPets / 4) + 1)
+    local cols = math.min(4, math.ceil(numPets / rows))
     local viewportSize = UDim2.new(1 / cols, -10, (1 / rows)/1.3, -10)
 
     local crackSound = Instance.new("Sound")
@@ -162,7 +162,7 @@ function HatchingStand:HatchAnimation(pets)
         table.insert(stopPulsing, pulseEgg(viewportFrame))
     end
 
-    task.wait(2)
+    task.wait(1) -- Reduced wait time
 
     local function hatchEgg(viewportFrame)
         task.spawn(function()
@@ -175,7 +175,7 @@ function HatchingStand:HatchAnimation(pets)
             hatchEffect.Rate = 100
             hatchEffect.Parent = viewportFrame
 
-            local shakeDuration = 1
+            local shakeDuration = 0.5 -- Reduced shake duration
             local startTime = tick()
             local originalPosition = viewportFrame.Position
             task.spawn(function()
@@ -186,7 +186,7 @@ function HatchingStand:HatchAnimation(pets)
                 end
                 viewportFrame.Position = originalPosition
             end)
-            task.wait(1.3)
+            task.wait(0.8) -- Reduced wait time
             hatchEffect:Destroy()
         end)
     end
@@ -240,7 +240,7 @@ function HatchingStand:HatchAnimation(pets)
 
     animationCompleted = true
 
-    task.wait(2)
+    task.wait(2) -- Reduced wait time
     crackSound:Destroy()
 
     self:FinishHatchAnimation()
@@ -321,6 +321,15 @@ function HatchingStand:Hatch(amount: number): nil
     if self._dumbell:IsEquipped() or self._hatching then return end
     self._hatching = true
 
+    if ReplicatedStorage:FindFirstChild("PetCounter") then
+       if ReplicatedStorage.PetCounter.Value >= ReplicatedStorage.MaxPets.Value then
+           self._ui:ShowError("You have reached the pet limit!")
+           self.hatchingauto = nil
+           self._hatching = false
+           return
+       end 
+    end
+
     if amount == 1 then
         self._hatchingService:Hatch(self._map, self.Instance.Name)
     else
@@ -351,18 +360,20 @@ function HatchingStand:BuyEight(): nil
 end
 
 function HatchingStand:Auto(): nil
-    local hatching = true
+    self.hatchingauto = true
     if not self:IsClosest() then return end
-    while hatching do
+    while self.hatchingauto do
         self:Hatch(8)
         repeat task.wait(0.5) until not self._hatching
         task.wait(6)
     end
     local char = player.Character or player.CharacterAdded:Wait()
     local root = char:WaitForChild("HumanoidRootPart")
-    self._janitor:Add(root:GetPropertyChangedSignal("Position"):Connect(function()
-        hatching = false
-    end))
+    local connection
+    connection = root:GetPropertyChangedSignal("Position"):Connect(function()
+        self.hatchingauto = nil
+        connection:Disconnect()
+    end)
     return nil
 end
 

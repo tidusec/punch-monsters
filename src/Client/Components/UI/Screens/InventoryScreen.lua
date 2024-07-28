@@ -206,6 +206,15 @@ function InventoryScreen:Height(card_amount: number): number
 	return height
 end
 
+if not ReplicatedStorage:FindFirstChild("CACHE") then
+    local cache = Instance.new("Folder")
+    cache.Name = "CACHE"
+    cache.Parent = ReplicatedStorage
+end
+
+local CACHE = ReplicatedStorage.CACHE
+
+
 function InventoryScreen:UpdatePetCards(pets, sorting)
     pets = pets or self.petsInventory
     sorting = sorting or self._sorting or "None"
@@ -291,7 +300,24 @@ function InventoryScreen:UpdatePetCards(pets, sorting)
             Viewport:Add(card.Viewport)
             card.Equipped.Visible = equippedPets[pet.ID]
 
-            self._ui:AddModelToViewportNoRotation(card.Viewport, Assets.Pets[pet.Name], { replaceModel = true })
+			if not CACHE:FindFirstChild(pet.Name) then
+				self._ui:AddModelToViewportNoRotation(card.Viewport, Assets.Pets[pet.Name], { replaceModel = true })
+				task.delay(2, function()
+					if card:FindFirstChild("Viewport") then
+						if CACHE:FindFirstChild(pet.Name) then
+							return
+						end
+						local clone = card.Viewport:Clone()
+						clone.Parent = CACHE
+						clone.Name = pet.Name
+					end
+				end)
+			else
+				card.Viewport:Destroy()
+				local clone = CACHE:FindFirstChild(pet.Name):Clone()
+				clone.Parent = card
+			end
+
             self._updateJanitor:Add(card)
             self._updateJanitor:Add(card.MouseButton1Click:Connect(function()
                 self:SelectPet(pet)
@@ -304,6 +330,20 @@ function InventoryScreen:UpdatePetCards(pets, sorting)
     self._background.Equipped.Text = tostring(#pets.Equipped).."/"..tostring(pets.MaxEquip or 4)
     self._background.Storage.Text = tostring(#pets.OwnedPets).."/"..(tostring(pets.MaxStorage) or "200")
 
+	if not ReplicatedStorage:FindFirstChild("PetCounter") then
+		local counter = Instance.new("IntValue")
+		counter.Name = "PetCounter"
+		counter.Parent = ReplicatedStorage
+	end
+
+	if not ReplicatedStorage:FindFirstChild("MaxPets") then
+		local maxPets = Instance.new("IntValue")
+		maxPets.Name = "MaxPets"
+		maxPets.Parent = ReplicatedStorage
+	end
+
+	ReplicatedStorage.PetCounter.Value = #pets.OwnedPets
+	ReplicatedStorage.MaxPets.Value = pets.MaxStorage
     return
 end
 
