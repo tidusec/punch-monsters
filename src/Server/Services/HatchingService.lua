@@ -58,14 +58,16 @@ function HatchingService:HatchManyServer(player: Player, map: string, name: stri
 	local egg = self._eggTemplate[map][name]
 	if not egg then return end
 
-	for _ = 1, amount do
-		local petName = self:ReturnPet(player, egg)
-		self._pets:Add(player, petName)
-		self._data:IncrementValue(player, "Eggs")
-		pets:Add(petName)
-	end
-
-	self.Client.PetHatched:Fire(player, pets:GetValues(), map, name)
+	task.spawn(function()
+		for _ = 1, amount do
+			local petName = self:ReturnPet(player, egg)
+			self._pets:Add(player, petName)
+			self._data:IncrementValue(player, "Eggs")
+			pets:Add(petName)
+		end
+	
+		self.Client.PetHatched:Fire(player, pets:GetValues(), map, name)
+	end)
 	
 	return
 end

@@ -136,36 +136,40 @@ end
 -- as such models that rely heavily on meshesh, csg, etc will only return an accurate
 -- result as their point cloud
 function ViewportModelClass:GetMinimumFitCFrame(orientation)
-	if not self.Model then
-		return CFrame.new()
-	end
-	
-	local rotation = orientation - orientation.Position
-	local rInverse = rotation:Inverse()
-	
-	local wcloud = self._points
-	local cloud = {rInverse * wcloud[1]}
-	local furthest = cloud[1].Z
+    if not self.Model then
+        return CFrame.new()
+    end
+    
+    local viewport = self._viewport
+    local tanxFov2, tanyFov2 = viewport.tanxFov2, viewport.tanyFov2
+    local wcloud = self._points
+    local cloudSize = #wcloud
+    
+    local rotation = orientation - orientation.Position
+    local rInverse = rotation:Inverse()
+    
+    local cloud = table.create(cloudSize)
+    local furthest = math.huge
 
-	for i = 2, #wcloud do
-		local lp = rInverse * wcloud[i]
-		furthest = math.min(furthest, lp.Z)
-		cloud[i] = lp
-	end
-	
-	local hMax, hMin = viewProjectionEdgeHits(cloud, "X", furthest, self._viewport.tanxFov2)
-	local vMax, vMin = viewProjectionEdgeHits(cloud, "Y", furthest, self._viewport.tanyFov2)
+    for i = 1, cloudSize do
+        local lp = rInverse * wcloud[i]
+        furthest = math.min(furthest, lp.Z)
+        cloud[i] = lp
+    end
+    
+    local hMax, hMin = viewProjectionEdgeHits(cloud, "X", furthest, tanxFov2)
+    local vMax, vMin = viewProjectionEdgeHits(cloud, "Y", furthest, tanyFov2)
 
-	local distance = math.max(
-		((hMax - hMin) / 2) / self._viewport.tanxFov2,
-		((vMax - vMin) / 2) / self._viewport.tanyFov2
-	)
+    local distance = math.max(
+        ((hMax - hMin) / 2) / tanxFov2,
+        ((vMax - vMin) / 2) / tanyFov2
+    )
 
-	return orientation * CFrame.new(
-		(hMax + hMin) / 2,
-		(vMax + vMin) / 2,
-		furthest + distance
-	)
+    return orientation * CFrame.new(
+        (hMax + hMin) / 2,
+        (vMax + vMin) / 2,
+        furthest + distance
+    )
 end
 
 --

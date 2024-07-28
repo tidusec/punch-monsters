@@ -116,6 +116,7 @@ end
 
 function QuestService:_GetGoalProgress(player: Player, goalName: string): number
   local progress = self._data:GetValue(player, "MegaQuestProgress")
+  if not progress then return 0 end
   if progress["Done"] then return 1 end
   if progress["Completed"] then return 1 end
   return math.min(progress[goalName] / QUEST_GOALS[goalName], 1)

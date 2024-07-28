@@ -291,7 +291,7 @@ function InventoryScreen:UpdatePetCards(pets, sorting)
             Viewport:Add(card.Viewport)
             card.Equipped.Visible = equippedPets[pet.ID]
 
-            self._ui:AddModelToViewport(card.Viewport, Assets.Pets[pet.Name], { replaceModel = true })
+            self._ui:AddModelToViewportNoRotation(card.Viewport, Assets.Pets[pet.Name], { replaceModel = true })
             self._updateJanitor:Add(card)
             self._updateJanitor:Add(card.MouseButton1Click:Connect(function()
                 self:SelectPet(pet)

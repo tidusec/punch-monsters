@@ -168,6 +168,7 @@ function TransactionService:KnitStart()
 				if not handleProduct then
 					return error("Missing dev product handler function in TransactionService")
 				end
+				
 
 				local success, err = pcall(function()
 					handleProduct(player)

@@ -76,7 +76,8 @@ function HatchingStand:HatchAnimation(pets)
         pets = {pets}
     end
 
-    local janitor = Janitor.new()
+    self._animationjanitor = Janitor.new()
+    local animationCompleted = false
 
     self._ui:SetScreen("EggUi", true)
     self._ui:SetHatching(true)
@@ -85,13 +86,20 @@ function HatchingStand:HatchAnimation(pets)
     local numPets = #pets
     local viewportFrames = {}
 
-    -- Create viewport frames for each pet
+    local rows = numPets > 8 and 2 or 1
+    local cols = math.ceil(numPets / rows)
+    local viewportSize = UDim2.new(1 / cols, -10, 1 / rows, -10)
+
     for i, pet in ipairs(pets) do
         local viewportFrame = Instance.new("ViewportFrame")
-        janitor:Add(viewportFrame)
+        self._animationjanitor:Add(viewportFrame)
         viewportFrame.BackgroundTransparency = 1
-        viewportFrame.Size = UDim2.new(1 / numPets, -10, 1, 0)
-        viewportFrame.Position = UDim2.new((i - 1) / numPets, 5, 0, 0)
+        viewportFrame.Size = viewportSize
+        
+        local column = (i - 1) % cols
+        local row = math.floor((i - 1) / cols)
+        viewportFrame.Position = UDim2.new(column / cols, 5, row / rows, 5)
+        
         viewportFrame.Parent = self._eggViewport
 
         table.insert(viewportFrames, viewportFrame)
@@ -113,7 +121,6 @@ function HatchingStand:HatchAnimation(pets)
         self._ui:AddModelToViewportNoRotation(viewportFrame, self._egg, { replaceModel = true })
     end
 
-    -- Egg pulsing and sparkling animation
     local function pulseEgg(viewportFrame)
         local originalSize = viewportFrame.Size
         local sparkles = Instance.new("ParticleEmitter")
@@ -151,7 +158,6 @@ function HatchingStand:HatchAnimation(pets)
 
     task.wait(2)
 
-    -- Egg hatching animation
     local function hatchEgg(viewportFrame)
         local hatchEffect = Instance.new("ParticleEmitter")
         hatchEffect.Texture = "rbxassetid://6333823"
@@ -185,12 +191,10 @@ function HatchingStand:HatchAnimation(pets)
         hatchEgg(viewportFrame)
     end
 
-    -- Stop pulsing animation
     for _, stopPulse in ipairs(stopPulsing) do
         stopPulse()
     end
 
-    -- Reveal pet with sparkle burst
     for i, pet in ipairs(pets) do
         local viewportFrame = viewportFrames[i]
         local petModel = ReplicatedStorage.Assets.Pets:FindFirstChild(pet)
@@ -208,7 +212,7 @@ function HatchingStand:HatchAnimation(pets)
         viewportFrame:SetAttribute("FitModel", true)
         viewportFrame:SetAttribute("FOV", 70)
         viewportFrame:SetAttribute("ModelRotation", 90)
-        janitor:Add(self._ui:AddModelToFastViewport(viewportFrame, petModel, { replaceModel = true }))
+        self._animationjanitor:Add(self._ui:AddModelToFastViewport(viewportFrame, petModel, { replaceModel = true }))
 
         local rotationTween = TweenService:Create(viewportFrame, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1), {
             Rotation = 360
@@ -224,76 +228,90 @@ function HatchingStand:HatchAnimation(pets)
         sparkles.Rate = 20
         sparkles.Parent = viewportFrame
 
-        -- Add text labels for pet information
         local petInfo = PetsTemplate[pet]
         if petInfo then
-            local infoFrame = Instance.new("Frame")
-            infoFrame.Size = UDim2.new(1, 0, 0.3, 0)
-            infoFrame.Position = UDim2.new(0, 0, 0.7, 0)
-            infoFrame.BackgroundTransparency = 1
-            infoFrame.Parent = viewportFrame
-
-            local nameLabel = Instance.new("TextLabel")
-            nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
-            nameLabel.Position = UDim2.new(0, 0, 0, 0)
-            nameLabel.BackgroundTransparency = 1
-            nameLabel.TextColor3 = Color3.new(1, 1, 1)
-            nameLabel.Font = Enum.Font.GothamBold
-            nameLabel.TextScaled = true
-            nameLabel.Text = pet
-            nameLabel.Parent = infoFrame
-
-            local rarityLabel = Instance.new("TextLabel")
-            rarityLabel.Size = UDim2.new(1, 0, 0.5, 0)
-            rarityLabel.Position = UDim2.new(0, 0, 0.5, 0)
-            rarityLabel.BackgroundTransparency = 1
-            rarityLabel.TextColor3 = Color3.new(1, 1, 1)
-            rarityLabel.Font = Enum.Font.Gotham
-            rarityLabel.TextScaled = true
-            rarityLabel.Text = petInfo.Rarity
-            if RarityStrokes:FindFirstChild(petInfo.Rarity) then
-                RarityStrokes:FindFirstChild(petInfo.Rarity):Clone().Parent = rarityLabel
-            else
-                RarityStrokes:FindFirstChild("Common"):Clone().Parent = rarityLabel
-            end
-            RarityStrokes:FindFirstChild("UIStroke"):Clone().Parent = rarityLabel
-            rarityLabel.Parent = infoFrame
-
-            -- Add text appearance effect
-            local function fadeInText(label)
-                label.TextTransparency = 1
-                local tween = TweenService:Create(label, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    TextTransparency = 0
-                })
-                tween:Play()
-            end
-
-            fadeInText(nameLabel)
-            task.wait(0.3)
-            fadeInText(rarityLabel)
+            self._animationjanitor:Add(self:CreatePetInfoFrame(viewportFrame, pet, petInfo))
         end
     end
 
-    -- Celebration sound
     local celebrationSound = Instance.new("Sound")
     celebrationSound.SoundId = "rbxassetid://6333015935"
     celebrationSound.Parent = self._eggViewport
     celebrationSound:Play()
 
-    task.wait(5)
+    animationCompleted = true
 
-    -- Smoothly transition back to main UI
+    task.wait(4)
+
+    self:FinishHatchAnimation()
+end
+
+function HatchingStand:CreatePetInfoFrame(viewportFrame, pet, petInfo)
+    local infoFrame = Instance.new("Frame")
+    infoFrame.Size = UDim2.new(viewportFrame.Size.X.Scale, viewportFrame.Size.X.Offset, 0.15, 0)
+    infoFrame.Position = UDim2.new(
+        viewportFrame.Position.X.Scale, 
+        viewportFrame.Position.X.Offset, 
+        viewportFrame.Position.Y.Scale + viewportFrame.Size.Y.Scale  - 0.2, 
+        viewportFrame.Position.Y.Offset + viewportFrame.Size.Y.Offset
+    )
+    infoFrame.BackgroundTransparency = 1
+    infoFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+    infoFrame.Parent = viewportFrame.Parent
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0.1, 0)
+    uiCorner.Parent = infoFrame
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.TextColor3 = Color3.new(1, 1, 1)
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextScaled = true
+    nameLabel.Text = pet
+    nameLabel.Parent = infoFrame
+
+    local rarityLabel = Instance.new("TextLabel")
+    rarityLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    rarityLabel.Position = UDim2.new(0, 0, 0.5, 0)
+    rarityLabel.BackgroundTransparency = 1
+    rarityLabel.TextColor3 = Color3.new(1, 1, 1)
+    rarityLabel.Font = Enum.Font.Gotham
+    rarityLabel.TextScaled = true
+    rarityLabel.Text = petInfo.Rarity
+    if RarityStrokes:FindFirstChild(petInfo.Rarity) then
+        RarityStrokes:FindFirstChild(petInfo.Rarity):Clone().Parent = rarityLabel
+    else
+        RarityStrokes:FindFirstChild("Common"):Clone().Parent = rarityLabel
+    end
+    RarityStrokes:FindFirstChild("UIStroke"):Clone().Parent = rarityLabel
+    rarityLabel.Parent = infoFrame
+
+    local function fadeInText(label)
+        label.TextTransparency = 1
+        local tween = TweenService:Create(label, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            TextTransparency = 0
+        })
+        tween:Play()
+    end
+
+    fadeInText(nameLabel)
+    task.wait(0.3)
+    fadeInText(rarityLabel)
+
+    return infoFrame
+end
+
+function HatchingStand:FinishHatchAnimation()
+
     self._ui:SetScreen("MainUi", false)
     self._ui:SetHatching(false)
     self._hatching = false
     self._chancesUI.Enabled = true
 
-    -- Cleanup viewport frames
-    for _, viewportFrame in ipairs(viewportFrames) do
-        viewportFrame:Destroy()
-    end
-
-    janitor:Destroy()
+    self._animationjanitor:Destroy()
 end
 
 function HatchingStand:Hatch(amount: number): nil
@@ -379,12 +397,18 @@ function HatchingStand:AddPetCards(): nil
                 Chance = chance
             })
         end
+
+        warn(pets.Values)
         
         pets:Sort(function(a: ChanceTable, b: ChanceTable)
             return a.Chance > b.Chance
         end)
+
+        warn("here")
         
         for _, pet in pets:GetValues() do
+            warn(pet)
+            warn(pet.Name)
             self._chancesUI.Enabled = true
             local petModel: Model? = ReplicatedStorage.Assets.Pets:FindFirstChild(pet.Name)        
             local petCard: ImageLabel & { Viewport: ViewportFrame; Chance: TextLabel } = UserInterface.Hatching.PetChanceCard:Clone()
@@ -394,11 +418,13 @@ function HatchingStand:AddPetCards(): nil
             
             local Viewport = Component.Get("Viewport")
             Viewport:Add(viewport)
+            
             if not petModel then
                 warn(string.format("Could not find pet model \"%s\"", tostring(pet.Name)))
                 continue
             end
-            self._ui:AddModelToViewport(viewport, petModel, { replaceModel = true })
+            
+            self._ui:AddModelToViewportNoRotation(viewport, petModel, { replaceModel = true })
             self._janitor:Add(petCard)
         end
     end)

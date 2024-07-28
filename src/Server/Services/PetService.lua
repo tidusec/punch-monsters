@@ -417,7 +417,7 @@ function PetService.Client:Unequip(player, pet)
 	return self.Server:Unequip(player, pet)
 end
 
-function PetService.Clinet:UnequipAll(player)
+function PetService.Client:UnequipAll(player)
 	return self.Server:UnequipAll(player)
 end
 

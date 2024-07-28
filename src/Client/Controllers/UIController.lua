@@ -154,6 +154,8 @@ function UIController:AddModelToViewport(viewport: ViewportFrame, modelTemplate:
     local defaultFOV = viewport:GetAttribute("DefaultFOV") or DEFAULT_FOV
     
     local theta = 0
+
+
     local connection = RunService.RenderStepped:Connect(function(dt)
         theta = theta + math.rad(ROTATION_SPEED * dt)
         local orientation = CFrame.fromEulerAnglesYXZ(math.rad(-20), theta, 0)
@@ -199,7 +201,8 @@ function UIController:AddModelToViewportNoRotation(viewport: ViewportFrame, mode
     local cf, size = modelTemplate:GetBoundingBox()
     local defaultFOV = viewport:GetAttribute("DefaultFOV") or DEFAULT_FOV
     
-    local orientation = CFrame.fromEulerAnglesYXZ(math.rad(-20), 0, 0)
+    local orientation = CFrame.fromEulerAnglesYXZ(math.rad(-20), math.rad(-90), 0)
+    
     local newCFrame = vpfModel:GetMinimumFitCFrame(orientation)
     local distance = (newCFrame.Position - cf.Position).Magnitude
     local fitFOV = 2 * math.deg(math.atan(size.Magnitude / (2 * distance)))
