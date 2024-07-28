@@ -27,12 +27,10 @@ local LoadScreen: Component.Def = {
                     Gloves = { ClassName = "Frame" },
                     LoadingBar = {
                         ClassName = "Frame",
-                        Children = {
-                            Skip = { ClassName = "TextButton" },
-                        }
                     }
                 }
-            }
+            },
+            Skip = { ClassName = "TextButton" }
         }
     };
 }
@@ -133,14 +131,17 @@ function LoadScreen:Activate(): nil
     end)
     
     task.delay(1, function(): nil
-        self._bar.Skip.Visible = true
+        if not game:GetService("UserInputService").TouchEnabled then
+            self.Instance.Skip.Visible = true
+        end
         return
     end)
 
-    self:AddToJanitor(self._bar.Skip.MouseButton1Click:Connect(function(): nil
+    self:AddToJanitor(self.Instance.Skip.MouseButton1Click:Connect(function(): nil
         return self._preloader.FinishedLoading:Fire()
     end))
 
+    
     self:AddToJanitor(self._preloader.ContentLoaded:Connect(function(): nil
         local loaded: number = self._preloader:GetLoaded()
         return self:UpdateProgressBar(loaded / self._preloader:GetRemaining())

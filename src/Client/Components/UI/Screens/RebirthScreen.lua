@@ -56,6 +56,7 @@ function RebirthScreen:Initialize(): nil
 	self._data = Knit.GetService("DataService")
 	self._rebirths = Knit.GetService("RebirthService")
 	self._background = self.Instance.Background
+	self._autorebirth = self._data:GetValue("AutoRebirth")
 
 	local db = Debounce.new(0.5)
 	self:AddToJanitor(self._background.Rebirth.MouseButton1Click:Connect(function(): nil
@@ -65,13 +66,15 @@ function RebirthScreen:Initialize(): nil
 	end))
 
 	self:AddToJanitor(self._data.DataUpdated:Connect(function(key)
-		if key ~= "Rebirths" and key ~= "Wins" then return end
+		if key ~= "Rebirths" and key ~= "Wins" and key ~= "AutoRebirth" then return end
 		self:UpdateStats()
 	end))
 
 	self:AddToJanitor(self._background.AutoRebirth.MouseButton1Click:Connect(function(): nil
 		--// TODO: Check if gui will auto change color
-		self._data:SetSetting("AutoRebirth", not self._data:GetValue("AutoRebirth"))
+		self._data:SetSetting("AutoRebirth", not self._autorebirth)
+		self._autorebirth = self._data:GetValue("AutoRebirth")
+		warn(self._data:GetValue("AutoRebirth"))
 		return
 	end))
 
@@ -81,11 +84,14 @@ function RebirthScreen:Initialize(): nil
 end
 
 function RebirthScreen:UpdateStats(): nil
-	if self._data:GetValue("AutoRebirth") then
+	if self._autorebirth == true then
 		task.spawn(function(): nil
 			self._rebirths:Rebirth()
 			return
 		end)
+		self._background.AutoRebirth.Title.Text = "Auto Rebirth: ON"
+	else
+		self._background.AutoRebirth.Title.Text = "Auto Rebirth: OFF"
 	end
 	task.spawn(function(): nil
 		local boosts = self._rebirths:GetBeforeAndAfter()

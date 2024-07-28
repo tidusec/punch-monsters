@@ -91,6 +91,11 @@ function HatchingStand:HatchAnimation(pets)
     local cols = math.ceil(numPets / rows)
     local viewportSize = UDim2.new(1 / cols, -10, (1 / rows)/1.3, -10)
 
+    local crackSound = Instance.new("Sound")
+    crackSound.SoundId = "rbxassetid://14657667490"
+    crackSound.Parent = self._eggViewport
+    crackSound:Play()
+
     for i, pet in ipairs(pets) do
         local viewportFrame = Instance.new("ViewportFrame")
         self._animationjanitor:Add(viewportFrame)
@@ -170,11 +175,6 @@ function HatchingStand:HatchAnimation(pets)
             hatchEffect.Rate = 100
             hatchEffect.Parent = viewportFrame
 
-            local crackSound = Instance.new("Sound")
-            crackSound.SoundId = "rbxassetid://5771441412"
-            crackSound.Parent = viewportFrame
-            crackSound:Play()
-
             local shakeDuration = 1
             local startTime = tick()
             local originalPosition = viewportFrame.Position
@@ -238,14 +238,10 @@ function HatchingStand:HatchAnimation(pets)
         end
     end
 
-    local celebrationSound = Instance.new("Sound")
-    celebrationSound.SoundId = "rbxassetid://6333015935"
-    celebrationSound.Parent = self._eggViewport
-    celebrationSound:Play()
-
     animationCompleted = true
 
-    task.wait(3)
+    task.wait(2)
+    crackSound:Destroy()
 
     self:FinishHatchAnimation()
 end
@@ -269,7 +265,7 @@ function HatchingStand:CreatePetInfoFrame(viewportFrame, pet, petInfo)
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
-    nameLabel.Position = UDim2.new(0, 0, 0, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0.6, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.TextColor3 = Color3.new(1, 1, 1)
     nameLabel.Font = Enum.Font.GothamBold
@@ -278,8 +274,8 @@ function HatchingStand:CreatePetInfoFrame(viewportFrame, pet, petInfo)
     nameLabel.Parent = infoFrame
 
     local rarityLabel = Instance.new("TextLabel")
-    rarityLabel.Size = UDim2.new(1, 0, 0.5, 0)
-    rarityLabel.Position = UDim2.new(0, 0, 0.5, 0)
+    rarityLabel.Size = UDim2.new(1, 0, 0.2, 0)
+    rarityLabel.Position = UDim2.new(0, 0, 1, 0)
     rarityLabel.BackgroundTransparency = 1
     rarityLabel.TextColor3 = Color3.new(1, 1, 1)
     rarityLabel.Font = Enum.Font.Gotham
@@ -290,7 +286,7 @@ function HatchingStand:CreatePetInfoFrame(viewportFrame, pet, petInfo)
     else
         RarityStrokes:FindFirstChild("Common"):Clone().Parent = rarityLabel
     end
-    RarityStrokes:FindFirstChild("UIStroke"):Clone().Parent = rarityLabel
+    RarityStrokes:FindFirstChild("UIStrokeHatch"):Clone().Parent = rarityLabel
     rarityLabel.Parent = infoFrame
 
     local function fadeInText(label)

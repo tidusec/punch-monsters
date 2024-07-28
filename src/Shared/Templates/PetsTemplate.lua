@@ -314,7 +314,7 @@ local module = {
 	["Magical Winged Wyvern"] = {
 		ID = nil,
 		Rarity = "Huge",
-		StrengthMultiplier = 2000,
+		StrengthMultiplier = 1000,
 	},
 
 	-- Reward from crates --

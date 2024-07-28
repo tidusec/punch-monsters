@@ -58,7 +58,16 @@ local InputTypeMap = {
 		forEachComponent("EnemyFighting", "Attack")
 		task.spawn(liftDumbell)
 		return
-	end
+	end,
+
+	Touch = function(): nil
+		forEachComponent("PunchingBag", "Punch")
+		forEachComponent("SitupBench", "Situp")
+		forEachComponent("EnemyFighting", "Attack")
+		task.spawn(liftDumbell)
+		return
+	end,
+
 }
 
 local KeyboardInputMap = {

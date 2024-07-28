@@ -85,9 +85,11 @@ function TransactionService:KnitStart()
 			return
 		end,
 		[1884295167] = function(player: Player): nil --give mega quest
-			local questprogress = data:GetValue(player, "MegaQuestProgress")
-			questprogress["Completed"] = true
-			data:SetValue(player, "MegaQuestProgress", questprogress)
+			task.spawn(function()
+				local questprogress = data:GetValue(player, "MegaQuestProgress")
+				questprogress["Completed"] = true
+				data:SetValue(player, "MegaQuestProgress", questprogress)
+			end)
 			pets:Add(player, "Magical Winged Wyvern")
 			hatching:ShowFakeHatch(player, "Magical Winged Wyvern")
 			return

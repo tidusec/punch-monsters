@@ -45,7 +45,7 @@ end
 
 function TimerService:GetAll(player: Player): { Timer }
   local data = self._data:GetValue(player, "Timers")
-  if #data == 0 then
+  if not data or #data == 0 then
     return {}
   else
     return data
