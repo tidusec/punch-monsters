@@ -101,23 +101,38 @@ end
 
 -- Should be called when something about the viewport frame / camera changes
 -- e.g. the frame size or the camera field of view
-function ViewportModelClass:Calibrate()
-	local viewport = {}
-	local size = self.ViewportFrame.AbsoluteSize
-	
-	viewport.aspect = size.X / size.Y
-	
-	viewport.yFov2 = math.rad(self.Camera.FieldOfView / 2)
-	viewport.tanyFov2 = math.tan(viewport.yFov2)
-		
-	viewport.xFov2 = math.atan(viewport.tanyFov2 * viewport.aspect)
-	viewport.tanxFov2 = math.tan(viewport.xFov2)
-	
-	viewport.cFov2 = math.atan(viewport.tanyFov2 * math.min(1, viewport.aspect))
-	viewport.sincFov2 = math.sin(viewport.cFov2)
-	
-	self._viewport = viewport
+
+local function isValidNumber(value)
+    return value == value and value ~= math.huge and value ~= -math.huge
 end
+
+
+function ViewportModelClass:Calibrate()
+    local viewport = {}
+    local size = self.ViewportFrame.AbsoluteSize
+
+    viewport.aspect = size.X / size.Y
+
+    viewport.yFov2 = math.rad(self.Camera.FieldOfView / 2)
+    viewport.tanyFov2 = math.tan(viewport.yFov2)
+
+    if not isValidNumber(viewport.tanyFov2) or viewport.tanyFov2 == 0 then
+        viewport.tanyFov2 = math.tan(math.rad(70 / 2))
+    end
+
+    viewport.xFov2 = math.atan(viewport.tanyFov2 * viewport.aspect)
+    viewport.tanxFov2 = math.tan(viewport.xFov2)
+
+    if not isValidNumber(viewport.tanxFov2) or viewport.tanxFov2 == 0 then
+        viewport.tanxFov2 = math.tan(math.rad(70 / 2))
+    end
+
+    viewport.cFov2 = math.atan(viewport.tanyFov2 * math.min(1, viewport.aspect))
+    viewport.sincFov2 = math.sin(viewport.cFov2)
+
+    self._viewport = viewport
+end
+
 
 -- returns a fixed distance that is guarnteed to encapsulate the full model
 -- this is useful for when you want to rotate freely around an object w/o expensive calculations
@@ -142,8 +157,23 @@ function ViewportModelClass:GetMinimumFitCFrame(orientation)
     
     local viewport = self._viewport
     local tanxFov2, tanyFov2 = viewport.tanxFov2, viewport.tanyFov2
+    
+    -- Check for invalid FOV values
+    if not isValidNumber(tanxFov2) or tanxFov2 == 0 then
+        tanxFov2 = math.tan(math.rad(70 / 2))
+    end
+
+    if not isValidNumber(tanyFov2) or tanyFov2 == 0 then
+        tanyFov2 = math.tan(math.rad(70 / 2))
+    end
+    
     local wcloud = self._points
     local cloudSize = #wcloud
+    
+    -- Check for empty point cloud
+    if cloudSize == 0 then
+        return orientation
+    end
     
     local rotation = orientation - orientation.Position
     local rInverse = rotation:Inverse()
@@ -160,9 +190,14 @@ function ViewportModelClass:GetMinimumFitCFrame(orientation)
     local hMax, hMin = viewProjectionEdgeHits(cloud, "X", furthest, tanxFov2)
     local vMax, vMin = viewProjectionEdgeHits(cloud, "Y", furthest, tanyFov2)
 
+    -- Prevent division by zero
+    local function safeDivide(a, b)
+        return b ~= 0 and a / b or 0
+    end
+
     local distance = math.max(
-        ((hMax - hMin) / 2) / tanxFov2,
-        ((vMax - vMin) / 2) / tanyFov2
+        safeDivide((hMax - hMin) / 2, tanxFov2),
+        safeDivide((vMax - vMin) / 2, tanyFov2)
     )
 
     return orientation * CFrame.new(

@@ -315,7 +315,14 @@ local module = {
 		ID = nil,
 		Rarity = "Huge",
 		StrengthMultiplier = 2000,
-	}
+	},
+
+	-- Reward from crates --
+	["Mystic Blackhole Phoenix"] = {
+		ID = nil,
+		Rarity = "Huge",
+		StrengthMultiplier = 350,
+	},
 }
 
 local meta = {

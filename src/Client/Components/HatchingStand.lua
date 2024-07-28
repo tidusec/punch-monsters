@@ -81,14 +81,15 @@ function HatchingStand:HatchAnimation(pets)
 
     self._ui:SetScreen("EggUi", true)
     self._ui:SetHatching(true)
+
     self._chancesUI.Enabled = false
 
     local numPets = #pets
     local viewportFrames = {}
 
-    local rows = numPets > 8 and 2 or 1
+    local rows = math.floor(numPets / 4)
     local cols = math.ceil(numPets / rows)
-    local viewportSize = UDim2.new(1 / cols, -10, 1 / rows, -10)
+    local viewportSize = UDim2.new(1 / cols, -10, (1 / rows)/1.3, -10)
 
     for i, pet in ipairs(pets) do
         local viewportFrame = Instance.new("ViewportFrame")
@@ -159,32 +160,35 @@ function HatchingStand:HatchAnimation(pets)
     task.wait(2)
 
     local function hatchEgg(viewportFrame)
-        local hatchEffect = Instance.new("ParticleEmitter")
-        hatchEffect.Texture = "rbxassetid://6333823"
-        hatchEffect.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0)})
-        hatchEffect.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
-        hatchEffect.Speed = NumberRange.new(5, 10)
-        hatchEffect.Lifetime = NumberRange.new(0.5, 1)
-        hatchEffect.Rate = 100
-        hatchEffect.Parent = viewportFrame
+        task.spawn(function()
+            local hatchEffect = Instance.new("ParticleEmitter")
+            hatchEffect.Texture = "rbxassetid://6333823"
+            hatchEffect.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0)})
+            hatchEffect.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+            hatchEffect.Speed = NumberRange.new(5, 10)
+            hatchEffect.Lifetime = NumberRange.new(0.5, 1)
+            hatchEffect.Rate = 100
+            hatchEffect.Parent = viewportFrame
 
-        local crackSound = Instance.new("Sound")
-        crackSound.SoundId = "rbxassetid://5771441412"
-        crackSound.Parent = viewportFrame
-        crackSound:Play()
+            local crackSound = Instance.new("Sound")
+            crackSound.SoundId = "rbxassetid://5771441412"
+            crackSound.Parent = viewportFrame
+            crackSound:Play()
 
-        local shakeDuration = 1
-        local startTime = tick()
-        local originalPosition = viewportFrame.Position
-        while tick() - startTime < shakeDuration do
-            local shakeOffset = UDim2.new(0, math.random(-3, 3), 0, math.random(-3, 3))
-            TweenService:Create(viewportFrame, TweenInfo.new(0.05, Enum.EasingStyle.Sine), {Position = originalPosition + shakeOffset}):Play()
-            task.wait(0.05)
-        end
-        viewportFrame.Position = originalPosition
-
-        task.wait(0.5)
-        hatchEffect:Destroy()
+            local shakeDuration = 1
+            local startTime = tick()
+            local originalPosition = viewportFrame.Position
+            task.spawn(function()
+                while tick() - startTime < shakeDuration do
+                    local shakeOffset = UDim2.new(0, math.random(-3, 3), 0, math.random(-3, 3))
+                    TweenService:Create(viewportFrame, TweenInfo.new(0.05, Enum.EasingStyle.Sine), {Position = originalPosition + shakeOffset}):Play()
+                    task.wait(0.05)
+                end
+                viewportFrame.Position = originalPosition
+            end)
+            task.wait(1.3)
+            hatchEffect:Destroy()
+        end)
     end
 
     for _, viewportFrame in ipairs(viewportFrames) do
@@ -241,7 +245,7 @@ function HatchingStand:HatchAnimation(pets)
 
     animationCompleted = true
 
-    task.wait(4)
+    task.wait(3)
 
     self:FinishHatchAnimation()
 end
@@ -309,6 +313,7 @@ function HatchingStand:FinishHatchAnimation()
     self._ui:SetScreen("MainUi", false)
     self._ui:SetHatching(false)
     self._hatching = false
+
     self._chancesUI.Enabled = true
 
     self._animationjanitor:Destroy()
@@ -343,12 +348,25 @@ function HatchingStand:BuyThree(): nil
     return nil
 end
 
-function HatchingStand:Auto(): nil
+function HatchingStand:BuyEight(): nil
     if not self:IsClosest() then return end
-    while self._hatching do
-        self:Hatch(3)
-        task.wait(1)
+    self:Hatch(8)
+    return nil
+end
+
+function HatchingStand:Auto(): nil
+    local hatching = true
+    if not self:IsClosest() then return end
+    while hatching do
+        self:Hatch(8)
+        repeat task.wait(0.5) until not self._hatching
+        task.wait(6)
     end
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+    self._janitor:Add(root:GetPropertyChangedSignal("Position"):Connect(function()
+        hatching = false
+    end))
     return nil
 end
 
@@ -397,20 +415,14 @@ function HatchingStand:AddPetCards(): nil
                 Chance = chance
             })
         end
-
-        warn(pets.Values)
         
         pets:Sort(function(a: ChanceTable, b: ChanceTable)
             return a.Chance > b.Chance
         end)
-
-        warn("here")
         
         for _, pet in pets:GetValues() do
-            warn(pet)
-            warn(pet.Name)
             self._chancesUI.Enabled = true
-            local petModel: Model? = ReplicatedStorage.Assets.Pets:FindFirstChild(pet.Name)        
+            local petModel: Model? = ReplicatedStorage.Assets.Pets:WaitForChild(pet.Name, 5) 
             local petCard: ImageLabel & { Viewport: ViewportFrame; Chance: TextLabel } = UserInterface.Hatching.PetChanceCard:Clone()
             local viewport = petCard.Viewport
             petCard.Chance.Text = string.format("%.2f%%", pet.Chance)
@@ -434,6 +446,9 @@ function HatchingStand:AddPetCards(): nil
     end)
     self._chancesUI.Background.BuyThree.MouseButton1Click:Connect(function()
         self:BuyThree()
+    end)
+    self._chancesUI.Background.BuyEight.MouseButton1Click:Connect(function()
+        self:BuyEight()
     end)
     self._chancesUI.Background.Auto.MouseButton1Click:Connect(function()
         self:Auto()

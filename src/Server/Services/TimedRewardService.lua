@@ -58,6 +58,18 @@ function TimedRewardService:Claim(player: Player, crateNumber: number): nil
 
     local rewardPool = TimedRewardTemplate[crateNumber]
     local key, value = randomPair(rewardPool)
+    local chances = {
+      1,
+      1/250,
+      1/100,
+    }
+    local row = math.floor(crateNumber/4) + 1
+    local chance = chances[row] or 1/500
+    local random = Random.new():NextNumber()
+    if random < chance then
+      self._pets:Add(player, "Mystic Blackhole Phoenix")
+      self._hatch:ShowFakeHatch(player, "Server", "Server1", "Mystic Blackhole Phoenix")
+    end
     if key == "Eggs" then
       local _, randomEgg = randomPair(value)
       self._pets:Add(player, randomEgg)

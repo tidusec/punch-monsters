@@ -13,6 +13,8 @@ local Knit = require(Packages.Knit)
 local Array = require(ReplicatedStorage.Modules.NewArray)
 local Component = require(Packages.Component)
 
+local Assets = ReplicatedStorage.Assets
+
 local player = Players.LocalPlayer
 
 type CrateButton = ImageButton & {
@@ -42,6 +44,7 @@ local RewardsScreen: Component.Def = {
 }
 
 function RewardsScreen:Initialize(): nil
+	self._ui = Knit.GetController("UIController")
 	local NotificationButton = Component.Get("NotificationButton")
 	repeat task.wait()
 		self._rewardsButton = NotificationButton:Find(self.Instance.Parent.MainUi.PlaytimeRewardButton)
@@ -77,6 +80,8 @@ function RewardsScreen:Initialize(): nil
 		self:UpdateScreen()
 		return
 	end))
+
+	self._ui:AddModelToViewport(self.Instance.Huge.ViewportFrame, Assets.Pets["Mystic Blackhole Phoenix"], { replaceModel = true })
 
 	return
 end
