@@ -84,7 +84,7 @@ function GamepassService:DoesPlayerOwn(player: Player, passName: string): boolea
 		PLAYER_OWNS_CACHE[player.UserId] = {}
 	end
 
-	if type(owned) == "table" and owned[passName] then
+	if table.find(owned, passName) then
 		return true
 	end
 	

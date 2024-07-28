@@ -384,6 +384,13 @@ function DataService:GetGamePasses(player: Player)
 	return self:GetValue(player, "GamePasses")
 end
 
+function DataService:AddGamePass(player: Player, name: string)
+	local gamepasses = self:GetGamePasses(player)
+	table.insert(gamepasses, name)
+	self:SetValue(player, "GamePasses", gamepasses)
+	return
+end
+
 -- client
 
 function DataService.Client:GetValue(player, name)

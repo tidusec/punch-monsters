@@ -145,7 +145,23 @@ function PetService:GetPetSpace(player: Player): number
 	if self._gamepass:DoesPlayerOwn(player, "+4 Pets Equipped") then
 		petSpace += 4
 	end
+
+	local pets = self._data:GetValue(player, "Pets")
+	if pets.MaxEquip ~= petSpace then
+		pets.MaxEquip = petSpace
+		self._data:SetValue(player, "Pets", pets)
+	end
+	
 	return petSpace
+end
+
+function PetService:AddInventorySpace(player: Player, amount: number): nil
+	AssertPlayer(player)
+	
+	local pets = self._data:GetValue(player, "Pets")
+	pets.MaxStorage += amount
+	self._data:SetValue(player, "Pets", pets)
+	return
 end
 
 function PetService:Equip(player: Player, pet: typeof(PetsTemplate.Dog)): nil
@@ -268,7 +284,7 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		janitor:Add(positionAligner)
 
 		local orientationAligner = Instance.new("AlignOrientation")
-		orientationAligner.MaxTorque = 100_000
+		orientationAligner.MaxTorque = 700_000
 		orientationAligner.Attachment0 = petAttachment
 		orientationAligner.Attachment1 = characterAttachment
 		orientationAligner.Responsiveness = FOLLOW_SPEED

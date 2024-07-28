@@ -349,14 +349,23 @@ end
 
 function HatchingStand:BuyThree(): nil
     if not self:IsClosest() then return end
-    self:Hatch(3)
+    if self._gamepass:DoesPlayerOwn("3x Hatch") then
+        self:Hatch(3)
+        return nil
+    else
+        self._gamepass:PromptPurchase("3x Hatch")
+    end
     return nil
 end
 
 function HatchingStand:BuyEight(): nil
     if not self:IsClosest() then return end
-    self:Hatch(8)
-    return nil
+    if self._gamepass:DoesPlayerOwn("8x Hatch") then
+        self:Hatch(8)
+        return nil
+    else
+        game:GetService("MarketplaceService"):PromptProductPurchase(player, 1890693814)
+    end
 end
 
 function HatchingStand:Auto(): nil

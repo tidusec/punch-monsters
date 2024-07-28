@@ -136,7 +136,40 @@ function TransactionService:KnitStart()
 		[1887044205] = function(player: Player): nil
 			hatching:HatchManyServer(player, "Server", "Frostbite Egg", 8)
 		end,
+
+		[1890690821] = function(player: Player): nil
+			task.spawn(function()
+				data:AddGamePass(player, "+4 Pets Equipped")
+				task.wait(0.5)
+				pets:GetPetSpace(player)
+			end)
+		end,
+
+		[1890692021] = function(player: Player): nil
+			task.spawn(function()
+				data:AddGamePass(player, "100x Luck")
+			end)
+		end,
+
+		[1890692458] = function(player: Player): nil
+			task.spawn(function()
+				data:AddGamePass(player, "10x Luck")
+			end)
+		end,
+
+		[1890693814] = function(player: Player): nil
+			task.spawn(function()
+				data:AddGamePass(player, "8x Hatch")
+			end)
+		end,
 		
+		[1890708273] = function(player: Player): nil
+			task.spawn(function()
+				if gamepass:DoesPlayerOwn(player, "+500 Inventory Space") then return end
+				data:AddGamePass(player, "+500 Inventory Space")
+				pets:AddInventorySpace(player, 500)
+			end)
+		end,
 	}
 	
 	MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passID, wasPurchased)
