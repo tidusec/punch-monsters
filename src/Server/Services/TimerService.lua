@@ -44,7 +44,12 @@ function TimerService:IsFinished(timer: Timer): boolean
 end
 
 function TimerService:GetAll(player: Player): { Timer }
-  return self._data:GetValue(player, "Timers")
+  local data = self._data:GetValue(player, "Timers")
+  if #data == 0 then
+    return {}
+  else
+    return data
+  end
 end
 
 function TimerService:Start(player: Player, name: string, length: number): nil
@@ -62,6 +67,10 @@ function TimerService:Start(player: Player, name: string, length: number): nil
     self:RemoveFinished(player)
   end)
   return
+end
+
+function TimerService:GetTimeLeft(timer: Timer): number
+  return math.max(0, timer.Length - (tick() - timer.BeginTime))
 end
 
 return TimerService

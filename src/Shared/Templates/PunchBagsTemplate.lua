@@ -8,27 +8,27 @@ local module = {
 		
 		PunchBag1 = {
 			PunchRequirement = 0,
-			Hit = 1,
+			Hit = 1 * 1.4,
 		},
 		PunchBag2 = {
 			PunchRequirement = 500,
-			Hit = 2,
+			Hit = 2 * 1.4,
 		},
 		PunchBag3 = {
 			PunchRequirement = 4000,
-			Hit = 3,
+			Hit = 3 * 1.4,
 		},
 		PunchBag4 = {
 			PunchRequirement = 22000,
-			Hit = 4,
+			Hit = 4 * 1.4,
 		},
 		PunchBag5 = {
 			PunchRequirement = 100000,
-			Hit = 5,
+			Hit = 5 * 1.4,
 		},
 		PunchBag6VIP = {
 			PunchRequirement = 0,
-			Hit = 10,
+			Hit = 10 * 1.4,
 
 			Vip = true,
 		}
@@ -38,27 +38,27 @@ local module = {
 
 		PunchBag1 = {
 			PunchRequirement = 0,
-			Hit = 10,
+			Hit = 10 * 1.4,
 		},
 		PunchBag2 = {
 			PunchRequirement = 500000,
-			Hit = 15,
+			Hit = 15 * 1.4,
 		},
 		PunchBag3 = {
 			PunchRequirement = 1000000,
-			Hit = 20,
+			Hit = 20 * 1.4,
 		},
 		PunchBag4 = {
 			PunchRequirement = 2000000,
-			Hit = 30,
+			Hit = 30 * 1.4,
 		},
 		PunchBag5 = {
 			PunchRequirement = 3500000,
-			Hit = 50,
+			Hit = 50 * 1.4,
 		},
 		PunchBag6VIP = {
 			PunchRequirement = 0,
-			Hit = 150,
+			Hit = 150 * 1.4,
 
 			Vip = true,
 		}
@@ -68,27 +68,27 @@ local module = {
 
 		PunchBag1 = {
 			PunchRequirement = 0,
-			Hit = 75,
+			Hit = 75 * 1.4,
 		},
 		PunchBag2 = {
 			PunchRequirement = 10000000,
-			Hit = 100,
+			Hit = 100 * 1.4,
 		},
 		PunchBag3 = {
 			PunchRequirement = 16000000,
-			Hit = 135,
+			Hit = 135 * 1.4,
 		},
 		PunchBag4 = {
 			PunchRequirement = 42000000,
-			Hit = 175,
+			Hit = 175 * 1.4,
 		},
 		PunchBag5 = {
 			PunchRequirement = 110000000,
-			Hit = 220,
+			Hit = 220 * 1.4,
 		},
 		PunchBag6VIP = {
 			PunchRequirement = 0,
-			Hit = 660,
+			Hit = 660 * 1.4,
 
 			Vip = true,
 		}
