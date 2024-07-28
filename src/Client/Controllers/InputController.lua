@@ -70,6 +70,10 @@ local KeyboardInputMap = {
 		forEachComponent("HatchingStand", "BuyThree")
 		return
 	end,
+	Y = function(): nil
+		forEachComponent("HatchingStand", "BuyEight")
+		return
+	end,
 	T = function(): nil
 		forEachComponent("HatchingStand", "Auto")
 		return

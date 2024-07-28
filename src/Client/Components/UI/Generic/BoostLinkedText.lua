@@ -38,7 +38,10 @@ function BoostLinkedText:Initialize(): nil
                 timeleft = self._boost:GetBoostTimeLeft(potion)
             end
             if timeleft > 1 then
-                timeleft -= 1 
+                self.Instance.Visible = true
+                timeleft -= 1
+            else
+                self.Instance.Visible = false
             end
 
             self.Instance.Value.Text = TFM.FormatStr(TFM.Convert(math.floor(timeleft)), "%02h:%02m:%02S")
