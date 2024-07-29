@@ -147,11 +147,23 @@ function PetService:GetPetSpace(player: Player): number
 	end
 
 	local pets = self._data:GetValue(player, "Pets")
-	if pets.MaxEquip ~= petSpace then
+
+	local petStorage = 200
+
+	if self._gamepass:DoesPlayerOwn(player, "+200 Inventory Space") then
+		petStorage += 200
+	end
+
+	if self._gamepass:DoesPlayerOwn(player, "+500 Inventory Space") then
+		petStorage += 500
+	end
+
+	if pets.MaxEquip ~= petSpace or pets.MaxStorage ~= petStorage then
 		pets.MaxEquip = petSpace
+		pets.MaxStorage = petStorage
 		self._data:SetValue(player, "Pets", pets)
 	end
-	
+
 	return petSpace
 end
 

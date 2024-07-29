@@ -45,6 +45,7 @@ function RebirthService:_AddRebirth(player: Player): nil
   self._data:SetValue(player, "BicepsStrength", 0)
   self._data:SetValue(player, "PunchStrength", 0)
   self._data:SetValue(player, "AbsStrength", 0)
+  self._data:SetValue(player, "DefeatedBosses", {})
 
   if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
       player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(-234.229, 5.649, 469.217))
