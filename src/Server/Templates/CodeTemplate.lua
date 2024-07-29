@@ -10,6 +10,9 @@ local module = {
 	test = {
 		Wins = 1000
 	},
+	newplayer = {
+		Egg = "Frostbite Egg"
+	},
 }
 
 return module

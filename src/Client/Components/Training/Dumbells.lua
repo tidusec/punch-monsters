@@ -40,6 +40,8 @@ function Dumbells:Initialize(): nil
     local player = Players:GetPlayerFromCharacter(char)
     if not player then return end
 
+    if not (player.Name == Players.LocalPlayer.Name) then return end
+
     if db:IsActive() then return end
 
     touching = true

@@ -12,7 +12,7 @@ local Packages = ReplicatedStorage.Packages
 local Knit = require(Packages.Knit)
 
 local QUEST_GOALS = {
-  StayActive = 45 * 60, -- 45 mins
+  StayActive = 25 * 60, -- 25 mins
   OpenEggs = 1500,
   EarnStrength = 35000,
 }

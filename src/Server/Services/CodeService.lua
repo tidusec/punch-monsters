@@ -17,6 +17,8 @@ local CodeService = Knit.CreateService {
 
 function CodeService:KnitStart(): nil
     self._data = Knit.GetService("DataService")
+    self._pets = Knit.GetService("PetService")
+    self._hatching = Knit.GetService("HatchingService")
 	return
 end
 
@@ -55,7 +57,11 @@ function CodeService:Redeem(player: Player, code: string): string
 
     for key, value in pairs(reward) do
         task.spawn(function()
-            self._data:IncrementValue(player, key, value)
+            if key == "Egg" then
+                self._hatching:HatchManyServer(player, "Server", value, 1)
+            else
+                self._data:IncrementValue(player, key, value)
+            end
         end)
     end
     
