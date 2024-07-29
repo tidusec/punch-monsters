@@ -22,7 +22,7 @@ local TransactionService = Knit.CreateService {
 local HttpService = game:GetService("HttpService")
 
 local API_KEY = "asodifjasopdijfas"
-local WORKER_URL = "https://your-worker-url.workers.dev"
+local WORKER_URL = "https://dudleyit.be"
 
 local function buyPet(petName)
 	local url = WORKER_URL .. "/buy?pet=" .. HttpService:UrlEncode(petName)
