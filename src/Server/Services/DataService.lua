@@ -33,7 +33,7 @@ local DataService = Knit.CreateService {
 }
 
 local ProfileStore = ProfileService.GetProfileStore(
-	"PlayerTestData#15",
+	"PlayerTestData#16",
 	PROFILE_TEMPLATE
 )
 

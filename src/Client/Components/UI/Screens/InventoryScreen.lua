@@ -85,13 +85,60 @@ function InventoryScreen:Initialize(): nil
 		self:UpdatePetCards()
 	end))
 
+	self._petsToDelete = {}
+	self._deleteMode = false
+
+	self:AddToJanitor(self._background.CancelDelete.MouseButton1Click:Connect(function()
+    	self:CancelDelete()
+	end))
+
 	self:AddToJanitor(self._background.Delete.MouseButton1Click:Connect(function()
-		if self._canDelete then
-			if not self._petToDelete then return end
-			self._pets:Delete(self._petToDelete)
+		if not self._deleteMode then
+			self:EnterDeleteMode()
+		else
+			self:DeleteSelectedPets()
 		end
 	end))
+
 	return
+end
+
+function InventoryScreen:EnterDeleteMode()
+    self._deleteMode = true
+    self._background.Delete.TextLabel.Text = "Confirm"
+    self._background.CancelDelete.Visible = true
+	self._background.EquipBest.Visible = false
+	self._background.UnequipAll.Visible = false
+	self._background.ImageColor3 = Color3.fromRGB(255, 0, 0)
+	self._petsToDelete = {}
+end
+
+function InventoryScreen:CancelDelete()
+    self._deleteMode = false
+    self._petsToDelete = {}
+    self._background.Delete.TextLabel.Text = "Delete"
+    self._background.CancelDelete.Visible = false
+	self._background.EquipBest.Visible = true
+	self._background.UnequipAll.Visible = true
+	self._background.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    self:UpdatePetCards()
+end
+
+function InventoryScreen:DeleteSelectedPets()
+    for _, pet in ipairs(self._petsToDelete) do
+        self._pets:Delete(pet)
+    end
+    self:CancelDelete()
+end
+
+function InventoryScreen:TogglePetForDeletion(pet)
+    local index = table.find(self._petsToDelete, pet)
+    if index then
+        table.remove(self._petsToDelete, index)
+    else
+        table.insert(self._petsToDelete, pet)
+    end
+    self:UpdatePetCards() -- Refresh the UI to show selection
 end
 
 function InventoryScreen:ToggleSelectionFrame(on: boolean): nil
@@ -128,7 +175,20 @@ local function toggleButton(button: ImageButton & { Title: TextLabel & { UIGradi
 	return
 end
 
+local function toggleLocked(button: ImageButton & { Title: TextLabel & { UIGradient: UIGradient } }, on: boolean): nil
+	task.spawn(function()
+		button.Image = button:GetAttribute(if on then "OnImage" else "OffImage")
+		button.Title.UIGradient.Color = button:GetAttribute(if on then "OnColor" else "OffColor")
+		button.Title.Text = if on then "Locked!" else "Not Locked!"
+	end)
+	return
+end
+
 function InventoryScreen:SelectPet(pet: Pet): nil
+	if self._deleteMode then
+        return self:TogglePetForDeletion(pet)
+    end
+
 	selectionJanitor:Cleanup()
 	if lastPetSelected == pet then
 		lastPetSelected = nil
@@ -142,6 +202,7 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 	
 	local isEquipped = self._pets:IsEquipped(pet)
 	toggleButton(self._petStats.Equip, not isEquipped)
+	toggleLocked(self._petStats.Lock, self._pets:IsLocked(pet.ID))
 	
 	task.spawn(function(): nil
 		self._petStats.PetName.Text = pet.Name
@@ -192,7 +253,9 @@ function InventoryScreen:SelectPet(pet: Pet): nil
 		end
 	end))
 	selectionJanitor:Add(self._petStats.Lock.MouseButton1Click:Connect(function()
-
+		local isLocked = self._pets:IsLocked(pet.ID)
+		self._pets:Lock(pet.ID)
+		toggleLocked(self._petStats.Lock, not isLocked)
 	end))
 	return
 end
@@ -218,6 +281,10 @@ local CACHE = ReplicatedStorage.CACHE
 function InventoryScreen:UpdatePetCards(pets, sorting)
     pets = pets or self.petsInventory
     sorting = sorting or self._sorting or "None"
+
+	if self._deleteMode then
+		sorting = "Strength"
+	end
 
     self._updateJanitor:Cleanup()
     local ownedPets = pets.OwnedPets
@@ -295,6 +362,17 @@ function InventoryScreen:UpdatePetCards(pets, sorting)
             else
                 card.Stars.Limited.Visible = false
             end
+
+			if self._deleteMode then
+				local isSelected = table.find(self._petsToDelete, pet) ~= nil
+				if isSelected then
+					card.ImageColor3 = Color3.fromRGB(143, 0, 0) -- Dark red color
+				else
+					card.ImageColor3 = Color3.fromRGB(255, 255, 255) -- Default white color
+				end
+			else
+				card.ImageColor3 = Color3.fromRGB(255, 255, 255) -- Default white color
+			end
 
             local Viewport = Component.Get("Viewport")
             Viewport:Add(card.Viewport)

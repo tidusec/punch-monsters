@@ -54,6 +54,7 @@ function HatchingStand:Initialize(): nil
     self._schedulercontroller = Knit.GetController("SchedulerController")
     self._ui = Knit.GetController("UIController")
     self._hatching = false
+    self._hatchregistered = false
     
     local eggUi = player.PlayerGui.EggUi
     self._eggViewport = eggUi.EggViewport
@@ -342,26 +343,35 @@ function HatchingStand:Hatch(amount: number): nil
 end
 
 function HatchingStand:BuyOne(): nil
+    if self._hatchregistered then return end
     if not self:IsClosest() then return end
+    self._hatchregistered = true
     self:Hatch(1)
+    self._hatchregistered = false
     return nil
 end
 
 function HatchingStand:BuyThree(): nil
+    if self._hatchregistered then return end
     if not self:IsClosest() then return end
-    if self._gamepass:DoesPlayerOwn("3x Hatch") then
+    if self._gamepass:DoesPlayerOwn("Triple Hatch") then
+        self._hatchregistered = true
         self:Hatch(3)
+        self._hatchregistered = false
         return nil
     else
-        self._gamepass:PromptPurchase("3x Hatch")
+        self._gamepass:PromptPurchase("Triple Hatch")
     end
     return nil
 end
 
 function HatchingStand:BuyEight(): nil
+    if self._hatchregistered then return end
     if not self:IsClosest() then return end
     if self._gamepass:DoesPlayerOwn("8x Hatch") then
+        self._hatchregistered = true
         self:Hatch(8)
+        self._hatchregistered = false
         return nil
     else
         game:GetService("MarketplaceService"):PromptProductPurchase(player, 1890693814)
@@ -369,20 +379,32 @@ function HatchingStand:BuyEight(): nil
 end
 
 function HatchingStand:Auto(): nil
+    if self._hatchregistered then return end
+    if self.hatchingauto then return end
     self.hatchingauto = true
     if not self:IsClosest() then return end
+    local amount = 1
+    if self._gamepass:DoesPlayerOwn("Triple Hatch") then
+        amount = 3
+    end
+    if self._gamepass:DoesPlayerOwn("8x Hatch") then
+        amount = 8
+    end
+    self._hatchregistered = true
+    local connection
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+    local pos = root.Position
     while self.hatchingauto do
-        self:Hatch(8)
+        if root.Position ~= pos then
+            self.hatchingauto = nil
+            self._hatchregistered = false
+            return
+        end
+        self:Hatch(amount)
         repeat task.wait(0.5) until not self._hatching
         task.wait(6)
     end
-    local char = player.Character or player.CharacterAdded:Wait()
-    local root = char:WaitForChild("HumanoidRootPart")
-    local connection
-    connection = root:GetPropertyChangedSignal("Position"):Connect(function()
-        self.hatchingauto = nil
-        connection:Disconnect()
-    end)
     return nil
 end
 

@@ -75,7 +75,7 @@ local module = {
 			["Flaming Rock"] = 20.59,
 			["Bat"] = 13.2998,
 			["Flaming Scorpion"] = 0.1,
-			["Flmaing Dragon"] = 0.01,
+			["Flaming Dragon"] = 0.01,
 			["Flaming Hydra"] = 0.0002,
 		},
 

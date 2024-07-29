@@ -29,7 +29,7 @@ return function(n: number)
 
 	if chosenAbbreviation then
 		local digits = Abbreviations[chosenAbbreviation]
-		local rounded = math.floor(n / 10 ^  (digits - 2)) * 10 ^  (digits - 2)
+		local rounded = math.round(n / 10 ^  (digits - 2)) * 10 ^  (digits - 2)
 		text = ("%.1f"):format(rounded / 10 ^ (digits - 1)) .. chosenAbbreviation
 	end
 

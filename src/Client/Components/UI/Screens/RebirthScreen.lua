@@ -58,6 +58,8 @@ function RebirthScreen:Initialize(): nil
 	self._background = self.Instance.Background
 	self._autorebirth = self._data:GetValue("AutoRebirth")
 
+	self:UpdateAutoRebirthButton()
+
 	local db = Debounce.new(0.5)
 	self:AddToJanitor(self._background.Rebirth.MouseButton1Click:Connect(function(): nil
 		if db:IsActive() then return end
@@ -71,10 +73,9 @@ function RebirthScreen:Initialize(): nil
 	end))
 
 	self:AddToJanitor(self._background.AutoRebirth.MouseButton1Click:Connect(function(): nil
-		--// TODO: Check if gui will auto change color
-		self._data:SetSetting("AutoRebirth", not self._autorebirth)
-		self._autorebirth = self._data:GetValue("AutoRebirth")
-		warn(self._data:GetValue("AutoRebirth"))
+		self._autorebirth = not self._autorebirth
+		self._data:SetSetting("AutoRebirth", self._autorebirth)
+		self:UpdateAutoRebirthButton()
 		return
 	end))
 
@@ -83,16 +84,21 @@ function RebirthScreen:Initialize(): nil
 	return
 end
 
-function RebirthScreen:UpdateStats(): nil
-	if self._autorebirth == true then
+function RebirthScreen:UpdateAutoRebirthButton(): nil
+	if self._autorebirth then
+		self._background.AutoRebirth.Title.Text = "Auto Rebirth: ON"
 		task.spawn(function(): nil
 			self._rebirths:Rebirth()
 			return
 		end)
-		self._background.AutoRebirth.Title.Text = "Auto Rebirth: ON"
 	else
 		self._background.AutoRebirth.Title.Text = "Auto Rebirth: OFF"
 	end
+end
+
+function RebirthScreen:UpdateStats(): nil
+	self:UpdateAutoRebirthButton()
+	
 	task.spawn(function(): nil
 		local boosts = self._rebirths:GetBeforeAndAfter()
 		local wins = self._data:GetValue("Wins")

@@ -61,8 +61,9 @@ function TimerService:Start(player: Player, name: string, length: number): nil
       Length = length
     }
   
+    
     local timers = self:GetAll(player)
-    table.insert(timers, timer)
+    timers[#timers + 1] = timer
     self._data:SetValue(player, "Timers", timers)
     self:RemoveFinished(player)
   end)

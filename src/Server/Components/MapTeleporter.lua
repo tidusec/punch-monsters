@@ -43,6 +43,7 @@ local playerBackTeleporterDebounces: { [number]: typeof(Debounce.new(0)) } = {}
 
 function MapTeleporter:Initialize(): nil
   self._data = Knit.GetService("DataService")
+  self._pets = Knit.GetService("PetService")
   self._mapName = self.Instance.Parent.Name
   local _, mapNumberString = table.unpack(self._mapName:split("Map"))
 
@@ -122,6 +123,7 @@ function MapTeleporter:Teleport(player: Player, character: Model, cframe: CFrame
   if self._data:GetValue(player, "Rebirths") < self.Attributes.RequiredRebirths then return end
   if self._data:GetValue(player, "Wins") < self.Attributes.RequiredWins then return end
   (character.HumanoidRootPart :: BasePart).CFrame = cframe
+  self._pets:UpdateFollowingPets(player, self._data:GetValue(player, "Pets").Equipped)
   return
 end
 

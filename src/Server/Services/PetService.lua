@@ -20,14 +20,9 @@ local ProfileTemplate = require(ReplicatedStorage.Templates.ProfileTemplate)
 
 local FOLLOW_SPEED = 12
 local Y_OFFSET = 0
-local PET_POSITIONS = Array.new("vector", {
-	Vector3.new(2, Y_OFFSET, 3),
-	Vector3.new(-4, Y_OFFSET, 6),
-	Vector3.new(6, Y_OFFSET, 10),
-	Vector3.new(-7, Y_OFFSET, 12),
-	Vector3.new(10, Y_OFFSET, 15),
-	Vector3.new(-10, Y_OFFSET, 15)
-})
+local MAX_PETS = 10 -- Assuming the maximum number of pets a player can have
+local BASE_RADIUS = 10 -- The radius of the circle around the player
+local Y_OFFSET = -0.5 -- Height offset from the player
 
 local PetService = Knit.CreateService {
 	Name = "PetService";
@@ -267,7 +262,28 @@ function PetService:GetPetOrder(player: Player): number?
 	return
 end
 
-function PetService:StartFollowing(player: Player, pet: Model): nil
+local function calculatePositions(numPets)
+    local positions = {}
+    local radius = BASE_RADIUS
+
+    if numPets == 1 then
+        positions[1] = Vector3.new(0, Y_OFFSET, radius)
+    elseif numPets == 2 then
+        positions[1] = Vector3.new(-radius, Y_OFFSET, 0)
+        positions[2] = Vector3.new(radius, Y_OFFSET, 0)
+    else
+        for i = 1, numPets do
+            local angle = (i - 1) * (2 * math.pi / numPets)
+            local x = radius * math.cos(angle)
+            local z = radius * math.sin(angle)
+            positions[i] = Vector3.new(x, Y_OFFSET, z)
+        end
+    end
+
+    return positions
+end
+
+function PetService:StartFollowing(player: Player, pet: Model, pet_index: number, numpets: number): nil
 	AssertPlayer(player)
 	task.defer(function()
 		local janitor = Janitor.new()
@@ -288,7 +304,7 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		janitor:Add(petAttachment)
 
 		local positionAligner = Instance.new("AlignPosition")
-		positionAligner.MaxForce = 100_000
+		positionAligner.MaxForce = 10_000_000
 		positionAligner.Attachment0 = petAttachment
 		positionAligner.Attachment1 = characterAttachment
 		positionAligner.Responsiveness = FOLLOW_SPEED
@@ -296,7 +312,7 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		janitor:Add(positionAligner)
 
 		local orientationAligner = Instance.new("AlignOrientation")
-		orientationAligner.MaxTorque = 700_000
+		orientationAligner.MaxTorque = 10_000_000
 		orientationAligner.Attachment0 = petAttachment
 		orientationAligner.Attachment1 = characterAttachment
 		orientationAligner.Responsiveness = FOLLOW_SPEED
@@ -306,7 +322,9 @@ function PetService:StartFollowing(player: Player, pet: Model): nil
 		local order = self:GetPetOrder(player)
 		pet:SetAttribute("Order", order)
 
-		local position = PET_POSITIONS:Index(order)
+		local PET_POSITIONS = calculatePositions(numpets)
+		local position = PET_POSITIONS[pet_index]
+
 		characterAttachment.Position = position
 		characterAttachment.Orientation = Vector3.new(0, -90, 0)
 		
@@ -347,7 +365,11 @@ function PetService:UpdateFollowingPets(player: Player, pets: { typeof(PetsTempl
 	local visible = self._data:GetSetting(player, "ShowOwnPets")
 	self:ToggleVisibility(player, visible)
 
+	local totalpets = #pets
+	local pet_index = 1
+
 	for _, pet in pets do
+		local pet_index_tosend = pet_index
 		task.defer(function(): nil
 			local petModelTemplate = ReplicatedStorage.Assets.Pets:FindFirstChild(pet.Name)
 			if not petModelTemplate then
@@ -356,8 +378,9 @@ function PetService:UpdateFollowingPets(player: Player, pets: { typeof(PetsTempl
 
 			local petModel = petModelTemplate:Clone()
 			petsJanitor:Add(petModel)
-			return self:StartFollowing(player, petModel)
+			return self:StartFollowing(player, petModel, pet_index_tosend, totalpets)
 		end)
+		pet_index += 1
 	end
 	return
 end
@@ -425,6 +448,7 @@ function PetService:Delete(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 		VerifyID(player, pet.ID)
 
 		local pets = self._data:GetValue(player, "Pets")
+		if pet.Locked then return end
 		local ownedPets = Array.new("table", pets.OwnedPets)
 		ownedPets:RemoveValue(pet)
 		local equippedPets = Array.new("table", pets.Equipped)
@@ -437,12 +461,48 @@ function PetService:Delete(player: Player, pet: typeof(PetsTemplate.Dog)): nil
 	return
 end
 
+function PetService:Lock(player, petID)
+	task.defer(function(): nil
+		AssertPlayer(player)
+		VerifyID(player, petID)
+		local pets = self._data:GetValue(player, "Pets")
+		local ownedPets = Array.new("table", pets.OwnedPets)
+		local pet = ownedPets:Find(function(pet)
+			return pet.ID == petID
+		end)
+		if not pet then return end
+		pet.Locked = not pet.Locked
+		self._data:SetValue(player, "Pets", pets)
+		return
+	end)
+	return
+end
+
+function PetService:IsLocked(player, petID)
+	AssertPlayer(player)
+	VerifyID(player, petID)
+	local pets = self._data:GetValue(player, "Pets")
+	local pet = Array.new("table", pets.OwnedPets)
+		:Find(function(pet)
+			return pet.ID == petID
+		end)
+	return pet.Locked
+end
+
 function PetService.Client:Equip(player, pet)
 	return self.Server:Equip(player, pet)
 end
 
 function PetService.Client:Unequip(player, pet)
 	return self.Server:Unequip(player, pet)
+end
+
+function PetService.Client:Lock(player, petID)
+	return self.Server:Lock(player, petID)
+end
+
+function PetService.Client:IsLocked(player, petID)
+	return self.Server:IsLocked(player, petID)
 end
 
 function PetService.Client:UnequipAll(player)

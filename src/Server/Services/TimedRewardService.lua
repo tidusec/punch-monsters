@@ -59,7 +59,7 @@ function TimedRewardService:Claim(player: Player, crateNumber: number): nil
     local rewardPool = TimedRewardTemplate[crateNumber]
     local key, value = randomPair(rewardPool)
     local chances = {
-      1,
+      1/500,
       1/250,
       1/100,
     }
@@ -92,9 +92,14 @@ end
 
 function TimedRewardService:GetElapsedTime(player: Player): number
   local currentTime = tick()
-  local firstJoinTime = self:_GetFirstJoinToday(player)
   local timePlayedToday = self._data:GetValue(player, "TimePlayedToday")
   local sessionTime = currentTime - SESSION_START_CACHE[player.UserId]
+
+  if sessionTime > 5 then
+    self._data:IncrementValue(player, "TimePlayedToday", sessionTime)
+    SESSION_START_CACHE[player.UserId] += sessionTime
+  end
+
   return math.round(timePlayedToday + sessionTime)
 end
 
@@ -143,21 +148,12 @@ end
 function TimedRewardService:_OnPlayerAdded(player: Player): nil
   local firstJoinToday = self:_GetFirstJoinToday(player)
   if not firstJoinToday then
-    self:_SetFirstJoinToday(player, tick())
-    self._data:SetValue(player, "TimePlayedToday", 0)
+    self:_CheckReset(player)
   end
   SESSION_START_CACHE[player.UserId] = tick()
 end
 
 function TimedRewardService:_OnPlayerRemoving(player: Player): nil
-  local sessionStartTime = SESSION_START_CACHE[player.UserId]
-  local sessionTime = tick() - sessionStartTime
-  local timePlayedToday = self._data:GetValue(player, "TimePlayedToday")
-  local timePlayedTotal = self._data:GetValue(player, "TimePlayedTotal")
-
-  self._data:SetValue(player, "TimePlayedToday", timePlayedToday + sessionTime)
-  self._data:SetValue(player, "TimePlayedTotal", timePlayedTotal + sessionTime)
-  
   SESSION_START_CACHE[player.UserId] = nil
 end
 

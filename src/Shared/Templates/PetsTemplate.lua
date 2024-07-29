@@ -232,30 +232,35 @@ local module = {
 		ID = nil,
 		Rarity = "Common",
 		StrengthMultiplier = 50,
+		Limited = true,
 	},
 
 	["Lamb"] = {
 		ID = nil,
 		Rarity = "Uncommon",
 		StrengthMultiplier = 80,
+		Limited = true,
 	},
 
 	["Yeti"] = {
 		ID = nil,
 		Rarity = "Epic",
 		StrengthMultiplier = 100,
+		Limited = true,
 	},
 
 	["Icy Hedgehog"] = {
 		ID = nil,
 		Rarity = "Legendary",
 		StrengthMultiplier = 150,
+		Limited = true,
 	},
 
 	["Huge Snowman"] = {
 		ID = nil,
 		Rarity = "Huge",
 		StrengthMultiplier = 12_000,
+		Limited = true,
 	},
 
 	-- Store Pets --
@@ -301,6 +306,7 @@ local module = {
 		ID = nil,
 		Rarity = "Huge",
 		StrengthMultiplier = 4000,
+		Limited = true,
 	},
 
 	["Mystic Void Phoenix"] = {
@@ -352,6 +358,7 @@ local meta = {
                 ID = nil,
                 Rarity = pet.Rarity,
                 StrengthMultiplier = pet.StrengthMultiplier * multiplier,
+				Locked = false,
             }
             self[key] = newPet
             return newPet

@@ -67,6 +67,26 @@ function RewardsScreen:Initialize(): nil
 		self:AddToJanitor(crateButton.MouseButton1Click:Connect(function()
 			if db:IsActive() then return end
 			if self:GetRemainingTime(crateButton) ~= 0 then return end
+			local icon = crateButton:FindFirstChild("Icon")
+			local shakeDuration = 0.5
+			local shakeIntensity = 5
+			
+			local originalPosition = icon.Position
+			
+			for i = 1, 10 do
+				local randomOffset = Vector2.new(
+					math.random(-shakeIntensity, shakeIntensity),
+					math.random(-shakeIntensity, shakeIntensity)
+				)
+				
+				icon.Position = originalPosition + UDim2.fromOffset(randomOffset.X, randomOffset.Y)
+				task.wait(shakeDuration / 10)
+			end
+			
+			icon.Position = originalPosition
+			
+			-- TODO: Add opening animation here
+			
 			self._timedRewards:Claim(crateButton.LayoutOrder)
 		end))
 	end
