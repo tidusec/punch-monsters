@@ -22,7 +22,7 @@ local FOLLOW_SPEED = 12
 local Y_OFFSET = 0
 local MAX_PETS = 10 -- Assuming the maximum number of pets a player can have
 local BASE_RADIUS = 10 -- The radius of the circle around the player
-local Y_OFFSET = -0.5 -- Height offset from the player
+local Y_OFFSET = 1 -- Height offset from the player
 
 local PetService = Knit.CreateService {
 	Name = "PetService";
@@ -347,6 +347,19 @@ function PetService:StartFollowing(player: Player, pet: Model, pet_index: number
 		if pet.PrimaryPart:IsDescendantOf(workspace) then
 			pet.PrimaryPart:SetNetworkOwner(player)
 		end
+
+		local BOBBING_AMPLITUDE = 0.8  -- Adjust this value to change the height of the bobbing
+		local BOBBING_FREQUENCY = 2    -- Adjust this value to change the speed of the bobbing
+
+		janitor:Add(game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
+			local time = os.clock()
+			local verticalOffset = math.sin(time * BOBBING_FREQUENCY) * BOBBING_AMPLITUDE
+			characterAttachment.Position = Vector3.new(
+				position.X,
+				position.Y + verticalOffset,
+				position.Z
+			)
+		end))
 	end)
 	return
 end

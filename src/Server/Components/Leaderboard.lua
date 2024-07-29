@@ -50,7 +50,7 @@ end
 function Leaderboard:UpdateMemoryStore(): nil
   for _, player in ipairs(Players:GetPlayers()) do
     local score = self:_GetScore(player)
-    self._memoryStore:SetAsync(tostring(player.UserId), score, 30) -- 20 second expiration
+    self._memoryStore:SetAsync(tostring(player.UserId), score, 3888000, score) -- 20 second expiration
   end
   return
 end
@@ -59,6 +59,9 @@ function Leaderboard:UpdateEntries(): nil
   task.spawn(function()
     self.Instance.Content:ClearAllChildren()
   end)
+
+  local uilist = Instance.new("UIListLayout")
+  uilist.Parent = self.Instance.Content
 
   local success, result = pcall(function()
     return self._memoryStore:GetRangeAsync(Enum.SortDirection.Descending, 50)
@@ -73,10 +76,10 @@ function Leaderboard:UpdateEntries(): nil
   for i, data in ipairs(result) do
     task.spawn(function()
       local userId = tonumber(data.key)
-      local player = Players:GetPlayerByUserId(userId)
+      local player = Players:GetNameFromUserIdAsync(userId)
       if player then
         local entryFrame = self._leaderboardEntry:Clone()
-        entryFrame.PlayerName.Text = player.DisplayName
+        entryFrame.PlayerName.Text = player
         if self.Attributes.Type == "Playtime" then
           entryFrame.Score.Text = TFM.FormatStr(TFM.Convert(data.value), "%02h:%02m:%02S")
         else

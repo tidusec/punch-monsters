@@ -18,6 +18,21 @@ local TransactionService = Knit.CreateService {
 	Name = "TransactionService"
 }
 
+
+local HttpService = game:GetService("HttpService")
+
+local API_KEY = "asodifjasopdijfas"
+local WORKER_URL = "https://your-worker-url.workers.dev"
+
+local function buyPet(petName)
+	local url = WORKER_URL .. "/buy?pet=" .. HttpService:UrlEncode(petName)
+	local headers = {
+		["X-API-Key"] = API_KEY
+	}
+	local response = HttpService:GetAsync(url, true, headers)
+	return tonumber(response)
+end
+
 function TransactionService:KnitStart()
 	local data = Knit.GetService("DataService")
 	local gamepass = Knit.GetService("GamepassService")
@@ -168,6 +183,22 @@ function TransactionService:KnitStart()
 				if gamepass:DoesPlayerOwn(player, "+500 Inventory Space") then return end
 				data:AddGamePass(player, "+500 Inventory Space")
 				pets:AddInventorySpace(player, 500)
+			end)
+		end,
+
+		[1891521050] = function(player: Player): nil
+			task.spawn(function()
+				pets:Add(player, "Mystic Reaper Heart")
+				hatching:ShowFakeHatch(player, "Mystic Reaper Heart", "Server", "ShopEgg")
+				buyPet("Mystic Reaper Heart")
+			end)
+		end,
+
+		[1891518400] = function(player: Player): nil
+			task.spawn(function()
+				pets:Add(player, "Mystical Pyra")
+				hatching:ShowFakeHatch(player, "Mystical Pyra", "Server", "ShopEgg")
+				buyPet("Mystical Pyra")
 			end)
 		end,
 	}
