@@ -133,6 +133,10 @@ function LoadScreen:Activate(): nil
     task.delay(1, function(): nil
         if not game:GetService("UserInputService").TouchEnabled then
             self.Instance.Skip.Visible = true
+        else
+            task.delay(5, function(): nil
+                return self._preloader.FinishedLoading:Fire()
+            end)
         end
         return
     end)

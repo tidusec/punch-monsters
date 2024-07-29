@@ -55,6 +55,8 @@ function Leaderboard:UpdateMemoryStore(): nil
   return
 end
 
+local useridtonamecache = {}
+
 function Leaderboard:UpdateEntries(): nil
   task.spawn(function()
     self.Instance.Content:ClearAllChildren()
@@ -76,7 +78,10 @@ function Leaderboard:UpdateEntries(): nil
   for i, data in ipairs(result) do
     task.spawn(function()
       local userId = tonumber(data.key)
-      local player = Players:GetNameFromUserIdAsync(userId)
+      if not useridtonamecache[userId] then
+        useridtonamecache[userId] = Players:GetNameFromUserIdAsync(userId)
+      end
+      local player = useridtonamecache[userId]
       if player then
         local entryFrame = self._leaderboardEntry:Clone()
         entryFrame.PlayerName.Text = player

@@ -110,15 +110,23 @@ local function UpdateLeaderstats(player: Player): nil
 		local bicepsStrength = data.BicepsStrength
 		local absStrength = data.AbsStrength
 
-		local arithmeticMean = (punchStrength + bicepsStrength + absStrength) / 3
+		local totalStrength = punchStrength + bicepsStrength + absStrength
 
-		local geometricMean = (punchStrength * bicepsStrength * absStrength) ^ (1/3)
+		if totalStrength > 10000000000 then
+    		local arithmeticMean = totalStrength / 3
 
-		local harmonicMean = 3 / ((1 / punchStrength) + (1 / bicepsStrength) + (1 / absStrength))
+    		local geometricMean = (punchStrength * bicepsStrength * absStrength) ^ (1/3)
 
-		--// make it a combination of all 3, making it so that the player has to train all 3 to get the best strength
-		data.leaderstats.Strength = (arithmeticMean + 3 * geometricMean + 2 * harmonicMean) / 6 * 3
-		data.leaderstats.Strength = math.floor(data.leaderstats.Strength * 100) / 100
+    		local harmonicMean = 3 / ((1 / punchStrength) + (1 / bicepsStrength) + (1 / absStrength))
+
+    		--// make it a combination of all 3, making it so that the player has to train all 3 to get the best strength
+    		local calculatedStrength = (arithmeticMean + 3 * geometricMean + 2 * harmonicMean) / 6 * 3
+    
+    		-- Ensure the result is always over 50k
+    		data.leaderstats.Strength = math.max(50000, math.floor(calculatedStrength * 100) / 100)
+		else
+    		data.leaderstats.Strength = totalStrength
+		end
 
 		(leaderstats :: any).Strength.Value = abbreviate(data.leaderstats.Strength);
 		(leaderstats :: any).Eggs.Value = abbreviate(data.leaderstats.Eggs);

@@ -50,6 +50,7 @@ function PunchingBag:Initialize(): nil
 	self._punchingbag = Knit.GetService("PunchingBagService")
 	self._animation = Knit.GetService("AnimationService")
 	self._sound = Knit.GetService("SoundService")
+	self._ui = Knit.GetController("UIController")
 	local scheduler = Knit.GetController("SchedulerController")
 	local destroyAutoTrainClicker
 
@@ -103,7 +104,6 @@ end
 
 function PunchingBag:Punch(): nil
 	if self.Attributes.PunchDebounce then return end
-	if self._dumbell:IsEquipped() then return end
 	
 	local isClosestBag = self:IsClosest()
 	if not isClosestBag then return end
@@ -111,8 +111,9 @@ function PunchingBag:Punch(): nil
 	local mapName = self.Instance.Parent.Parent.Name
 	local bagTemplate = PunchBagsTemplate[mapName][self.Instance.Name]
 	local punchStrength, strengthMultiplier = self._data:GetTotalStrength("Punch")
-	if punchStrength < bagTemplate.PunchRequirement then return end
-	
+	if punchStrength < bagTemplate.PunchRequirement then self._ui:ShowError("You don't have enough strength!") return end
+	if self._dumbell:IsEquipped() then self._ui:ShowError("Please unequip the dumbell!") return end
+
 	self.Attributes.PunchDebounce = true
 	task.spawn(function(): nil
 		local punchAnim = if self._jab1 then "Jab" else "Jab2"

@@ -245,8 +245,8 @@ end
 
 function EnemyFighting:UpdateBars(): nil
 	task.spawn(function()
-		local PlayerHPSize = math.clamp((self :: any)._playerHealth / self._playerMaxHealth, 0, 1)
-		local EnemyHPSize = math.clamp((self :: any)._enemyHealth / self._enemyMaxHealth, 0, 1)
+		local PlayerHPSize = math.clamp((self :: any)._playerHealth / (self._playerMaxHealth or 100), 0, 1)
+		local EnemyHPSize = math.clamp((self :: any)._enemyHealth / (self._enemyMaxHealth or 100), 0, 1)
 		
 		self._fightUi.Me.HP.Bar:TweenSize(
 			UDim2.fromScale(PlayerHPSize, 1),

@@ -14,7 +14,7 @@ local module = {
 	
 	['Map1'] = {
 		['Egg1'] = {
-			['WinsCost'] = 15,
+			['WinsCost'] = 5,
 			['Chances'] = ChancesTemplate.Map1.Egg1
 		},
 		['Egg2'] = {

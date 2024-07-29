@@ -5,22 +5,22 @@ local module = {
 	
 	Nerd = {
 		Wins = 5,
-		Strength = 500,
+		Strength = 25,
 		Boss = false
 	},
 	Businessman = {
 		Wins = 25,
-		Strength = 4_500,
+		Strength = 1000,
 		Boss = false
 	},
 	Bodybuilder = {
 		Wins = 80,
-		Strength = 30_000,
+		Strength = 20_000,
 		Boss = false
 	},
 	Hitman = {
 		Wins = 200,
-		Strength = 160_000,
+		Strength = 120_000,
 		Boss = false
 	},
 	Powerlifter = {

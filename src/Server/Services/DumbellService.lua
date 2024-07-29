@@ -82,7 +82,7 @@ function DumbellService:Lift(player: Player): nil
 		return self._gamepass:PromptPurchase(player, "VIP")
 	end
 	
-	self._data:IncrementValue(player, "BicepsStrength", dumbellInfo.EquippedDumbellTemplate.Gain * strengthMultiplier)
+	self._data:IncrementValue(player, "BicepsStrength", dumbellInfo.EquippedDumbellTemplate.Gain * 6 * strengthMultiplier)
 	return
 end
 

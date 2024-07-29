@@ -66,6 +66,8 @@ function HatchingStand:Initialize(): nil
         if eggname ~= self.Instance.Name or map ~= self._map then return end
         self:HatchAnimation(pets)
     end))
+
+
     
     self:AddPetCards()
     self._chancesUI.Enabled = true
@@ -491,6 +493,12 @@ function HatchingStand:AddPetCards(): nil
     self._chancesUI.Background.Auto.MouseButton1Click:Connect(function()
         self:Auto()
     end)
+    if self._eggTemplate.WinsCost then
+        self._chancesUI.Background.Price.Text = self._eggTemplate.WinsCost
+    else
+        self._chancesUI.Background.Price.Visible = false
+        self._chancesUI.Background.PriceImage.Visible = false
+    end
     self._chancesUI.Adornee = self._egg.PrimaryPart
     self._chancesUI.Parent = player.PlayerGui
     self._chancesUI.Enabled = true
