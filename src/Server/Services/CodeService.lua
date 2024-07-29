@@ -17,7 +17,6 @@ local CodeService = Knit.CreateService {
 
 function CodeService:KnitStart(): nil
     self._data = Knit.GetService("DataService")
-	self._codes = require(Templates:WaitForChild("CodeTemplate"))
 	return
 end
 
@@ -36,26 +35,33 @@ function CodeService:KnitInit(): nil
 	return
 end
 
+local codes = require(Templates:WaitForChild("CodeTemplate"))
+
 function CodeService:Redeem(player: Player, code: string): string
-	if not self.codes[code] then 
-		return "Invalid code provided!"
-	end
-	local reward = self.codes[code]
+    code = code:lower()
+    if not codes then
+        return "An error occurred. Please try again later."
+    end
 
-	local redeemedCodes = Array.new("string", self._data:GetValue("RedeemedCodes"))
-	if redeemedCodes:Has(code) then
-		return "You've already redeemed this code!"
-	end
+    if not codes[code] then 
+        return "Invalid code provided!"
+    end
+    local reward = codes[code]
 
-	for key, value in reward do
-		task.spawn(function()
-			self._data:IncrementValue(player, key, value)
-		end)
-	end
-	
-	redeemedCodes:Push(code)
-	self._data:SetValue(player, "RedeemedCodes", redeemedCodes:ToTable())
-	return "Successfully redeemed code!"
+    local redeemedCodes = Array.new("string", self._data:GetValue(player, "RedeemedCodes"))
+    if redeemedCodes:Has(code) then
+        return "You've already redeemed this code!"
+    end
+
+    for key, value in pairs(reward) do
+        task.spawn(function()
+            self._data:IncrementValue(player, key, value)
+        end)
+    end
+    
+    redeemedCodes:Push(code)
+    self._data:SetValue(player, "RedeemedCodes", redeemedCodes:ToTable())
+    return "Successfully redeemed code!"
 end
 
 function CodeService.Client:Redeem(player: Player, code: string): number

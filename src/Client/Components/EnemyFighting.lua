@@ -103,6 +103,7 @@ function EnemyFighting:Initialize(): nil
 	self._proximityPrompt = Instance.new("ProximityPrompt")
 	self._proximityPrompt.HoldDuration = 1
 	self._proximityPrompt.ObjectText = "Fight"
+	self._proximityPrompt.RequiresLineOfSight = false
 	self._proximityPrompt.Parent = self._proxyPart
 	
 	self._fighting = false
@@ -151,7 +152,6 @@ function EnemyFighting:Enter(): nil
 	if self._dumbell:IsEquipped() then 
 		self._dumbell:Unequip()
 	end
-	if self.Attributes.InUse then return end
 
 	self._playerMaxHealth, self._enemyMaxHealth = self._enemyfighting:Enter(self.Instance)
 	
@@ -233,7 +233,6 @@ function EnemyFighting:Exit(forced: boolean): nil
 	self:Toggle(false)
 	self:Reset()
 	self._fighting = false
-	if not self.Attributes.InUse then return end
 
 	task.spawn(function()
 		if forced then
@@ -267,7 +266,6 @@ end
 
 function EnemyFighting:Attack(): nil
 	if not self._fighting then return end
-	if not self.Attributes.InUse then return end
 	if self.Attributes.PunchDebounce then return end
 	self.Attributes.PunchDebounce = true
 	task.delay(COOLDOWN, function()

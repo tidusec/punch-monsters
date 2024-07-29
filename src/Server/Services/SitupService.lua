@@ -88,7 +88,6 @@ function SitupService:Enter(player: Player, mapName: string, bench: Instance): n
 	if SitupInfo.EquippedSitupTemplate == Situp then return end
 	if SitupInfo.Equipped then return end
 
-	self._remoteDispatcher:SetAttribute(player, bench, "InUse", true)
 	self._remoteDispatcher:SetShiftLockOption(player, false)
 
 	local bicepsStrength = self._data:GetTotalStrength(player, "Abs")
@@ -107,9 +106,6 @@ function SitupService:Exit(player: Player): nil
 
 	local SitupInfo = self._playerSitupInfo[player.UserId]
 	if not SitupInfo.Equipped then return end
-	if SitupInfo.bench then
-		self._remoteDispatcher:SetAttribute(player, self._playerSitupInfo[player.UserId].bench, "InUse", false)
-	end
 	SitupInfo.Equipped = false
 	SitupInfo.EquippedSitupTemplate = nil
 	self._playerSitupInfo[player.UserId] = SitupInfo

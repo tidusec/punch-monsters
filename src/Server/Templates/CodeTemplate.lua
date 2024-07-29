@@ -2,7 +2,7 @@
 --!strict
 local module = {
 	release = {
-		Wins = 115
+		Wins = 500
 	},
 	early = {
 		Wins = 500
@@ -10,15 +10,6 @@ local module = {
 	test = {
 		Wins = 1000
 	},
-	summer = {
-		--TODO: 30M 2X WIN BOOST
-	},
-	secretpet = {
-		--TODO 15M 100X LUCK BOOST
-	},
-	luckboost = {
-		--TODO 30M 10X LUCK BOOST
-	}
 }
 
 return module

@@ -103,7 +103,6 @@ end
 
 function SitupBench:Enter(): nil
 	if self._dumbell:IsEquipped() then return end
-	if self.Attributes.InUse then return end
 	
 	task.spawn(function()
 		self._situp:Enter(self.Instance.Parent.Parent.Name, self.Instance)
@@ -130,7 +129,6 @@ function SitupBench:Exit(): nil
 end
 
 function SitupBench:Situp(): nil
-	if not self.Attributes.InUse then return end
 	if self.Attributes.SitupDebounce then return end
 	if not self.DoingSitups then return end
 

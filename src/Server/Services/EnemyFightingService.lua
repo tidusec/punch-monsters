@@ -50,7 +50,6 @@ function EnemyFightingService:KnitStart(): nil
 end
 
 function EnemyFightingService:Toggle(player, thing, on): nil
-	self._remoteDispatcher:SetAttribute(player, thing, "InUse", on)
 	self._remoteDispatcher:SetShiftLockOption(player, not on)
 	return
 end
@@ -70,7 +69,6 @@ function EnemyFightingService:Enter(player: Player, bossmodel: Model): string
 	self.memory[player.UserId].bossdamage = self._enemies[boss].Strength / self._healthToDamageRatio
 	self.memory[player.UserId].winner = false
 	self.memory[player.UserId].exited = false
-	self:Toggle(player, bossmodel, true)
 
 	return self.memory[player.UserId].health, self.memory[player.UserId].bosshealth
 end
