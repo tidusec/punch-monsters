@@ -8,27 +8,27 @@ local module = {
 		
 		PunchBag1 = {
 			PunchRequirement = 0,
-			Hit = 1 * 1.4,
+			Hit = 1 * 1.4 * 5,
 		},
 		PunchBag2 = {
 			PunchRequirement = 500,
-			Hit = 2 * 1.4,
+			Hit = 2 * 1.4 * 5,
 		},
 		PunchBag3 = {
 			PunchRequirement = 4000,
-			Hit = 3 * 1.4,
+			Hit = 3 * 1.4 * 5,
 		},
 		PunchBag4 = {
 			PunchRequirement = 22000,
-			Hit = 4 * 1.4,
+			Hit = 4 * 1.4 * 5,
 		},
 		PunchBag5 = {
 			PunchRequirement = 100000,
-			Hit = 5 * 1.4,
+			Hit = 5 * 1.4 * 5,
 		},
 		PunchBag6VIP = {
 			PunchRequirement = 0,
-			Hit = 10 * 1.4,
+			Hit = 10 * 1.4 * 5,
 
 			Vip = true,
 		}

@@ -123,8 +123,7 @@ function PetService:Add(player: Player, petName: string): nil
 		local ownedPets = pets.OwnedPets
 		table.insert(ownedPets, pet)
 
-		pets.OwnedPets = ownedPets
-		self._data:SetValue(player, "Pets", pets)
+		self:AutoDelete(player, pets)
 		return
 	end)
 	return
@@ -500,6 +499,35 @@ function PetService:IsLocked(player, petID)
 			return pet.ID == petID
 		end)
 	return pet.Locked
+end
+
+function PetService:AutoDelete(player, pets)
+	AssertPlayer(player)
+	pets = pets or self._data:GetValue(player, "Pets")
+	local autodelete = self._data:GetValue(player, "AutoDelete")
+
+	local ownedPets = Array.new("table", pets.OwnedPets)
+	local equippedPets = Array.new("table", pets.Equipped)
+
+	ownedPets:Filter(function(pet)
+		return not pet.Locked
+	end)
+
+	ownedPets:Filter(function(pet)
+		return autodelete[pet.Rarity]
+	end)
+
+	equippedPets:Filter(function(pet)
+		return not pet.Locked
+	end)
+	equippedPets:Filter(function(pet)
+		return autodelete[pet.Rarity]
+	end)
+
+	pets.Equipped = equippedPets:ToTable()
+	pets.OwnedPets = ownedPets:ToTable()
+	self._data:SetValue(player, "Pets", pets)
+	return pets
 end
 
 function PetService.Client:Equip(player, pet)

@@ -329,6 +329,12 @@ local module = {
 		Rarity = "Huge",
 		StrengthMultiplier = 350,
 	},
+
+	["Mystic Ice Demon"] = {
+		ID = nil,
+		Rarity = "Huge",
+		StrengthMultiplier = 10,
+	},
 }
 
 local meta = {

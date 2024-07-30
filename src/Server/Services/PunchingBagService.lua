@@ -57,7 +57,7 @@ function PunchingBagService:Hit(player: Player, map: string, name: string): nil
 end
 
 function PunchingBagService:GiveStuff(player: Player, punchbagInfo): nil
-    local amount = punchbagInfo.Hit * 7
+    local amount = punchbagInfo.Hit
     local punchStrength, strengthMultiplier = self._data:GetTotalStrength(player, "Punch")
     if punchStrength < punchbagInfo.PunchRequirement then return end
             

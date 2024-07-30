@@ -4,27 +4,27 @@ local module = {
 	Map1 = {
 		SitupBench1 = {
 			AbsRequirement = 0,
-			Hit = 1 * 1.4 * 1.2,
+			Hit = 1 * 1.4 * 1.2 * 5,
 		},
 		SitupBench2 = {
 			AbsRequirement = 500,
-			Hit = 2 * 1.4 * 1.2,
+			Hit = 2 * 1.4 * 1.2 * 5,
 		},
 		SitupBench3 = {
 			AbsRequirement = 4000,
-			Hit = 4 * 1.4 * 1.2,
+			Hit = 4 * 1.4 * 1.2 * 5,
 		},
 		SitupBench4 = {
 			AbsRequirement = 22000,
-			Hit = 6 * 1.4 * 1.2,
+			Hit = 6 * 1.4 * 1.2 * 5,
 		},
 		SitupBench5 = {
 			AbsRequirement = 100000,
-			Hit = 8 * 1.4 * 1.2,
+			Hit = 8 * 1.4 * 1.2 * 5,
 		},
 		SitupBench6VIP = {
 			AbsRequirement = 0,
-			Hit = 15 * 1.4 * 1.2,
+			Hit = 15 * 1.4 * 1.2 * 5,
 
 			Vip = true,
 		}

@@ -41,7 +41,7 @@ function Leaderboard:StartUpdateLoop(): nil
     while true do
       self:UpdateMemoryStore()
       self:UpdateEntries()
-      task.wait(15)
+      task.wait(30)
     end
   end)
   return

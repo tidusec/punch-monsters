@@ -50,7 +50,7 @@ function InventoryScreen:Initialize(): nil
 	self._petStats = background.Stats
 	self._petStats.Visible = false
 	self.petsInventory = nil
-	self._sorting = "None"
+	self._sorting = "Strength"
 	
 	self._updateJanitor = Janitor.new()
 	self:AddToJanitor(self._data.DataUpdated:Connect(function(key, value)
@@ -65,6 +65,36 @@ function InventoryScreen:Initialize(): nil
 
 	self:AddToJanitor(self._background.UnequipAll.MouseButton1Click:Connect(function()
 		self._pets:UnequipAll()
+	end))
+	
+	self:AddToJanitor(self._background.AutoDelete.MouseButton1Click:Connect(function()
+		self.Instance.AutoDelete.Visible = true
+
+		self:AddToJanitor(self.Instance.AutoDelete.Close.MouseButton1Click:Connect(function()
+			self.Instance.AutoDelete.Visible = false
+		end))
+
+		local autodeletesettings = self._data:GetAutoDelete()
+		warn(autodeletesettings)
+
+		for _, frame in ipairs(self.Instance.AutoDelete:GetChildren()) do
+			if autodeletesettings[frame.Name] ~= nil then
+				local textbutton = frame:FindFirstChild("TextButton")
+				textbutton.Text = autodeletesettings[frame.Name] and "" or "✅"
+
+				self:AddToJanitor(textbutton.MouseButton1Click:Connect(function()
+					autodeletesettings[frame.Name] = not autodeletesettings[frame.Name]
+					textbutton.Text = autodeletesettings[frame.Name] and "" or "✅"
+				end))
+
+			end
+		end
+
+		self:AddToJanitor(self.Instance.AutoDelete.Save.MouseButton1Click:Connect(function()
+			self._data:SetAutoDelete(autodeletesettings)
+			self.Instance.AutoDelete.Visible = false
+		end))
+
 	end))
 
 	self:AddToJanitor(self._background.Sort.MouseButton1Click:Connect(function()

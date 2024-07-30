@@ -109,7 +109,7 @@ function SitupBench:Enter(): nil
 	end)
 
 	local absStrength = self._data:GetTotalStrength("Abs")
-	if absStrength < self._absRequirement then return end
+	if absStrength < self._absRequirement then self._ui:ShowError("You don't have enough strength!") return end
 	
 	self:Toggle(true)
 	self.DoingSitups = true

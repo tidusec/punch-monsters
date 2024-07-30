@@ -136,6 +136,18 @@ function HatchingService:ShowFakeHatch(player, petName, map, egg)
 	self.Client.PetHatched:Fire(player, petName, map, egg)
 end
 
+function HatchingService:GetFreePetGift(player: Player): nil
+	AssertPlayer(player)
+	local data = self._data:GetValue(player, "Tutorial")
+
+	if data == false then
+		self._data:SetValue(player, "Tutorial", true)
+		self._pets:Add(player, "Mystic Ice Demon")
+		self:ShowFakeHatch(player, "Mystic Ice Demon", "Server", "Server2")
+	end
+end
+
+
 function HatchingService:ReturnPet(player, egg): string
   	local has2xLuck = self._gamepass:DoesPlayerOwn(player, "2x Luck")
 	local has10xLuck = self._gamepass:DoesPlayerOwn(player, "10x Luck")
@@ -191,6 +203,10 @@ end
 
 function HatchingService.Client:HatchMany(player: Player, map: string, name: string, amount: number): nil
   	return self.Server:HatchMany(player, map, name, amount)
+end
+
+function HatchingService.Client:GetFreePetGift(player)
+	return self.Server:GetFreePetGift(player)
 end
 
 return HatchingService

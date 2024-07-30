@@ -29,6 +29,7 @@ local DataService = Knit.CreateService {
 	DataUpdated = Instance.new("BindableEvent");
 	Client = {
 		DataUpdated = Knit.CreateSignal(),
+		TutorialTime = Knit.CreateSignal(),
 	};
 }
 
@@ -206,6 +207,11 @@ function DataService:InitializeClientUpdate(player: Player): nil
 		self:DataUpdate(player, "FirstJoinToday", profile.Data.FirstJoinToday)
 		self:DataUpdate(player, "AutoTrain", profile.Data.AutoTrain)
 		self:DataUpdate(player, "AutoFight", profile.Data.AutoFight)
+
+		if not profile.Data.Tutorial then
+			self.Client.TutorialTime:Fire(player)
+		end
+
 		return
 	end)
 	return
@@ -262,6 +268,10 @@ function DataService:SetValue<T>(player: Player, name: string, value: T): Promis
 
 		if name == "Pets" then
 			if PetDuplicatesWereFound() then warn("Pet Duplicates") return end
+		end
+
+		if name == "AutoDelete" then
+			self._pets:AutoDelete(player)
 		end
 
 		task.spawn(function(): nil
@@ -423,6 +433,14 @@ end
 
 function DataService.Client:DispatchUpdate(player: Player): nil
 	return self.Server:InitializeClientUpdate(player)
+end
+
+function DataService.Client:GetAutoDelete(player: Player): boolean
+	return self.Server:GetValue(player, "AutoDelete")
+end
+
+function DataService.Client:SetAutoDelete(player: Player, value: boolean): nil
+	return self.Server:SetValue(player, "AutoDelete", value)
 end
 
 return DataService

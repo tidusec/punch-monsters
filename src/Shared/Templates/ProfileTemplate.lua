@@ -51,6 +51,22 @@ local PROFILE_TEMPLATE = {
 
 	Map = 0,
 	TotalPlaytime = 0,
+
+	Tutorial = false,
+
+	AutoDelete = {
+		Common = false,
+		Uncommon = false,
+		Rare = false,
+		Epic = false,
+		Legendary = false,
+		Huge = false,
+	},
+
+	Titles = {
+		Current = "",
+		Owned = {}
+	},
 }
 
 return PROFILE_TEMPLATE

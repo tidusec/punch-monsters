@@ -71,7 +71,7 @@ function SitupService:Situp(player: Player): nil
 	if SitupInfo.EquippedSitupTemplate.IsVIP and not hasVIP then
 		self._gamepass:PromptPurchase(player, "VIP")
 	else
-		self._data:IncrementValue(player, "AbsStrength", SitupInfo.EquippedSitupTemplate.Hit * 9 * strengthMultiplier)
+		self._data:IncrementValue(player, "AbsStrength", SitupInfo.EquippedSitupTemplate.Hit * strengthMultiplier)
 	end
 	return
 end

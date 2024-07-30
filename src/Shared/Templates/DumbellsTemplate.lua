@@ -2,63 +2,63 @@ local module = {
 	Map1 = {
 		{
       Required = 0,
-      Gain = 1,
+      Gain = 1 * 5,
       IsVIP = false
     }, {
       Required = 150,
-      Gain = 2,
+      Gain = 2 * 5,
       IsVIP = false
     }, {
       Required = 350,
-      Gain = 4,
+      Gain = 4 * 5,
       IsVIP = false
     }, {
       Required = 550,
-      Gain = 6,
+      Gain = 6 * 5,
       IsVIP = false
     }, {
       Required = 800,
-      Gain = 8,
+      Gain = 8 * 5,
       IsVIP = false
     }, {
       Required = 1200,
-      Gain = 10,
+      Gain = 10 * 5,
       IsVIP = false
     }, {
       Required = 2000,
-      Gain = 18 * 0.65 * 0.9,
+      Gain = 18 * 0.65 * 0.9 * 5,
       IsVIP = false
     }, {
       Required = 3500,
-      Gain = 23 * 0.65 * 0.75,
+      Gain = 23 * 0.65 * 0.75 * 5,
       IsVIP = false
     }, {
       Required = 7500,
-      Gain = 25 * 0.65 * 0.75,
+      Gain = 25 * 0.65 * 0.75 * 5,
       IsVIP = false
     }, {
       Required = 15_000,
-      Gain = 30 * 0.65 * 0.75,
+      Gain = 30 * 0.65 * 0.75 * 5,
       IsVIP = false
     }, {
       Required = 25_000,
-      Gain = 35 * 0.65 * 0.75,
+      Gain = 35 * 0.65 * 0.75 * 5,
       IsVIP = false
     }, {
       Required = 45_000,
-      Gain = 50 * 0.65 * 0.75,
+      Gain = 50 * 0.65 * 0.75 * 5,
       IsVIP = false
     }, {
       Required = 75_000,
-      Gain = 70 * 0.65 * 0.75,
+      Gain = 50 * 0.65 * 0.75 * 5,
       IsVIP = false
     }, {
       Required = 110_000,
-      Gain = 90 * 0.65 * 0.75,
+      Gain = 90 * 0.65 * 0.75 * 5,
       IsVIP = false
     }, { -- VIP
       Required = 0,
-      Gain = 100 * 0.65 * 0.75,
+      Gain = 100 * 0.65 * 0.75 * 5,
       IsVIP = true
     }
 	},
