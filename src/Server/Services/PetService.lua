@@ -514,14 +514,14 @@ function PetService:AutoDelete(player, pets)
 	end)
 
 	ownedPets:Filter(function(pet)
-		return autodelete[pet.Rarity]
+		return not autodelete[pet.Rarity]
 	end)
 
 	equippedPets:Filter(function(pet)
 		return not pet.Locked
 	end)
 	equippedPets:Filter(function(pet)
-		return autodelete[pet.Rarity]
+		return not autodelete[pet.Rarity]
 	end)
 
 	pets.Equipped = equippedPets:ToTable()

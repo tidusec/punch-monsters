@@ -63,8 +63,11 @@ local function GetProfile(player: Player): Promise
 
 		repeat
 			profile = PROFILE_CACHE[player]
-			task.wait()
-		until profile ~= nil and profile.Loaded
+			task.wait(0.05)
+		until (profile ~= nil and profile.Loaded)
+		if not profile or not profile.Loaded then
+			player:Kick("There was a data error, sorry.")
+		end
 		return resolve(profile)
 	end)
 end
@@ -263,11 +266,11 @@ function DataService:SetValue<T>(player: Player, name: string, value: T): Promis
 	AssertPlayer(player)
 	return Promise.new(function(resolve, reject): nil
 		local success, profile = GetProfile(player):await()
-		if not success then return error(profile) end
-		if not profile then return end
+		if not success then return reject("not success") end
+		if not profile then return reject("no profile") end
 
 		if name == "Pets" then
-			if PetDuplicatesWereFound() then warn("Pet Duplicates") return end
+			if PetDuplicatesWereFound() then warn("Pet Duplicates") return reject("pet duplicates") end
 		end
 
 		if name == "AutoDelete" then
@@ -291,7 +294,7 @@ function DataService:SetValue<T>(player: Player, name: string, value: T): Promis
 		
 		if type(value) == "number" then
 			local old = self:GetValue(player, name)
-			if old == value then return end
+			if old == value then return resolve() end
 			if value < old then
 				self._ga:RegisterCurrencySpent(player.UserId, name, old - value)
 			else

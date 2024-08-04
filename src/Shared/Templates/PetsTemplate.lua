@@ -91,7 +91,7 @@ local module = {
 	},
 	["Huge Dragon"] = {
 		ID = nil,
-		Rarity = "Legendary Huge",
+		Rarity = "Huge",
 		StrengthMultiplier = 450,
 	},
 	
@@ -157,7 +157,7 @@ local module = {
 	},
 	["Hydra"] = {
 		ID = nil,
-		Rarity = "Legendary Huge",
+		Rarity = "Huge",
 		StrengthMultiplier = 4575,
 	},
 	
@@ -223,7 +223,7 @@ local module = {
 	},	
 	["Flaming Hydra"] = {
 		ID = nil,
-		Rarity = "Legendary Huge",
+		Rarity = "Huge",
 		StrengthMultiplier = 12000,
 	},	
 

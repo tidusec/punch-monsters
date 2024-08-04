@@ -67,6 +67,7 @@ local PROFILE_TEMPLATE = {
 		Current = "",
 		Owned = {}
 	},
+	Streak = 0,
 }
 
 return PROFILE_TEMPLATE

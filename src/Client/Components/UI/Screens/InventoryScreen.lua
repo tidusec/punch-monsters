@@ -80,11 +80,11 @@ function InventoryScreen:Initialize(): nil
 		for _, frame in ipairs(self.Instance.AutoDelete:GetChildren()) do
 			if autodeletesettings[frame.Name] ~= nil then
 				local textbutton = frame:FindFirstChild("TextButton")
-				textbutton.Text = autodeletesettings[frame.Name] and "" or "✅"
+				textbutton.Text = autodeletesettings[frame.Name] and "✅" or ""
 
 				self:AddToJanitor(textbutton.MouseButton1Click:Connect(function()
 					autodeletesettings[frame.Name] = not autodeletesettings[frame.Name]
-					textbutton.Text = autodeletesettings[frame.Name] and "" or "✅"
+					textbutton.Text = autodeletesettings[frame.Name] and "✅" or ""
 				end))
 
 			end

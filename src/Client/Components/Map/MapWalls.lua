@@ -21,6 +21,8 @@ local MapWalls: Component.Def = {
 
 function MapWalls:GetClosestPoint(playerPos: Vector3): Vector3
     local wall = self.Instance
+    if not wall.CFrame then return end
+    
     local relPoint = wall.CFrame:PointToObjectSpace(playerPos)
     local clampedPos = Vector3.new(
         math.clamp(relPoint.X, -wall.Size.X / 2, wall.Size.X / 2),
@@ -57,6 +59,9 @@ function MapWalls:HandleSmoothTransparency(time: number, humanoidRootPart: BaseP
 end
 
 function MapWalls:Initialize(): nil
+    if game:GetService("UserInputService").TouchEnabled then
+        return
+    end
     local player = Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")

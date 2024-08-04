@@ -156,7 +156,16 @@ function EnemyFightingService:Exit(player: Player, thing: Instance, winner: bool
 		end
 		return winner
 	else
-		warn("Player tried to exit a boss fight they weren't in")
+		winner = winner or false
+		if winner then
+			self:AddWin(player)
+			winner = self._randomItem:GiveItem(player, thing.Name)
+		end
+		self:ClearData(player, winner)
+		if thing then
+			self:Toggle(player, thing, false)
+		end
+		return winner
 	end
 	return
 end

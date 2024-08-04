@@ -119,7 +119,7 @@ function QuestService:_GetGoalProgress(player: Player, goalName: string): number
   if not progress then return 0 end
   if progress["Done"] then return 1 end
   if progress["Completed"] then return 1 end
-  return math.min(progress[goalName] / QUEST_GOALS[goalName], 1)
+  return math.min((progress[goalName] or 0) / QUEST_GOALS[goalName], 1)
 end
 
 function QuestService:GetGoalsThisWeek(): (string, string)
